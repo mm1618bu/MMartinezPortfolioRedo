@@ -3,7 +3,7 @@ Jobs to do:
 React
     Gradebook +
     Doordash
-    Secret Santa
+    Secret Santa +
     Password Generator
 
 Angular
