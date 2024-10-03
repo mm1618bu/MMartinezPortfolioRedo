@@ -1,0 +1,26 @@
+Jobs to do:
+
+React
+    Gradebook
+    Doordash
+    Secret Santa
+    Password Generator
+
+Angular
+    Paycheck Calculator
+    Twitter
+
+PHP
+    Discussion Board
+    Job portal
+
+Java
+    Twitter
+    Point of Sale System
+
+Ruby
+
+
+Django
+
+Flask

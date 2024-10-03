@@ -1,0 +1,129 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  text-align: center;
+  padding: 20px; /* Reduced padding for smaller screens */
+  background-color: #f0f4f8;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.add-student-form > button, 
+.add-student-form > input {
+  margin: 10px;
+  padding: 8px; /* Increased padding for easier tap targets */
+  font-size: 16px; /* Consistent font size */
+}
+
+.gradebook-table {
+  width: 100%; /* Full width for small screens */
+  margin: 20px auto; /* Reduced margin for smaller screens */
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.gradebook-table th, 
+.gradebook-table td {
+  padding: 10px; /* Reduced padding for smaller screens */
+  border: 1px solid #e0e0e0;
+  text-align: center;
+  font-size: 14px; /* Reduced font size for smaller screens */
+}
+
+.gradebook-table th {
+  background-color: #2b6cb0;
+  color: #fff;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gradebook-table td {
+  background-color: #fafafa;
+  white-space: nowrap;
+  padding: 8px; /* Reduced padding for smaller screens */
+  text-align: center;
+}
+
+.gradebook-table tbody tr:hover {
+  background-color: #f1f5f9; /* Add a hover effect for table rows */
+}
+
+.gradebook-table tbody tr td:first-child {
+  text-align: left;
+  font-weight: bold;
+  color: #333;
+}
+
+.gradebook-table td input {
+  width: 80px;
+  padding: 8px;
+  margin: 5px 0;
+  border: none;
+  background-color: transparent;
+  border-radius: 4px;
+  font-size: 14px; /* Reduced font size for smaller screens */
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.gradebook-table td input:focus {
+  border-color: #2b6cb0;
+  outline: none;
+}
+
+.summary-row {
+  background-color: #e2e8f0;
+  font-weight: bold;
+}
+
+.summary-row td {
+  border-top: 2px solid #2b6cb0;
+  padding: 10px;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .App {
+    padding: 15px;
+  }
+
+  .gradebook-table th, 
+  .gradebook-table td {
+    font-size: 12px; /* Further reduce font size for smaller screens */
+    padding: 8px; /* Adjust padding */
+  }
+
+  .gradebook-table td input {
+    width: 60px; /* Reduce input width for smaller screens */
+    font-size: 12px; /* Adjust input font size */
+  }
+}
+
+@media (max-width: 480px) {
+  .App {
+    padding: 10px; /* Further reduce padding */
+  }
+
+  .gradebook-table th, 
+  .gradebook-table td {
+    font-size: 10px; /* Further reduce font size */
+    padding: 5px; /* Reduce padding */
+  }
+
+  .gradebook-table td input {
+    width: 50px; /* Further reduce input width */
+    font-size: 10px; /* Adjust input font size */
+  }
+
+  .add-student-form > button, 
+  .add-student-form > input {
+    padding: 6px; /* Reduce padding for buttons and inputs */
+    font-size: 14px; /* Adjust font size */
+  }
+}
