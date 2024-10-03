@@ -1,0 +1,76 @@
+body {
+  background-color: #f0f8ff; /* Light background */
+  font-family: Arial, sans-serif;
+  color: #333; /* Dark text for readability */
+  margin: 0; /* Remove default body margin */
+  height: 100vh; /* Full viewport height */
+  display: flex; /* Use flexbox to center content */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+}
+
+.App {
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: white; /* White background for the card effect */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+  width: 90%; /* Take up 90% of the viewport width */
+  max-width: 600px; /* Maximum width for larger screens */
+}
+
+h1 {
+  color: #d50000; /* Christmas red */
+}
+
+h2 {
+  color: #007a33; /* Christmas green */
+}
+
+input {
+  padding: 10px;
+  margin: 10px;
+  border: 2px solid #007a33; /* Green border */
+  border-radius: 5px;
+  font-size: 16px;
+  width: fit-content; /* Full width for input */
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  background-color: #d50000; /* Christmas red */
+  color: white; /* White text */
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #c20000; /* Darker red on hover */
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 5px;
+  border-bottom: 1px solid #ccc; /* Light grey for separation */
+}
+
+div {
+  margin-top: 20px;
+}
+
+button {
+  padding: 5px;
+  margin-left: 10px;
+  border: none; /* No border for icon buttons */
+  cursor: pointer;
+}
+
+
