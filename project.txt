@@ -4,7 +4,8 @@ React
     Gradebook +
     Doordash
     Secret Santa +
-    Password Generator
+    Password Generator+
+    ShiftSchedule
 
 Angular
     Paycheck Calculator
