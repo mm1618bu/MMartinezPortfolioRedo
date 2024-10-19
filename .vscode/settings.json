@@ -1,0 +1,27 @@
+{
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./PythonProjects",
+        "-p",
+        "*test.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "AMZL",
+            "database": "amzl",
+            "username": "sample",
+            "password": ""
+        }
+    ]
+}
