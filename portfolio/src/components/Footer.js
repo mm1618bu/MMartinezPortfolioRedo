@@ -5,7 +5,7 @@ export default function footer() {
   return (
     <footer className="footer">
       <div className="footer-text">
-        <h3>© 2024  by Mitchell Martinez</h3>
+        <h4>© 2024  by Mitchell Martinez</h4>
       </div>
     </footer>
   );

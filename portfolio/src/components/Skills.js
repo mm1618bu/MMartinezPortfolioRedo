@@ -5,47 +5,55 @@ const Skills = () => {
   return (
     <div className="skills">
       <h1>Skills</h1>
+      
       <div className="skills-section">
         <h2>Front End</h2>
         <div className="skills-grid">
           <span>HTML</span>
+          <span>CSS</span>
+          <span>SCSS</span>
+          <span>Tailwind CSS</span>
+          <span>Bootstrap</span>
+          <span>Material UI</span>
           <span>JavaScript</span>
-          <span>TypeScript</span>
           <span>React</span>
-          <span>Next</span>
-          <span>Redux</span>
-          <span>Astro</span>
-          <span>Recoil</span>
-          <span>GraphQL</span>
-          <span>Apollo</span>
-          <span>Firebase</span>
+          <span>Angular</span>
+          <span>Next.js</span>
+          <span>React Native</span>
         </div>
       </div>
 
       <div className="skills-section">
-        <h2>Styling & Design</h2>
+        <h2>Back End</h2>
         <div className="skills-grid">
-          <span>CSS</span>
-          <span>SASS</span>
-          <span>BootStrap</span>
-          <span>Tailwind CSS</span>
-          <span>CSS Module</span>
-          <span>Figma</span>
-          <span>Styled-Components</span>
+          <span>Node.js</span>
+          <span>PHP</span>
+          <span>SQL</span>
+          <span>MongoDB</span>
+          <span>Redis</span>
+          <span>Celery</span>
+          <span>PubSub</span>
+          <span>AWS</span>
+          <span>Terraform</span>
+          <span>Docker</span>
+          <span>Java</span>
+          <span>C</span>
+          <span>Rest APIs</span>
         </div>
       </div>
 
       <div className="skills-section">
         <h2>Miscellaneous</h2>
         <div className="skills-grid">
+          <span>Netlify</span>
           <span>Git</span>
-          <span>Jest</span>
-          <span>Cypress</span>
-          <span>Playwright</span>
-          <span>react-testing-library</span>
           <span>Webpack</span>
-          <span>UI/UX design processes</span>
-          <span>REST APIs</span>
+          <span>cPanel</span>
+          <span>Linux</span>
+          <span>Adobe Photoshop</span>
+          <span>Adobe DreamSpark</span>
+          <span>Webflow</span>
+          <span>Wordpress</span>
         </div>
       </div>
     </div>
