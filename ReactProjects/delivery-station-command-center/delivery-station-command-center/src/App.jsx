@@ -1,7 +1,6 @@
 import './styles/main.scss';
 import Stowing from './components/Stowing';
 import ParentComponent from './components/ParentComponent';
-import RouteAssembly from './components/RouteAssembly';
 
 function App() {
   return (
