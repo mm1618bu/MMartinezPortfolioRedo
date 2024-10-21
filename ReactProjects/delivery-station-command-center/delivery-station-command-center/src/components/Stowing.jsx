@@ -1,57 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 const Stowing = () => {
-  const totalRows = 120;
-  const maxPackages = 550;
-  const minInterval = 6000; // 6 seconds in milliseconds
-  const maxInterval = 12000; // 12 seconds in milliseconds
+    const [arrivedPackages, setArrivedPackages] = useState(Array(5).fill(0));
+    const [stowedPackages, setStowedPackages] = useState(Array(5).fill(0));
 
-  const [rows, setRows] = useState(Array(totalRows).fill(0));
-  const [elapsedTime, setElapsedTime] = useState(0);
+    useEffect(() => {
+        const arrivalInterval = setInterval(() => {
+            setArrivedPackages(prevArrivedPackages => 
+                prevArrivedPackages.map(packages => packages + Math.floor(Math.random() * 10) + 1)
+            );
+        }, 1000); // 1 second interval
 
-  useEffect(() => {
-    const intervalIds = rows.map((_, index) => {
-      const interval = Math.floor(Math.random() * (maxInterval - minInterval + 1)) + minInterval;
-      return setInterval(() => {
-        setRows(prevRows => {
-          const newRows = [...prevRows];
-          if (newRows[index] < maxPackages) {
-            newRows[index] += Math.floor(Math.random() * 10) + 1; // Increment by 1 to 10 packages
-            if (newRows[index] > maxPackages) {
-              newRows[index] = maxPackages; // Cap at maxPackages
-            }
-          }
-          return newRows;
-        });
-      }, interval);
-    });
+        const stowInterval = setInterval(() => {
+            setStowedPackages(prevStowedPackages => 
+                prevStowedPackages.map((packages, index) => 
+                    packages < arrivedPackages[index] ? packages + 1 : packages
+                )
+            );
+        }, 8000); // 8 second interval
 
-    return () => {
-      intervalIds.forEach(clearInterval);
-    };
-  }, []);
+        return () => {
+            clearInterval(arrivalInterval);
+            clearInterval(stowInterval);
+        };
+    }, [arrivedPackages, stowedPackages]);
 
-  useEffect(() => {
-    const timerInterval = setInterval(() => {
-      setElapsedTime(prevTime => prevTime + 1);
-    }, 1000); // 1 second interval
-
-    return () => clearInterval(timerInterval);
-  }, []);
-
-  return (
-    <div>
-      <h1>Stowing</h1>
-      <div>
-        {rows.map((packages, index) => (
-          <div key={index}>
-            Row {index + 1}: {packages} packages
-          </div>
-        ))}
-      </div>
-      <h2>Elapsed Time: {elapsedTime} seconds</h2>
-    </div>
-  );
+    return (
+        <div>
+            <h1>Stowing</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Arrived Packages</th>
+                        <th>Stowed Packages</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {arrivedPackages.map((packages, index) => (
+                        <tr key={index}>
+                            <td>Row {index + 1}</td>
+                            <td>{packages}</td>
+                            <td>{stowedPackages[index]}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
 };
 
 export default Stowing;

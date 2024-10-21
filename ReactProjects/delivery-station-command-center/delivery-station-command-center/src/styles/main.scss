@@ -1,7 +1,108 @@
 // Main SCSS file
-body {
+*{
   font-family: Arial, sans-serif;
+  margin: 1px;
+  padding: 1px;
+  width: max-content;
+}
+
+.App{
+  width: 100%;
+}
+
+.page{
+  background-color: #ddd;
+  margin: 40px;
+}
+
+body{
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
+  background-color: #007bff;
+}
+
+table{
+  width: max-content;
+  border-collapse: collapse;
+
+  th{
+    background-color: #007bff;
+    color: white;
+    padding: 4px;
+    margin: 4px;
+  }
+
+  td, th{
+    border: 1px solid #ddd;
+    padding: 14px;
+    margin: 8px;
+
+  }
+
+  tr:nth-child(odd){
+    background-color: #f2f2f2;
+  }
+
+}
+
+input{
+  padding: 8px;
+  margin: 8px;
+  border: 2px solid #007bff;
+  border-radius: 8px;
+}
+
+button{
+  padding: 8px;
+  margin: 8px;
+  border: 2px solid #007bff;
+  background-color: #007bff;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.total{
+  font-weight: bold;
+  font-size: 1.5em;
+  border: 2px solid #007bff;
+  padding: 8px;
+  margin: 8px;
+  border-radius: 8px;
+  text-align: center;
+  width: max-content;
+}
+
+.Top{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  h1{
+    margin: 8px;
+    background-color: #007bff;
+    color: white;
+  }
+
+}
+
+.App{
+  width: 100%;
+}
+
+.Header{
+  color: white;
+  padding: 0px;
+  margin: 0px;
+  text-align: center;
+}
+
+.PCMain{
+  display: inline-flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.parent-component{
+  width: 100%;
+  display: inline-flex;
 }

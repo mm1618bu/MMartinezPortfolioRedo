@@ -1,13 +1,12 @@
 import './styles/main.scss';
-import Stowing from './components/Stowing';
 import ParentComponent from './components/ParentComponent';
+import Header from './components/Header';
 
 function App() {
   return (
     <div className="App">
-      <h1>Delivery Station Command Center</h1>
+      <Header />
       <ParentComponent />
-      <Stowing />
     </div>
   );
 }
