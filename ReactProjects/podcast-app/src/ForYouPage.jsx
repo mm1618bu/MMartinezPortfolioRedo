@@ -13,17 +13,17 @@ const ForYouPage = () => {
                 </div>
                 <div className="for-you-card">
                     <img src="podcast-2.jpg" alt="Podcast 2" />
-                    <h3>Podcast 2</h3>
+                    <h3>Football Friendzy</h3>
                     <p>Podcast description</p>
                 </div>
                 <div className="for-you-card">
                     <img src="podcast-3.jpg" alt="Podcast 3" />
-                    <h3>Podcast 3</h3>
+                    <h3>The Eric Cartman Show </h3>
                     <p>Podcast description</p>
                 </div>
                 <div className="for-you-card">
                     <img src="podcast-4.jpg" alt="Podcast 4" />
-                    <h3>Podcast 4</h3>
+                    <h3>Art Gallery</h3>
                     <p>Podcast description</p>
                 </div>
             </div>

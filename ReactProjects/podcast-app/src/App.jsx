@@ -10,6 +10,7 @@ import ForYouPage from './ForYouPage'
 import Search from './Search'
 import EndUserSettings from './EndUserSettings'
 import BroadcastRoom from './BroadcastRoom'
+import LiveChatFeature from './LiveChatFeature'
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
       <Search />
       <EndUserSettings/>
       <BroadcastRoom />
+      <LiveChatFeature />
     </>
   )
 }

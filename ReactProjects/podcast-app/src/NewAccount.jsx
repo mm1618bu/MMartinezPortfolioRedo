@@ -12,7 +12,7 @@ const NewAccount = () => {
             <input type="password" id="password" name="password" required />
             <label htmlFor="confirm-password">Confirm password</label>
             <input type="password" id="confirm-password" name="confirm-password" required />
-            <button type="submit">Create account</button>
+            <button type="submit" className='sso-button'>Create account</button>
         </form>
         <p>Already have an account? Sign in</p>
         </div>

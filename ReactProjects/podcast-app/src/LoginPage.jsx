@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import { SocialIcon } from 'react-social-icons'
 
 const LoginPage = () => {
     return (
@@ -7,16 +8,16 @@ const LoginPage = () => {
             <h2>Login</h2>
             <div className="sso-options">
                 <button className="sso-button">
-                    <img src="apple-icon.png" alt="Apple icon" />
-                    Continue with Apple
+                 <SocialIcon network="google"/>
+                    <p className='icon-paragraph'>Continue with Apple</p>
                 </button>
                 <button className="sso-button">
-                    <img src="google-icon.png" alt="Google icon" />
-                    Continue with Google
+                 <SocialIcon network="google"/>
+                    <p className='icon-paragraph'>Continue with Apple</p>
                 </button>
                 <button className="sso-button">
-                    <img src="facebook-icon.png" alt="Facebook icon" />
-                    Continue with Facebook
+                 <SocialIcon network="google"/>
+                    <p className='icon-paragraph'>Continue with Apple</p>
                 </button>
                 <h3>Or</h3>
                 <button className="sso-button">Continue with email</button>

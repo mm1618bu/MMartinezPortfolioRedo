@@ -6,21 +6,31 @@
   font-family: Arial, sans-serif;
 }
 
+:root {
+  --primary-color: #ff7e5f;
+  --secondary-color: #86a8e7;
+  --button-color: #222;
+  --hover-color: #eb920d;
+}
+
+#root{
+  width: -webkit-fill-available;
+}
+
 body {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  color: #fff;
+  color: black;
   margin: 0;
 }
 
 .login-page-container, .forgot-password-container, .new-account-container, .sms-verify-container {
   width: 100%;
-  max-width: 400px;
   padding: 2rem;
-  background: radial-gradient(circle at top left, #ff7e5f, transparent 60%),
-  radial-gradient(circle at bottom right, #86a8e7, transparent 60%),
+  background: radial-gradient(circle at top left, var(--primary-color), transparent 60%),
+  radial-gradient(circle at bottom right, var(--secondary-color), transparent 60%),
   linear-gradient(to right, #1a1a2e, #111);
 
   border-radius: 12px;
@@ -46,7 +56,7 @@ h2 {
   margin: 8px 0;
   font-size: 16px;
   color: #fff;
-  background-color: #222;
+  background-color: var(--button-color);
   border: 1px solid #333;
   border-radius: 24px;
   cursor: pointer;
@@ -54,7 +64,7 @@ h2 {
 }
 
 .sso-button:hover {
-  background-color: #eb920d;
+  background-color: var(--hover-color);
 }
 
 .sso-button:active {
@@ -113,7 +123,7 @@ input[type="password"]:focus {
   width: 100%;
   padding: 12px;
   font-size: 16px;
-  background-color: #ff4500;
+  background-color: var(--button-color);
   color: #fff;
   border: none;
   border-radius: 24px;
@@ -122,7 +132,7 @@ input[type="password"]:focus {
 }
 
 .login-button:hover {
-  background-color: #e09200;
+  background-color: var(--hover-color);
 }
 
 .bottomLinks {
@@ -139,7 +149,7 @@ input[type="password"]:focus {
 }
 
 .for-you-card {
-  background-color: yellow;
+  background-color: #ffff9f;
   border-radius: 12px;
   padding: 1rem;
   margin: 1rem 0;
@@ -195,5 +205,98 @@ input[type="password"]:focus {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 2px solid black;
+  background-color: var(--button-color);
+}
+
+.icon-paragraph{
+  margin-left: 10px;
+}
+
+.audio-room-container {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.room-header {
+  text-align: center;
+}
+
+.room-header h2 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.room-header .room-name {
+  font-size: 12px;
+  color: gray;
+}
+
+.speakers-section, .followed-section {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.speaker, .follower {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.speaker-icon, .follower-icon {
+  font-size: 60px;
+  color: #ccc;
+}
+
+.mute-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 14px;
+  color: red;
+}
+
+.speaker-name, .follower-name {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.footer p {
+  font-size: 12px;
+  color: gray;
+}
+
+.footer-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.leave-button, .raise-hand-button {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.leave-button {
+  color: red;
+}
+
+.raise-hand-button {
+  color: #333;
 }

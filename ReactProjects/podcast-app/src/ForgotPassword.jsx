@@ -27,7 +27,7 @@ const ForgotPassword = () => {
                         required
                     />
                 </div>
-                <button type="submit">Reset Password</button>
+                <button type="submit" className='sso-button'>Reset Password</button>
             </form>
             {message && <p>{message}</p>}
             <p>Back to Login</p>

@@ -8,7 +8,7 @@ const SMSVerify = () => {
             <form className="sms-verify-form">
                 <label htmlFor="phone">Phone number</label>
                 <input type="tel" id="phone" name="phone" required />
-                <button type="submit">Verify</button>
+                <button type="submit" className='sso-button'>Verify</button>
                 <p>I cant access my phone</p>
             </form>
         </div>
