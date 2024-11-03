@@ -14,7 +14,9 @@ const BroadcastRoom = () => {
         <p>John Smith, Lisa Lenord</p>
       </header>
       
-      <div className="speakers-section">
+      <h2>Host</h2>
+      <div className="speakers-section hosting">
+        
         <div className="speaker">
           <FontAwesomeIcon icon={faUserCircle} className="speaker-icon" />
           <p className="speaker-name">Bethania</p>
@@ -32,6 +34,23 @@ const BroadcastRoom = () => {
         </div>
       </div>
       
+      <h2>Paid Members</h2>
+      <div className="speakers-section">
+        <div className="listener">
+          <FontAwesomeIcon icon={faUserCircle} className="speaker-icon" />
+          <p className="listener-name">Ian</p>
+        </div>
+        <div className="listener">
+          <FontAwesomeIcon icon={faUserCircle} className="speaker-icon" />
+          <p className="listener-name">Rebecca</p>
+        </div>
+        <div className="listener">
+          <FontAwesomeIcon icon={faUserCircle} className="speaker-icon" />
+          <p className="listener-name">Mitch</p>
+        </div>
+      </div>
+
+      <h2>Just Listening</h2>
       <div className="followed-section">
         <div className="follower">
           <FontAwesomeIcon icon={faUserCircle} className="follower-icon" />

@@ -248,13 +248,15 @@ input[type="password"]:focus {
 }
 
 .room-header {
-  text-align: center;
+  text-align: left;
+  margin-bottom: 2px;
 }
 
 .room-header h2 {
   font-size: 18px;
   font-weight: bold;
   color: #333;
+  margin-bottom: 0;
 }
 
 .room-header .room-name {
@@ -335,4 +337,73 @@ input[type="password"]:focus {
 .exit{
   color: red;
   padding-left: 5px;
+}
+
+.hosting{
+  border: 2px solid #333;
+}
+
+.audio-room-container h2{
+  color: #333;
+}
+
+.live-chat-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+.chat-messages {
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.chat-message {
+  background-color: #e6f7ff;
+  padding: 8px 12px;
+  margin: 5px 0;
+  border-radius: 15px;
+  max-width: 80%;
+}
+
+.live-chat-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#message {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+.message-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.sso-button:hover {
+  background-color: #0056b3;
 }

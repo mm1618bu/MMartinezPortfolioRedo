@@ -11,11 +11,14 @@ import Search from './Search'
 import EndUserSettings from './EndUserSettings'
 import BroadcastRoom from './BroadcastRoom'
 import LiveChatFeature from './LiveChatFeature'
+import LandingPage from './LandingPage'
+import BroadcastInfo from './BroadcastInfo'
 
 function App() {
 
   return (
     <div>
+      <LandingPage />
       <LoginPage />
       <ForgotPassword />
       <NewAccount />
@@ -25,6 +28,7 @@ function App() {
       <EndUserSettings/>
       <BroadcastRoom />
       <LiveChatFeature />
+      <BroadcastInfo />
     </div>
   )
 }
