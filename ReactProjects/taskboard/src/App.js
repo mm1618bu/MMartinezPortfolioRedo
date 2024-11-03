@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import LoginForm from './LoginForm';
+import WarehouseTable from './WarehouseTable';
 
 const DraggableAssignmentTable = () => {
   const [assignments, setAssignments] = useState({
@@ -412,96 +414,8 @@ const DraggableAssignmentTable = () => {
 
   return (
     <div>
-      <h2>Assignment Management</h2>
-      
-      {/* Dropdown to filter by days */}
-      <select onChange={(e) => setSelectedDay(e.target.value)} value={selectedDay}>
-        <option value="">All Days</option>
-        <option value="M">Monday</option>
-        <option value="T">Tuesday</option>
-        <option value="W">Wednesday</option>
-        <option value="R">Thursday</option>
-        <option value="F">Friday</option>
-        <option value="S">Saturday</option>
-        <option value="U">Sunday</option>
-      </select>
-      {/* Render pending assignments filtered by selected day */}
-      <div style={{        }}>
-        <h4>Pending Assignments</h4>
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '1px'}}>
-        {filterAssignmentsByDays(pendingAssignments, selectedDay).map((assignment) => (
-          <div
-            key={assignment.id}
-            draggable
-            onDragStart={(e) => handleDragStart(e, assignment)}
-            style={{
-              backgroundColor: dayColorMap[assignment.days.charAt(0)], // Use first day for color
-              color: 'white',
-              padding: '10px',
-              borderRadius: '5px',
-              marginBottom: '5px',
-              cursor: 'move',
-              width: '200px',
-            }}
-          >
-            <p style={{ margin: 0 }}>{assignment.name}</p>
-            <p style={{ margin: 0 }}>{assignment.additionalInfo}</p>
-            <p style={{ margin: 0 }}>{assignment.days}</p>
-          </div>
-        ))}
-        </div>
-      </div>
-
-      {/* Render tables A, B, C, D, E, F, G, H, J */}
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {Object.keys(assignments).map((table) => (
-          <div
-            key={table}
-            style={{
-              border: '1px solid black',
-              minHeight: '200px',
-              width: '200px',
-              margin: '10px',
-              padding: '10px',
-              backgroundColor: '#e0e0e0',
-            }}
-          >
-            <h5>{table}</h5>
-            {Object.keys(assignments[table]).map((aisle) => (
-              <div
-                key={aisle}
-                onDrop={(e) => handleDrop(e, table, aisle)}
-                onDragOver={handleDragOver}
-                style={{
-                  border: '1px dashed black',
-                  minHeight: '50px',
-                  marginBottom: '10px',
-                  padding: '10px',
-                  backgroundColor: '#f0f0f0',
-                }}
-              >
-                <h6>{aisle}</h6>
-                {assignments[table][aisle].map((assignment) => (
-                  <div
-                    key={assignment.id}
-                    style={{
-                      backgroundColor: dayColorMap[assignment.days.charAt(0)], // Use first day for color
-                      color: 'white',
-                      padding: '10px',
-                      borderRadius: '5px',
-                      marginBottom: '5px',
-                    }}
-                  >
-                    <p style={{ margin: 0 }}>{assignment.name}</p>
-                    <p style={{ margin: 0 }}>{assignment.additionalInfo}</p>
-                    <p style={{ margin: 0 }}>{assignment.days}</p>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
+        <WarehouseTable />
+     
     </div>
   );
 };

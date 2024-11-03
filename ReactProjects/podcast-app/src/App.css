@@ -1,0 +1,199 @@
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #fff;
+  margin: 0;
+}
+
+.login-page-container, .forgot-password-container, .new-account-container, .sms-verify-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background: radial-gradient(circle at top left, #ff7e5f, transparent 60%),
+  radial-gradient(circle at bottom right, #86a8e7, transparent 60%),
+  linear-gradient(to right, #1a1a2e, #111);
+
+  border-radius: 12px;
+  text-align: center;
+}
+
+h2 {
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.sso-options {
+  margin-top: 1.5rem;
+}
+
+.sso-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 16px;
+  color: #fff;
+  background-color: #222;
+  border: 1px solid #333;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sso-button:hover {
+  background-color: #eb920d;
+}
+
+.sso-button:active {
+  transform: scale(0.98);
+}
+
+.sso-button img {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+h3 {
+  font-size: 16px;
+  color: #aaa;
+  margin: 1rem 0;
+}
+
+/* Form styles */
+form {
+  margin-top: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+label {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 0.5rem;
+}
+
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #6a67ce;
+  box-shadow: 0 0 5px rgba(106, 103, 206, 0.2);
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #ff4500;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #e09200;
+}
+
+.bottomLinks {
+  margin-top: 1rem;
+}
+
+.for-you-card > p{
+  color: black;
+}
+
+
+.for-you-container > h2 {
+  color: black;
+}
+
+.for-you-card {
+  background-color: yellow;
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.keypad-container {
+  width: 200px;
+  height: 300px;
+  border: 2px solid black;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.display {
+  width: 50%;
+  height: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.camera {
+  width: 60px;
+  height: 30px;
+  border: 2px solid black;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.camera-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: black;
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  width: 100px;
+}
+
+.button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid black;
+}
