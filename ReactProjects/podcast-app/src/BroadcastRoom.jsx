@@ -1,14 +1,17 @@
 import React from 'react';
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle, faMicrophoneSlash, faHandPaper, faSignOutAlt, faComment } from '@fortawesome/free-solid-svg-icons';
+import { faUserCircle, faMicrophoneSlash, faHandPaper, faSignOutAlt, faComment, faShare } from '@fortawesome/free-solid-svg-icons';
 
 const BroadcastRoom = () => {
   return (
     <div className="audio-room-container">
       <header className="room-header">
+      <button className="leave-button">
+            <FontAwesomeIcon icon={faSignOutAlt} /><p className='exit'> Exit</p>
+          </button>
         <h2>Cricket Corner</h2>
-        <p className="room-name">John Smith, Lisa Lenord</p>
+        <p>John Smith, Lisa Lenord</p>
       </header>
       
       <div className="speakers-section">
@@ -47,18 +50,18 @@ const BroadcastRoom = () => {
       <div className="footer">
         <p>You’re in the audience on mute.</p>
         <div className="footer-buttons">
-          <button className="leave-button">
-            <FontAwesomeIcon icon={faSignOutAlt} /> Exit
-          </button>
-          <button className="raise-hand-button">
-            <FontAwesomeIcon icon={faHandPaper} />
-          </button>
+
           <button className="mute-button">
             <FontAwesomeIcon icon={faMicrophoneSlash} />
           </button>
           <button className="chat-button">
             <FontAwesomeIcon icon={faComment} />
           </button>
+          <button className="raise-hand-button">
+            <FontAwesomeIcon icon={faHandPaper} />
+          </button>
+          <button className="end-room-button">
+            <FontAwesomeIcon icon={faShare}/></button>
         </div>
       </div>
     </div>

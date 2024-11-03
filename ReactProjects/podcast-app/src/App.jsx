@@ -15,7 +15,7 @@ import LiveChatFeature from './LiveChatFeature'
 function App() {
 
   return (
-    <>
+    <div>
       <LoginPage />
       <ForgotPassword />
       <NewAccount />
@@ -25,8 +25,8 @@ function App() {
       <EndUserSettings/>
       <BroadcastRoom />
       <LiveChatFeature />
-    </>
+    </div>
   )
 }
 
-export default App
+export default App;

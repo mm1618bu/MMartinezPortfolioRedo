@@ -13,6 +13,33 @@
   --hover-color: #eb920d;
 }
 
+/* Full-screen background container */
+.login-page-container {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #ff7e5f, #86a8e7, #ff7e5f, #86a8e7);
+  background-size: 400% 400%;
+  animation: gradientShift 10s ease infinite;
+  z-index: -1; /* Make sure it stays behind other content */
+}
+
+/* Keyframes for the gradient animation */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+
 #root{
   width: -webkit-fill-available;
 }
@@ -26,7 +53,7 @@ body {
   margin: 0;
 }
 
-.login-page-container, .forgot-password-container, .new-account-container, .sms-verify-container {
+.forgot-password-container, .new-account-container, .sms-verify-container {
   width: 100%;
   padding: 2rem;
   background: radial-gradient(circle at top left, var(--primary-color), transparent 60%),
@@ -235,6 +262,12 @@ input[type="password"]:focus {
   color: gray;
 }
 
+.room-name{
+  display: flex;
+  align-items: center; /* Vertically centers the icon and text */
+  gap: 8px;
+}
+
 .speakers-section, .followed-section {
   display: flex;
   justify-content: space-around;
@@ -293,10 +326,13 @@ input[type="password"]:focus {
   cursor: pointer;
 }
 
-.leave-button {
-  color: red;
-}
+
 
 .raise-hand-button {
   color: #333;
+}
+
+.exit{
+  color: red;
+  padding-left: 5px;
 }
