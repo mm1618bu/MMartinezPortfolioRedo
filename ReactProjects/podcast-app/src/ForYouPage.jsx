@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCoffee } from "@fortawesome/free-solid-svg-icons";
+import { faCoffee, faPerson, faMessage } from "@fortawesome/free-solid-svg-icons";
 
 const ForYouPage = () => {
     return (
@@ -12,7 +12,7 @@ const ForYouPage = () => {
                     <div className="room-name">
                 <FontAwesomeIcon icon={faCoffee}/> <h3>Cricket Corner</h3></div>
                     <p>John Smith, Lisa Lenord</p>
-                    <p>100 people/10 messages</p>
+                    <p><FontAwesomeIcon icon={faPerson}/>100 people / <FontAwesomeIcon icon={faMessage}/>10 messages</p>
                 </div>
                 <div className="for-you-card">
                 <div className="room-name">
