@@ -1,89 +1,136 @@
 import React from 'react';
-import './App.css';
+import batman from './assets/batman.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle, faMicrophoneSlash, faHandPaper, faSignOutAlt, faComment, faShare } from '@fortawesome/free-solid-svg-icons';
-
 const BroadcastRoom = () => {
   return (
-    <div className="audio-room-container">
-      <header className="room-header">
-      <button className="leave-button">
-            <FontAwesomeIcon icon={faSignOutAlt} /><p className='exit'> Exit</p>
-          </button>
-        <h2>Cricket Corner</h2>
-        <p>John Smith, Lisa Lenord</p>
-      </header>
-      
-      <h2>Host</h2>
-      <div className="speakers-section hosting">
-        
-        <div className="speaker">
-          <FontAwesomeIcon icon={faUserCircle} className="speaker-icon" />
-          <p className="speaker-name">Bethania</p>
-          <FontAwesomeIcon icon={faMicrophoneSlash} className="mute-icon" />
-        </div>
-        <div className="speaker">
-          <FontAwesomeIcon icon={faUserCircle} className="speaker-icon" />
-          <p className="speaker-name">Dr. Angela</p>
-          <FontAwesomeIcon icon={faMicrophoneSlash} className="mute-icon" />
-        </div>
-        <div className="speaker">
-          <FontAwesomeIcon icon={faUserCircle} className="speaker-icon" />
-          <p className="speaker-name">Andy</p>
-          <FontAwesomeIcon icon={faMicrophoneSlash} className="mute-icon" />
-        </div>
-      </div>
-      
-      <h2>Paid Members</h2>
-      <div className="speakers-section">
-        <div className="listener">
-          <FontAwesomeIcon icon={faUserCircle} className="speaker-icon" />
-          <p className="listener-name">Ian</p>
-        </div>
-        <div className="listener">
-          <FontAwesomeIcon icon={faUserCircle} className="speaker-icon" />
-          <p className="listener-name">Rebecca</p>
-        </div>
-        <div className="listener">
-          <FontAwesomeIcon icon={faUserCircle} className="speaker-icon" />
-          <p className="listener-name">Mitch</p>
-        </div>
-      </div>
+    <>
+      <style>
+        {`
+          .broadcast-room {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 400px;
+            margin: auto;
+            color: #333;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          }
+          .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            margin-bottom: 15px;
+          }
+          .header .leave {
+            color: #ff5733;
+            cursor: pointer;
+          }
+          .participants {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+          }
+          .participant {
+            position: relative;
+            width: 80px;
+            text-align: center;
+          }
+          .participant img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #00c853;
+          }
+          .participant .name {
+            font-size: 12px;
+            margin-top: 5px;
+          }
+          .participant .add {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+          }
+          .muted {
+            opacity: 0.5;
+          }
+          .listener {
+            display: flex;
+            gap: 10px;
+            font-size: 14px;
+          }
+          .listener img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+          }
+          .join-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+          }
+        `}
+      </style>
 
-      <h2>Just Listening</h2>
-      <div className="followed-section">
-        <div className="follower">
-          <FontAwesomeIcon icon={faUserCircle} className="follower-icon" />
-          <p className="follower-name">Ian</p>
+      <div className="broadcast-room">
+        <div className="header">
+          <span>Public</span>
+          <span>🎉 Meet People</span>
+          <span className="leave">Exit</span>
         </div>
-        <div className="follower">
-          <FontAwesomeIcon icon={faUserCircle} className="follower-icon" />
-          <p className="follower-name">Rebecca</p>
+          <span>Hosts</span>
+        <div className="participants">
+          {["Tucker","Chris"].map((name, index) => (
+            <div key={index} className={`participant ${name === "Fiona" || name === "HORI" || name === "Suhrab" ? 'muted' : ''}`}>
+              <img src={batman} alt={name} />
+              <div className="add">+</div>
+              <div className="name">{name}</div>
+            </div>
+          ))}
         </div>
-        <div className="follower">
-          <FontAwesomeIcon icon={faUserCircle} className="follower-icon" />
-          <p className="follower-name">Mitch</p>
+        <span>Participants</span>
+        <div className="participants">
+          {["جنون", "Masoud", "Mona", "Fiona", "HORI", "Suhrab"].map((name, index) => (
+            <div key={index} className={`participant ${name === "Fiona" || name === "HORI" || name === "Suhrab" ? 'muted' : ''}`}>
+              <img src={batman} alt={name} />
+              <div className="add">+</div>
+              <div className="name">{name}</div>
+            </div>
+          ))}
         </div>
-      </div>
-      
-      <div className="footer">
-        <p>You’re in the audience on mute.</p>
-        <div className="footer-buttons">
 
-          <button className="mute-button">
-            <FontAwesomeIcon icon={faMicrophoneSlash} />
-          </button>
-          <button className="chat-button">
-            <FontAwesomeIcon icon={faComment} />
-          </button>
-          <button className="raise-hand-button">
-            <FontAwesomeIcon icon={faHandPaper} />
-          </button>
-          <button className="end-room-button">
-            <FontAwesomeIcon icon={faShare}/></button>
+        <p>Just Listening</p>
+        <div className="listener">
+          <div className="participant">
+            <img src={batman} alt="Mitchell" />
+            <span className="name">Mitchell</span>
+          </div>
+          <div className="participant">
+            <img src={batman} alt="Orlando" />
+            <span className="name">Orlando</span>
+          </div>
         </div>
+
+        <div className="join-btn">+</div>
       </div>
-    </div>
+    </>
   );
 };
 
