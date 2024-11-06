@@ -4,8 +4,7 @@ import "./App.css";
 const LiveChatFeature = () => {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([
-        "Welcome to the chat!",
-        "Feel free to start a conversation.",
+        "Its too quiet in here...",
     ]);
 
     const handleSubmit = (e) => {
@@ -18,7 +17,7 @@ const LiveChatFeature = () => {
 
     return (
         <div className="live-chat-container">
-            <h2>Live Chat with Other Listeners</h2>
+            <h2>Live Chat</h2>
             
             {/* Chat messages display area */}
             <div className="chat-messages">
@@ -31,7 +30,6 @@ const LiveChatFeature = () => {
 
             {/* Message input form */}
             <form className="live-chat-form" onSubmit={handleSubmit}>
-                <label htmlFor="message">Message</label>
                 <input
                     type="text"
                     id="message"
@@ -39,7 +37,7 @@ const LiveChatFeature = () => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     required
-                    placeholder="Type your message here..."
+                    placeholder="Say Something..."
                 />
                 <button type="submit" className="message-button">Send</button>
             </form>

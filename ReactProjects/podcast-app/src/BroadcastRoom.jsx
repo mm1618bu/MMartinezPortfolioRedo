@@ -1,6 +1,8 @@
 import React from 'react';
 import batman from './assets/batman.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faComment, faShare, faPlus, faEllipsisVertical, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+
 const BroadcastRoom = () => {
   return (
     <>
@@ -86,6 +88,34 @@ const BroadcastRoom = () => {
             font-size: 20px;
             cursor: pointer;
           }
+
+          .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            padding: 0 20px;
+          }
+          .footer .left-icons {
+            display: flex;
+            gap: 30px;
+          }
+          .footer .right-icon {
+            font-size: 24px;
+            cursor: pointer;
+          }
+
+          .icon{
+            font-size: 24px;
+            cursor: pointer;
+            margin-left: 10px;
+            padding-left: 10px;
+          }
+
+          .divisions{
+            font-size: 10px;    
+          }
         `}
       </style>
 
@@ -105,7 +135,7 @@ const BroadcastRoom = () => {
             </div>
           ))}
         </div>
-        <span>Participants</span>
+        <span className='divisions'>Participants</span>
         <div className="participants">
           {["جنون", "Masoud", "Mona", "Fiona", "HORI", "Suhrab"].map((name, index) => (
             <div key={index} className={`participant ${name === "Fiona" || name === "HORI" || name === "Suhrab" ? 'muted' : ''}`}>
@@ -116,7 +146,7 @@ const BroadcastRoom = () => {
           ))}
         </div>
 
-        <p>Just Listening</p>
+        <span className='divisions'>Just Listening</span>
         <div className="listener">
           <div className="participant">
             <img src={batman} alt="Mitchell" />
@@ -127,8 +157,16 @@ const BroadcastRoom = () => {
             <span className="name">Orlando</span>
           </div>
         </div>
+        <br/>
 
-        <div className="join-btn">+</div>
+        <div className="controls">
+          <div className="left-icons">
+            <FontAwesomeIcon icon={faComment} className="icon" />
+            <FontAwesomeIcon icon={faShare} className="icon" />
+            <FontAwesomeIcon icon={faEllipsisH} className="icon" />
+          </div>
+          <FontAwesomeIcon icon={faPlus} className="right-icon" />
+        </div>
       </div>
     </>
   );
