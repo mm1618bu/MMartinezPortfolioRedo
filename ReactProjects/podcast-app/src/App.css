@@ -78,7 +78,7 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  position: relative;
   padding: 12px;
   margin: 8px 0;
   font-size: 16px;
@@ -181,6 +181,13 @@ input[type="password"]:focus {
   padding: 1rem;
   margin: 1rem 0;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.for-you-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 20px;
+
 }
 
 .keypad-container {
@@ -408,4 +415,64 @@ h2 {
 
 .sso-button:hover {
   background-color: #0056b3;
+}
+
+
+
+
+
+.new-account-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.new-account-form label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: var(--button-color);
+}
+
+.new-account-form input {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  width: calc(100% - 22px); /* Adjust for padding and border */
+}
+
+.new-account-form input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+
+.new-account-container p {
+  margin-top: 15px;
+  color: #333;
+}
+
+.new-account-container p a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.new-account-container p a:hover {
+  text-decoration: underline;
+}
+
+.login-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.svg-inline--fa {
+  display: var(--fa-display, inline-block);
+  height: 0.85em;
+  overflow: visible;
+  vertical-align: -0.125em;
 }

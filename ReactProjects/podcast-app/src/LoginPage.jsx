@@ -6,7 +6,7 @@ const LoginPage = () => {
     return (
         <div className="login-page-container">
             <h2>Login</h2>
-            <div className="sso-options">
+            <span className="sso-options">
                 <button className="sso-button">
                  <SocialIcon network="google"/>
                     <p className='icon-paragraph'>Continue with Apple</p>
@@ -21,7 +21,7 @@ const LoginPage = () => {
                 </button>
                 <h3>Or</h3>
                 <button className="sso-button">Continue with email</button>
-            </div>
+            </span>
         </div>
     );
 };
