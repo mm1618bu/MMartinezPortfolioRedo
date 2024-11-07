@@ -33,6 +33,10 @@ const ForYouPage = () => {
                         align-items: center;
                         text-align: center;
                     }
+
+                    .for-you-card:hover{
+                        background-color: lightyellow;
+                    }
                     .room-name {
                         display: flex;
                         align-items: center;
@@ -60,12 +64,13 @@ const ForYouPage = () => {
                             <FontAwesomeIcon icon={faCoffee} className="icon" />
                             <h3>Cricket Corner</h3>
                         </div>
+                        <h4>Tagline for the Podcast</h4>
                         <p>John Smith, Lisa Lenord</p>
                         <p>
                             <FontAwesomeIcon icon={faUser} className="icon" />
-                            100 people / 
+                            100     
                             <FontAwesomeIcon icon={faComment} className="icon" />
-                            10 messages
+                            10 
                         </p>
                     </div>
                     <div className="for-you-card">
@@ -79,6 +84,34 @@ const ForYouPage = () => {
                         <div className="room-name">
                             <FontAwesomeIcon icon={faCoffee} className="icon" />
                             <h3>Health & Wellness</h3>
+                        </div>
+                        <p>Podcast description</p>
+                    </div>
+                    <div className="for-you-card">
+                        <div className="room-name">
+                            <FontAwesomeIcon icon={faCoffee} className="icon" />
+                            <h3>Travel Diaries</h3>
+                        </div>
+                        <p>Podcast description</p>
+                    </div>
+                    <div className="for-you-card">
+                        <div className="room-name">
+                            <FontAwesomeIcon icon={faCoffee} className="icon" />
+                            <h3>Travel Diaries</h3>
+                        </div>
+                        <p>Podcast description</p>
+                    </div>
+                    <div className="for-you-card">
+                        <div className="room-name">
+                            <FontAwesomeIcon icon={faCoffee} className="icon" />
+                            <h3>Travel Diaries</h3>
+                        </div>
+                        <p>Podcast description</p>
+                    </div>
+                    <div className="for-you-card">
+                        <div className="room-name">
+                            <FontAwesomeIcon icon={faCoffee} className="icon" />
+                            <h3>Travel Diaries</h3>
                         </div>
                         <p>Podcast description</p>
                     </div>
