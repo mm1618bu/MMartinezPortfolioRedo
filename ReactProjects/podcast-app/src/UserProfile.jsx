@@ -5,9 +5,10 @@ const UserProfile = () => {
     return (
         <div className="user-profile-card">
             <div>
-                <h2>Your Name</h2>
-                <h3>Your username</h3>
-                <h3>Headcount</h3>
+                <img src="https://via.placeholder.com/150" alt="User profile" />
+                <h3>John Doe</h3>
+                <h3>@JDoe1234</h3>
+                <h3>200 Followers</h3>
             </div>
             <div>
                 <button>Add</button>

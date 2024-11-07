@@ -2,8 +2,15 @@ import React from 'react';
 import batman from './assets/batman.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faShare, faPlus, faEllipsisVertical, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import BroadcastRoomDropDown from './BroadcastRoomDropdown';
 
 const BroadcastRoom = () => {
+  const [isDropdownVisible, setIsDropdownVisible] = React.useState(false);
+  
+  const toggleDropdown = () => {
+    setIsDropdownVisible(!isDropdownVisible);
+  };
+
   return (
     <>
       <style>
@@ -115,6 +122,7 @@ const BroadcastRoom = () => {
 
           .divisions{
             font-size: 10px;    
+            margin-top: 5px;
           }
         `}
       </style>
@@ -163,10 +171,11 @@ const BroadcastRoom = () => {
           <div className="left-icons">
             <FontAwesomeIcon icon={faComment} className="icon" />
             <FontAwesomeIcon icon={faShare} className="icon" />
-            <FontAwesomeIcon icon={faEllipsisH} className="icon" />
+            <FontAwesomeIcon icon={faEllipsisH} className="icon" onClick={toggleDropdown} />
           </div>
           <FontAwesomeIcon icon={faPlus} className="right-icon" />
         </div>
+        {isDropdownVisible && (<div className='dropdown'><BroadcastRoomDropDown /></div>)}
       </div>
     </>
   );
