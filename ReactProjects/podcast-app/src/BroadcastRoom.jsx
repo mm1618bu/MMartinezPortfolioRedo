@@ -1,8 +1,9 @@
 import React from 'react';
 import batman from './assets/batman.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComment, faShare, faPlus, faEllipsisVertical, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import { faComment, faShare, faPlus, faHand, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import BroadcastRoomDropDown from './BroadcastRoomDropdown';
+import { Link } from 'react-router-dom';
 
 const BroadcastRoom = () => {
   const [isDropdownVisible, setIsDropdownVisible] = React.useState(false);
@@ -131,7 +132,7 @@ const BroadcastRoom = () => {
         <div className="header">
           <span>Public</span>
           <span>🎉 Meet People</span>
-          <span className="leave">Exit</span>
+          <span className="leave"><Link to="/for-you">Exit</Link></span>
         </div>
           <span>Hosts</span>
         <div className="participants">
@@ -169,8 +170,9 @@ const BroadcastRoom = () => {
 
         <div className="controls">
           <div className="left-icons">
-            <FontAwesomeIcon icon={faComment} className="icon" />
-            <FontAwesomeIcon icon={faShare} className="icon" />
+            <FontAwesomeIcon icon={faComment} className="icon" title="message"/>
+            <FontAwesomeIcon icon={faShare} className="icon" title="share" />
+            <FontAwesomeIcon icon={faHand} className="icon" title="talk"/>
             <FontAwesomeIcon icon={faEllipsisH} className="icon" onClick={toggleDropdown} />
           </div>
           <FontAwesomeIcon icon={faPlus} className="right-icon" />

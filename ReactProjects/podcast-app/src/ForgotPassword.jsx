@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
@@ -103,7 +104,7 @@ const ForgotPassword = () => {
                     <button type="submit" className="sso-button">Reset Password</button>
                 </form>
                 {message && <p className="message">{message}</p>}
-                <p className="back-to-login">Back to Login</p>
+                <Link to="/login" className="back-to-login">Back to Login</Link>
             </div>
         </>
     );
