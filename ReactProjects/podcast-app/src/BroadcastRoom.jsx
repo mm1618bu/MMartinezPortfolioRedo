@@ -12,11 +12,22 @@ const BroadcastRoom = () => {
     setIsDropdownVisible(!isDropdownVisible);
   };
 
+  const handleShareClick = () => {
+    const roomLink = "https://example.com/room"; // Replace with the actual room link
+    navigator.clipboard.writeText(roomLink).then(() => {
+        alert("Room link copied to clipboard!");
+    }).catch(err => {
+        console.error("Failed to copy: ", err);
+    });
+  };
+
   return (
     <>
       <style>
         {`
+
           .broadcast-room {
+            height: webkit-fill-available;
             font-family: Arial, sans-serif;
             padding: 20px;
             max-width: 400px;
@@ -170,8 +181,8 @@ const BroadcastRoom = () => {
 
         <div className="controls">
           <div className="left-icons">
-            <FontAwesomeIcon icon={faComment} className="icon" title="message"/>
-            <FontAwesomeIcon icon={faShare} className="icon" title="share" />
+            <Link to="/live-chat"><FontAwesomeIcon icon={faComment} className="icon" title="message"/></Link>
+            <FontAwesomeIcon icon={faShare} className="icon" title="share" onClick={handleShareClick} />
             <FontAwesomeIcon icon={faHand} className="icon" title="talk"/>
             <FontAwesomeIcon icon={faEllipsisH} className="icon" onClick={toggleDropdown} />
           </div>
@@ -182,5 +193,6 @@ const BroadcastRoom = () => {
     </>
   );
 };
+
 
 export default BroadcastRoom;

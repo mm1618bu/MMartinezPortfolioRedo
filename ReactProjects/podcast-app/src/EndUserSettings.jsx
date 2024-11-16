@@ -143,12 +143,14 @@ const EndUserSettings = () => {
             <div className="end-user-settings-container">
                 <h2>End user settings</h2>
                 <form className="end-user-settings-form">
-                    <label htmlFor="username">Username</label>
-                    <input type="text" id="username" name="username" required />
+                    <label htmlFor="username">Full Name</label>
+                    <input type="text" id="fullname" name="fullname" required />
                     <label htmlFor="email">Email</label>
                     <input type="email" id="email" name="email" required />
                     <label htmlFor="password">Password</label>
                     <input type="password" id="password" name="password" required />
+                    <label htmlFor="phone">Phone #</label>
+                    <input type="tel" id="phone" name="phone" required />
                     <button type="submit">Save changes</button>
                 </form>
                 <h2>Your Name</h2>

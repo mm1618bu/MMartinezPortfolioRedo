@@ -1,14 +1,17 @@
 import React from 'react';
 import './Landingpage.css';
+import { Link } from 'react-router-dom';
 
-const App = () => {
+const LandingPage= () => {
   return (
     <div className="app">
       {/* Hero Section */}
       <section className="hero">
-        <h1>Welcome to My Awesome Product</h1>
-        <p>Discover the future of technology with our cutting-edge solutions.</p>
-        <button className="cta-button">Get Started</button>
+        <h1>Tenge Tenge Live</h1>
+        <p>Connect with Others, Learn More, Become Engaged with your interests</p>
+        <Link to="/login">
+                    <button className="cta-button">Log In</button>
+                </Link>
       </section>
 
       {/* Features Section */}
@@ -16,15 +19,15 @@ const App = () => {
         <h2>Our Features</h2>
         <div className="features-grid">
           <div className="feature-card">
-            <h3>Fast Performance</h3>
+            <h3>Global Audience</h3>
             <p>Our product is designed for high performance and speed.</p>
           </div>
           <div className="feature-card">
-            <h3>Secure & Reliable</h3>
+            <h3>Live Audio Broadcasts</h3>
             <p>We prioritize your security with top-notch encryption and reliability.</p>
           </div>
           <div className="feature-card">
-            <h3>Easy Integration</h3>
+            <h3>Safe & Secure</h3>
             <p>Integrate seamlessly with your existing systems and workflows.</p>
           </div>
         </div>
@@ -45,4 +48,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default LandingPage;

@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+import { Link } from "react-router-dom";
 
 const BroadcastRoomDropDown = () => {
     return (
@@ -49,9 +50,9 @@ const BroadcastRoomDropDown = () => {
             <div className="dropdown">
                 <button className="dropbtn">Options</button>
                 <div className="dropdown-content">
-                    <a href="#">Search</a>
+                    <Link to="/search">Search</Link>
                     <a href="#">Report</a>
-                    <a href="#">Exit</a>
+                    <Link to="/for-you">Exit</Link>
                 </div>
             </div>
         </>

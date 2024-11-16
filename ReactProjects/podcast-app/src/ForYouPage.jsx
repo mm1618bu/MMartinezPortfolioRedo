@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCoffee, faUser, faComment } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 const ForYouPage = () => {
     const [selectedOption, setSelectedOption] = useState("forYou");
@@ -98,7 +99,7 @@ const ForYouPage = () => {
                         <div className="for-you-card">
                             <div className="room-name">
                                 <FontAwesomeIcon icon={faCoffee} className="icon" />
-                                <h3>Cricket Corner</h3>
+                                <Link to="/broadcast-room"><h3>Cricket Corner</h3></Link>
                             </div>
                             <h4>Tagline for the Podcast</h4>
                             <p>John&nbsp;Smith,&nbsp;Lisa&nbsp;Lenord</p>

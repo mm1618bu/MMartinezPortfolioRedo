@@ -13,6 +13,7 @@ import LiveChatFeature from './LiveChatFeature';
 import LandingPage from './LandingPage';
 import BroadcastInfo from './BroadcastInfo';
 import UserProfile from './UserProfile';
+import Landing2 from './Landing2';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/live-chat" element={<LiveChatFeature />} />
         <Route path="/broadcast-info" element={<BroadcastInfo />} />
         <Route path="/user-profile" element={<UserProfile />} />
+        <Route path="/landing2"l element={<Landing2 />} />
       </Routes>
     </Router>
   );
