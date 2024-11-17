@@ -3,10 +3,10 @@ import "./App.css";
 import radioImage from "./assets/radio.png"; // Import the image
 
 const Landing2 = () => {
-    const circles = Array.from({ length: 40 }, (_, index) => ({
-        size: Math.random() * 20 + 10, // Random size between 10px and 30px
+    const snowflakes = Array.from({ length: 50 }, (_, index) => ({
+        size: Math.random() * 5 + 5, // Random size between 5px and 10px
         left: Math.random() * 100, // Random left position between 0% and 100%
-        duration: Math.random() * 5 + 3, // Random duration between 3s and 8s
+        duration: Math.random() * 5 + 5, // Random duration between 5s and 10s
         delay: Math.random() * 5, // Random delay between 0s and 5s
     }));
 
@@ -34,19 +34,19 @@ const Landing2 = () => {
                         background-position: center;
                     }
 
-                    .circle-container {
+                    .snowflake-container {
                         position: absolute;
                         width: 100%;
                         height: 100%;
                         top: 0;
                         left: 0;
-                        pointer-events: none; /* Prevent circles from blocking interactions */
+                        pointer-events: none; /* Prevent snowflakes from blocking interactions */
                     }
 
-                    .circle {
+                    .snowflake {
                         position: absolute;
                         border-radius: 50%;
-                        background-color: rgba(255, 255, 255, 0.5);
+                        background-color: rgba(255, 255, 255, 0.8);
                         animation-iteration-count: infinite;
                         animation-timing-function: linear;
                     }
@@ -62,11 +62,14 @@ const Landing2 = () => {
 
                     .text-container {
                         flex: 0 0 50%; /* Take up 50% of the width */
-                        padding: 20px;
-                        color: #333;
-                        z-index: 1; /* Ensure text is above the background and circles */
-                        background-color: rgba(255, 255, 255, 0.8); /* Optional: Add a background color for better readability */
+                        padding: 60px;
+                        margin: 60px 60px 60px 1960px;
+                        color: white;
+                        z-index: 1; /* Ensure text is above the background and snowflakes */
                         margin-left: auto; /* Push the text container to the right */
+                        border: 4px outset rgba(244, 132, 1, 0.7);
+                        border-radius: 20px;
+                        background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
                     }
 
                     .text-container p {
@@ -76,28 +79,41 @@ const Landing2 = () => {
             </style>
             <div className="landing2-container">
                 <div className="background"></div>
-                <div className="circle-container">
-                    {circles.map((circle, index) => (
+                <div className="snowflake-container">
+                    {snowflakes.map((snowflake, index) => (
                         <div
                             key={index}
-                            className="circle"
+                            className="snowflake"
                             style={{
-                                width: `${circle.size}px`,
-                                height: `${circle.size}px`,
-                                left: `${circle.left}%`,
-                                animation: `fall ${circle.duration}s linear ${circle.delay}s infinite`,
+                                width: `${snowflake.size}px`,
+                                height: `${snowflake.size}px`,
+                                left: `${snowflake.left}%`,
+                                animation: `fall ${snowflake.duration}s linear ${snowflake.delay}s infinite`,
                             }}
                         ></div>
                     ))}
                 </div>
                 <div className="text-container">
-    <p>Welcome to [Your Radio Station Name], your go-to online destination for nonstop music, talk shows, and entertainment!</p>
-    <p>Our station brings you the latest hits, timeless classics, and exclusive interviews with your favorite artists from around the world.</p>
-    <p>Whether you're tuning in from home, work, or on the go, our goal is to keep you connected with the music and stories you love.</p>
-    <p>Join our vibrant community of listeners and discover why we're more than just a radio station – we're your soundtrack to every moment!</p>
-</div>
-
-
+                    <section>
+                        <h1>Podcast App</h1>
+                        <p>
+                            Welcome to the Podcast App! Listen to your favorite podcasts
+                            on the go.
+                        </p>
+                        <p>
+                            This is a simple podcast app built using React. It fetches
+                            podcast data from the Listen Notes API.
+                        </p>
+                    </section>
+                    <section>
+                        <h1>Features</h1>
+                        <ul>
+                            <li>Search for podcasts</li>
+                            <li>View podcast episodes</li>
+                            <li>Listen to podcast episodes</li>
+                        </ul>
+                    </section>
+                </div>
             </div>
         </>
     );
