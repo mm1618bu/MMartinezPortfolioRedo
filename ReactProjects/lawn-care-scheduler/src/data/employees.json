@@ -1,0 +1,102 @@
+[
+    {
+      "Name": "Chris B",
+      "HireDate": "01/01/2020",      
+      "Town": ["Weymouth", "Hingham", "Hull"],
+      "Skills": ["Lawn Mowing", "Leaf Raking", "Fall Clean Up", "Spring Clean Up"],
+      "Car": true,
+      "Customer Ranking": 0,
+      "VIP": "No",
+      "Days Off": ["Thursday", "Friday"]
+    },
+    {
+      "Name": "Chris I",
+      "HireDate": "01/01/2008",
+      "Town": ["Weymouth", "Hingham", "Hull", "Quincy"],
+      "Skills": ["Lawn Mowing", "Leaf Raking", "Fall Clean Up", "Spring Clean Up"],
+      "Car": true,
+      "Customer Ranking": 100,
+      "VIP": "False",
+      "Days Off": ["Monday", "Sunday"]
+    },
+    {
+      "Name": "Declan",
+      "HireDate": "03/01/2010",
+      "Town": ["Weymouth", "Hingham", "Hull", "Quincy", "Braintree"],
+      "Skills": ["Lawn Mowing", "Leaf Raking", "Fall Clean Up", "Spring Clean Up"],
+      "Car": true,
+      "Customer Ranking": 0,
+      "VIP": "No",
+      "Days Off": ["Tuesday", "Wednesday"]
+    },
+    {
+        "Name": "Dylan",
+        "HireDate": "03/01/2010",
+        "Town": ["Weymouth", "Hingham", "Hull", "Quincy", "Braintree"],
+        "Skills": ["Lawn Mowing", "Leaf Raking", "Fall Clean Up", "Spring Clean Up"],
+        "Car": true,
+        "Customer Ranking": 0,
+        "VIP": "No",
+        "Days Off": ["Thursday", "Friday"]
+        },
+        {
+        "Name": "Evan",
+        "HireDate": "03/01/2010",
+        "Town": ["Weymouth", "Hingham", "Hull", "Quincy", "Braintree"],
+        "Skills": ["Lawn Mowing", "Leaf Raking", "Fall Clean Up", "Spring Clean Up"],
+        "Car": "No",
+        "Customer Ranking": 100,
+        "VIP": "No",
+        "Days Off": ["Saturday", "Sunday"]
+        },
+        {
+        "Name": "Jack",
+        "HireDate": "03/01/2010",
+        "Town": ["Weymouth", "Hingham", "Hull", "Quincy", "Braintree"],
+        "Skills": ["Lawn Mowing", "Leaf Raking", "Fall Clean Up", "Spring Clean Up"],
+        "Car": "No",
+        "Customer Ranking": 100,
+        "VIP": "No",
+        "Days Off": ["Monday", "Tuesday"]
+        },
+        {
+        "Name": "John",
+        "HireDate": "03/01/2010",
+        "Town": ["Weymouth", "Hingham", "Hull", "Quincy", "Braintree"],
+        "Skills": ["Lawn Mowing", "Leaf Raking", "Fall Clean Up", "Spring Clean Up"],
+        "Car": "No",
+        "Customer Ranking": 100,
+        "VIP": "No",
+        "Days Off": ["Wednesday", "Thursday"]
+        },
+        {
+        "Name": "Matt",
+        "HireDate": "03/01/2010",
+        "Town": ["Weymouth", "Hingham", "Hull", "Quincy", "Braintree"],
+        "Skills": ["Lawn Mowing", "Leaf Raking", "Fall Clean Up", "Spring Clean Up"],
+        "Car": "No",
+        "Customer Ranking": 100,
+        "VIP": "No",
+        "Days Off": ["Friday", "Saturday"]
+        },
+        {
+        "Name": "Mike",
+        "HireDate": "03/01/2010",
+        "Town": ["Weymouth", "Hingham", "Hull", "Quincy", "Braintree"],
+        "Skills": ["Lawn Mowing", "Leaf Raking", "Fall Clean Up", "Spring Clean Up"],
+        "Car": "No",
+        "Customer Ranking": 100,
+        "VIP": "No",
+        "Days Off": ["Sunday", "Monday"]
+        },
+        {
+        "Name": "Nick",
+        "HireDate": "03/01/2014",
+        "Town": ["Weymouth", "Hingham", "Hull", "Quincy", "Braintree"],
+        "Skills": ["Lawn Mowing", "Leaf Raking", "Fall Clean Up", "Spring Clean Up"],
+        "Car": "No",
+        "Customer Ranking": 0,
+        "VIP": "No",
+        "Days Off": ["Tuesday", "Wednesday"]
+        }
+    ]
