@@ -25,7 +25,7 @@ const JobAssignment = () => {
       const { Vehicle, YardSize, Date: jobDateStr, Location } = job;
   
       // Determine how many employees are needed
-      const requiredEmployees = { Small: 1, Medium: 2, Large: 3 }[YardSize] || 1;
+      const requiredEmployees = { Small: 1, Medium: 2, Large: 2 }[YardSize] || 1;
   
       // Get the day of the week from the job date
       const jobDate = new Date(jobDateStr);
@@ -129,7 +129,7 @@ const JobAssignment = () => {
 
   return (
     <div className="job-assignment-container">
-      <h1>Job Assignment</h1>
+      <h1>Active Jobs</h1>
       <button onClick={assignJobsToEmployees} className="assign-button">
         Assign Jobs
       </button>
@@ -138,7 +138,7 @@ const JobAssignment = () => {
         <ul>
           {employees.map((employee) => (
             <li key={employee.Name} className="EmployeeItem">
-              {employee.Name} - Jobs: {jobCount[employee.Name]}
+              {employee.Name} <br/>{jobCount[employee.Name]} Assigned Jobs
             </li>
           ))}
         </ul>
@@ -207,7 +207,7 @@ const JobAssignment = () => {
                 <td>{job.YardSize} yard</td>
                 <td>{job.Date}</td>
                 <td>{job.Time}</td>
-                <td>{job.AssignedEmployees?.join(", ") || "FLEXIBLE"}</td>
+                <td>{job.AssignedEmployees?.join(", ") || "Flex"}</td>
               </tr>
             ))}
           </tbody>
