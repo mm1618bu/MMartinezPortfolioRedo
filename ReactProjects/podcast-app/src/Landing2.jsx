@@ -1,122 +1,267 @@
-import React from "react";
-import "./App.css";
-import radioImage from "./assets/radio.png"; // Import the image
+import React from 'react';
 
 const Landing2 = () => {
-    const snowflakes = Array.from({ length: 50 }, (_, index) => ({
-        size: Math.random() * 5 + 5, // Random size between 5px and 10px
-        left: Math.random() * 100, // Random left position between 0% and 100%
-        duration: Math.random() * 5 + 5, // Random duration between 5s and 10s
-        delay: Math.random() * 5, // Random delay between 0s and 5s
-    }));
+  return (
+    <>
+      <style>
+        {`
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
 
-    return (
-        <>
-            <style>
-                {`
-                    .landing2-container {
-                        display: flex;
-                        height: 100vh;
-                        overflow: hidden;
-                        position: relative;
-                    }
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #fff;
+          }
 
-                    .background {
-                        display: block;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        object-fit: cover;
-                        width: 100%;
-                        height: 100%;
-                        background-image: url(${radioImage});
-                        background-size: cover;
-                        background-position: center;
-                    }
+          .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            padding: 40px;
+            overflow: hidden;
+          }
 
-                    .snowflake-container {
-                        position: absolute;
-                        width: 100%;
-                        height: 100%;
-                        top: 0;
-                        left: 0;
-                        pointer-events: none; /* Prevent snowflakes from blocking interactions */
-                    }
+          .header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 50px;
+            background-color: #1c1c1c;
+            margin-bottom: 40px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+          }
 
-                    .snowflake {
-                        position: absolute;
-                        border-radius: 50%;
-                        background-color: rgba(255, 255, 255, 0.8);
-                        animation-iteration-count: infinite;
-                        animation-timing-function: linear;
-                    }
+          .logo {
+            display: flex;
+            align-items: center;
+          }
 
-                    @keyframes fall {
-                        0% {
-                            top: -10%;
-                        }
-                        100% {
-                            top: 110%;
-                        }
-                    }
+          .logo img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+          }
 
-                    .text-container {
-                        flex: 0 0 50%; /* Take up 50% of the width */
-                        padding: 60px;
-                        margin: 60px 60px 60px 1960px;
-                        color: white;
-                        z-index: 1; /* Ensure text is above the background and snowflakes */
-                        margin-left: auto; /* Push the text container to the right */
-                        border: 4px outset rgba(244, 132, 1, 0.7);
-                        border-radius: 20px;
-                        background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
-                    }
+          .logo span {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+          }
 
-                    .text-container p {
-                        margin-bottom: 20px;
-                    }
-                `}
-            </style>
-            <div className="landing2-container">
-                <div className="background"></div>
-                <div className="snowflake-container">
-                    {snowflakes.map((snowflake, index) => (
-                        <div
-                            key={index}
-                            className="snowflake"
-                            style={{
-                                width: `${snowflake.size}px`,
-                                height: `${snowflake.size}px`,
-                                left: `${snowflake.left}%`,
-                                animation: `fall ${snowflake.duration}s linear ${snowflake.delay}s infinite`,
-                            }}
-                        ></div>
-                    ))}
-                </div>
-                <div className="text-container">
-                    <section>
-                        <h1>Podcast App</h1>
-                        <p>
-                            Welcome to the Podcast App! Listen to your favorite podcasts
-                            on the go.
-                        </p>
-                        <p>
-                            This is a simple podcast app built using React. It fetches
-                            podcast data from the Listen Notes API.
-                        </p>
-                    </section>
-                    <section>
-                        <h1>Features</h1>
-                        <ul>
-                            <li>Search for podcasts</li>
-                            <li>View podcast episodes</li>
-                            <li>Listen to podcast episodes</li>
-                        </ul>
-                    </section>
-                </div>
-            </div>
-        </>
-    );
-}
+          .menu {
+            display: flex;
+            align-items: center;
+          }
+
+          .menu a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+            font-size: 18px;
+          }
+
+          .menu a:hover {
+            color: #ff4500;
+          }
+
+          .hero-section {
+            background: linear-gradient(135deg, #ff7a00, #ff4500);
+            width: 100%;
+            padding: 50px 20px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            margin-top: 90px;
+            z-index: 10;
+          }
+
+          .hero-section h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #fff;
+            font-weight: 700;
+          }
+
+          .hero-section p {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 40px;
+          }
+
+          .hero-section button {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: #ff4500;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+          }
+
+          .hero-section button:hover {
+            background-color: #ff7a00;
+          }
+
+          .player {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 60px;
+            width: 100%;
+            max-width: 900px;
+            padding: 0 20px;
+          }
+
+          .player .controls {
+            display: inline-flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 40%;
+          }
+
+          .player .controls button {
+            background-color: #ff4500;
+            border: none;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+          }
+
+          .player .controls button:hover {
+            background-color: #ff7a00;
+          }
+
+          .player .details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            color: #fff;
+            width: 50%;
+          }
+
+          .player .details .song-info {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+          }
+
+          .player .details .artist-info {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ff7a00;
+          }
+
+          .footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 14px;
+            color: #b7b7b7;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+          }
+
+          .footer a {
+            color: #ff4500;
+            text-decoration: none;
+          }
+
+          .footer a:hover {
+            color: #ff7a00;
+          }
+
+          @media (max-width: 768px) {
+            .header {
+              flex-direction: column;
+              align-items: center;
+            }
+
+            .menu {
+              margin-top: 20px;
+            }
+
+            .hero-section {
+              padding: 30px;
+            }
+
+            .player {
+              flex-direction: column;
+              align-items: center;
+            }
+
+            .player .controls button {
+              width: 60px;
+              height: 60px;
+              font-size: 30px;
+            }
+
+            .player .details {
+              width: 100%;
+              text-align: center;
+            }
+
+            .footer {
+              font-size: 12px;
+            }
+          }
+        `}
+      </style>
+
+      <div className="container">
+        <div className="header">
+          <div className="logo">
+            <img src="https://via.placeholder.com/50" alt="Logo" />
+            <span>Radio App</span>
+          </div>
+          <div className="menu">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+          </div>
+        </div>
+
+        <div className="hero-section">
+          <h1>Listen to the Best Tunes Live!</h1>
+          <p>Join us now and experience music like never before. We have all your favorite songs!</p>
+          <button>Start Listening</button>
+        </div>
+
+        <div className="player">
+          <div className="controls">
+            <button>⏮️</button>
+            <button>▶️</button>
+            <button>⏭️</button>
+          </div>
+          <div className="details">
+            <div className="song-info">LostJons - Lartion Now</div>
+            <div className="artist-info">Artist: Mitus</div>
+          </div>
+        </div>
+
+        <div className="footer">
+          <p>&copy; 2024 Radio App | All Rights Reserved</p>
+        </div>
+      </div>
+    </>
+  );
+};
 
 export default Landing2;

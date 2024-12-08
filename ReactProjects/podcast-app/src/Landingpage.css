@@ -36,20 +36,21 @@
   }
   
   .cta-button {
-    background-color: #ff6a3d;
-    color: #fff;
-    padding: 15px 30px;
+    background-color: #007bff;
+    color: white;
     border: none;
-    border-radius: 25px;
-    font-size: 1rem;
+    padding: 10px 20px;
+    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
   }
   
   .cta-button:hover {
-    background-color: #ff8b5e;
+    background-color: #0056b3;
   }
-  
   /* Features Section */
   .features {
     padding: 60px 20px;

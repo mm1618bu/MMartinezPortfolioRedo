@@ -16,10 +16,12 @@ import UserProfile from './UserProfile';
 import Landing2 from './Landing2';
 
 function App() {
+
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<Landing2 />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/new-account" element={<NewAccount />} />
@@ -31,7 +33,7 @@ function App() {
         <Route path="/live-chat" element={<LiveChatFeature />} />
         <Route path="/broadcast-info" element={<BroadcastInfo />} />
         <Route path="/user-profile" element={<UserProfile />} />
-        <Route path="/landing2"l element={<Landing2 />} />
+        <Route path="/landing2" element={<Landing2 />} />
       </Routes>
     </Router>
   );

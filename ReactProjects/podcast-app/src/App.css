@@ -476,3 +476,8 @@ h2 {
   overflow: visible;
   vertical-align: -0.125em;
 }
+
+.Timestamp{
+  color: #333;
+  font-size: 9px;
+}

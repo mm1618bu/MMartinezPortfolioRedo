@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import "./App.css";
+import React, { useState } from 'react';
 
 const LiveChatFeature = () => {
     const [message, setMessage] = useState("");
@@ -15,15 +14,23 @@ const LiveChatFeature = () => {
         }
     };
 
+    const handleBack = () => {
+        window.location.href = '/broadcast-room';
+    };
+
     return (
         <div className="live-chat-container">
             <h2>Live Chat</h2>
             
+            {/* Back button */}
+            <button onClick={handleBack}>Back</button>
+
             {/* Chat messages display area */}
             <div className="chat-messages">
                 {messages.map((msg, index) => (
                     <div key={index} className="chat-message">
-                        <p>{msg}</p>
+                        <p><b>Name </b> {msg}</p>
+                        <p className="Timestamp">One Minute Ago</p>
                     </div>
                 ))}
             </div>
@@ -39,10 +46,9 @@ const LiveChatFeature = () => {
                     required
                     placeholder="Say Something..."
                 />
-                <button type="submit" className="message-button">Send</button>
             </form>
         </div>
     );
-}
+};
 
 export default LiveChatFeature;

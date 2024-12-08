@@ -10,8 +10,8 @@ const LandingPage= () => {
         <h1>Tenge Tenge Live</h1>
         <p>Connect with Others, Learn More, Become Engaged with your interests</p>
         <Link to="/login">
-                    <button className="cta-button">Log In</button>
-                </Link>
+          <button className="cta-button">Log In</button>
+        </Link>
       </section>
 
       {/* Features Section */}
