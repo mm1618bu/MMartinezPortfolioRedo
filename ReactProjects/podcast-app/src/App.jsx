@@ -14,6 +14,7 @@ import LandingPage from './LandingPage';
 import BroadcastInfo from './BroadcastInfo';
 import UserProfile from './UserProfile';
 import Landing2 from './Landing2';
+import UserAccountSettings from './UserAccountSettings';
 
 function App() {
 
@@ -34,6 +35,7 @@ function App() {
         <Route path="/broadcast-info" element={<BroadcastInfo />} />
         <Route path="/user-profile" element={<UserProfile />} />
         <Route path="/landing2" element={<Landing2 />} />
+        <Route path="/user-account-settings" element={<UserAccountSettings />} />
       </Routes>
     </Router>
   );

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./App.css";
+import batman from "./assets/batman.png";
 
 const UserProfile = () => {
     const [isEditingBio, setIsEditingBio] = useState(false);
@@ -49,7 +50,6 @@ const UserProfile = () => {
                         color: #333;
                         font-size: 24px;
                         font-weight: bold;
-                        margin-bottom: 5px;
                     }
 
                     .user-profile-card p {
@@ -75,10 +75,11 @@ const UserProfile = () => {
                         background-color: #007bff;
                         color: white;
                         border: none;
-                        border-radius: 8px;
+                        border-radius: 18px;
                         font-size: 16px;
                         cursor: pointer;
                         transition: background-color 0.3s ease, transform 0.2s ease;
+                        width: 200px;
                     }
 
                     .user-profile-card button:hover {
@@ -163,7 +164,7 @@ const UserProfile = () => {
             </style>
             <div className="user-profile-card">
                 <div className="user-name-info">
-                    <img src="https://via.placeholder.com/150" alt="User profile" />
+                    <img src={batman} alt="User profile" />
                     <h3>John Doe</h3>
                     <p>@JDoe1234</p>
                     <h4>200 Followers</h4>
@@ -194,9 +195,7 @@ const UserProfile = () => {
                     <p>Edit</p>
                 </div>
                 <div className="tags">
-                    <button>Meet People</button>
-                    <button>Join Room</button>
-                    <button>Follow</button>
+                    <button>India</button>
                 </div>
             </div>
         </>

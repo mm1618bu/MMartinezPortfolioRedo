@@ -1,5 +1,6 @@
 import React from 'react';
 import batman from './assets/batman.png';
+import aqua from './assets/aqua.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faShare, faPlus, faHand, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import BroadcastRoomDropDown from './BroadcastRoomDropdown';
@@ -28,7 +29,7 @@ const BroadcastRoom = () => {
           .broadcast-room {
             font-family: Arial, sans-serif;
             padding: 30px;
-            max-width: 500px;
+            max-width: 100%;
             margin: auto;
             color: #333;
             background: white;
@@ -61,49 +62,47 @@ const BroadcastRoom = () => {
           }
 
           .participant {
-            position: relative;
-            width: 80px;
-            text-align: center;
-            margin: 0 auto;
-          }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+    margin: 0 auto;
+    text-align: center;
+}
 
-          .participant img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 2px solid #00c853;
-            transition: transform 0.3s ease;
-          }
+.participant img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #00c853;
+    transition: transform 0.3s ease;
+}
 
-          .participant img:hover {
-            transform: scale(1.1);
-          }
+.participant img:hover {
+    transform: scale(1.1);
+}
 
-          .participant .name {
-            font-size: 12px;
-            margin-top: 5px;
-            font-weight: 600;
-            color: #333;
-            cursor: pointer;
-          }
+.participant .name {
+    font-size: 11px;
+    margin-top: 5px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+}
 
-          .participant .add {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: #007bff;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-size: 18px;
-            transition: background-color 0.3s ease;
-          }
-
+.participant .add {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
           .participant .add:hover {
             background: #0056b3;
           }
@@ -117,6 +116,7 @@ const BroadcastRoom = () => {
             gap: 20px;
             font-size: 14px;
             margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 3fr));
           }
 
           .listener img {
@@ -241,7 +241,7 @@ const BroadcastRoom = () => {
         <div className="participants">
           {["جنون", "Masoud", "Mona", "Fiona", "HORI", "Suhrab"].map((name, index) => (
             <div key={index} className={`participant`}>
-              <img src={batman} alt={name} />
+              <img src={aqua} alt={name} />
               <div className="add">+</div>
               <Link to="/user-profile" className="name">{name}</Link>
             </div>
@@ -261,6 +261,14 @@ const BroadcastRoom = () => {
             </Link>
             <Link to="/user-profile" className="name">Orlando</Link>
           </div>
+          <div className="participant">
+            <img src={batman} alt="Jen" />
+            <Link to="/user-profile" className="name">Jen</Link>
+          </div>
+          <div className="participant">
+            <img src={batman} alt="Katie" />
+            <Link to="/user-profile" className="name">Katie</Link>
+            </div>
         </div>
 
         <div className="controls">
@@ -275,7 +283,6 @@ const BroadcastRoom = () => {
 
         {isDropdownVisible && (<div className='dropdown'><BroadcastRoomDropDown /></div>)}
 
-        <button className="join-btn">+</button>
       </div>
     </>
   );
