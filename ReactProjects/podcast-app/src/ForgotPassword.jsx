@@ -7,8 +7,7 @@ const ForgotPassword = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle password reset logic here
-        setMessage("If an account with that email exists, a password reset link has been sent.");
+        setMessage("Password reset email sent!");
     };
 
     return (
