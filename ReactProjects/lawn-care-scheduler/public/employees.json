@@ -1,0 +1,110 @@
+[
+  {
+    "id": 1,
+    "name": "Alice Johnson",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Monday","Tuesday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Stoughton", "Canton", "Avon"]
+  },
+  {
+    "id": 2,
+    "name": "Bob Smith",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Wednesday","Thursday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy",  "Stoughton", "Canton", "Avon"]
+  },
+  {
+    "id": 3,
+    "name": "Charlie Brown",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Friday","Saturday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Hull", "Abington", "Rockland", "Randolph", "Holbrook", "Cohasset", "Sitchuate", "Hanover", "Norwell", "Stoughton", "Canton", "Avon"]
+  },
+  {
+    "id": 4,
+    "name": "David Lee",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Sunday","Monday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Hull", "Abington", "Rockland", "Randolph", "Holbrook", "Cohasset", "Sitchuate", "Hanover", "Norwell", "Stoughton", "Canton", "Avon"]
+  },
+  {
+    "id": 5,
+    "name": "Eve Johnson",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Monday","Tuesday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Hull", "Abington", "Rockland", "Randolph", "Holbrook", "Cohasset", "Sitchuate", "Hanover", "Norwell", "Canton", "Avon"]
+  },
+  {
+    "id": 6,
+    "name": "Frank Smith",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Wednesday","Thursday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Hull", "Abington", "Rockland", "Randolph", "Holbrook", "Cohasset", "Sitchuate", "Hanover", "Norwell", "Stoughton", "Canton", "Avon"]
+  },
+  {
+    "id": 7,
+    "name": "George Brown",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Friday","Saturday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Hull", "Abington", "Rockland", "Randolph", "Holbrook", "Cohasset", "Sitchuate", "Hanover", "Norwell", "Stoughton", "Canton", "Avon"]
+  },
+  {
+    "id": 8,
+    "name": "Harry Lee",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Sunday","Monday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Hull", "Abington", "Rockland", "Randolph", "Holbrook", "Cohasset", "Sitchuate", "Hanover", "Norwell", "Stoughton", "Canton", "Avon"]
+  },
+  {
+    "id": 9,
+    "name": "Ivy Johnson",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Monday","Tuesday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Hull", "Abington", "Rockland", "Randolph", "Holbrook", "Cohasset", "Sitchuate", "Hanover", "Norwell", "Stoughton", "Canton", "Avon"]
+  },
+  {
+    "id": 10,
+    "name": "Jack Smith",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Wednesday","Thursday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Hull", "Abington", "Rockland", "Randolph", "Holbrook", "Cohasset", "Sitchuate", "Hanover", "Norwell", "Stoughton", "Canton", "Avon"]
+  },
+  {
+    "id": 11,
+    "name": "Kathy Brown",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Friday","Saturday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Hull", "Abington", "Rockland", "Randolph", "Holbrook", "Cohasset", "Sitchuate", "Hanover", "Norwell", "Stoughton", "Canton", "Avon"]
+  },
+  {
+    "id": 12,
+    "name": "Larry Lee",
+    "phone": "555-555-5555",
+    "email": "",
+    "skills": ["Leaf Raking","Lawn Mowing", "Fall Clean Up"],
+    "daysOff": ["Sunday","Monday"],
+    "serviceArea": ["Weymouth", "Braintree", "Quincy", "Milton", "Hingham", "Hull", "Abington", "Rockland", "Randolph", "Holbrook", "Cohasset", "Sitchuate", "Hanover", "Norwell", "Stoughton", "Canton", "Avon"]
+  }
+]
