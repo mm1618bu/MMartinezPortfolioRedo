@@ -14,78 +14,126 @@ const ForgotPassword = () => {
         <>
             <style>
                 {`
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+
                     .forgot-password-container {
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
-                        padding: 20px;
-                        background-color: #f9f9f9;
-                        border-radius: 8px;
-                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                        max-width: 400px;
+                        padding: 40px;
+                        background-color: #222222; /* Black background */
+                        border-radius: 12px;
+                        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+                        max-width: 450px;
                         margin: auto;
-                        color: #333;
+                        color: #fff; /* White text color */
+                        transition: all 0.3s ease;
                     }
+
+                    .forgot-password-container:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+                    }
+
                     .forgot-password-container h2 {
-                        font-size: 24px;
-                        margin-bottom: 10px;
-                        color: #007bff;
+                        font-size: 32px;
+                        margin-bottom: 20px;
+                        color: #ff4500; /* Orange color */
+                        font-weight: 700;
+                        text-align: center;
                     }
+
                     .forgot-password-container p {
-                        font-size: 16px;
-                        margin: 10px 0;
+                        font-size: 18px;
+                        margin: 15px 0;
+                        color: #ccc; /* Lighter text color */
+                        text-align: center;
+                        line-height: 1.6;
                     }
+
                     .forgot-password-container form {
                         display: flex;
                         flex-direction: column;
                         width: 100%;
+                        margin-top: 25px;
                     }
+
                     .form-group {
-                        margin-bottom: 15px;
+                        margin-bottom: 18px;
+                        width: 100%;
                     }
+
                     .form-group label {
-                        margin-bottom: 5px;
-                        font-weight: bold;
-                        color: #333;
-                    }
-                    .form-group input {
-                        padding: 10px;
-                        border: 1px solid #ccc;
-                        border-radius: 4px;
+                        margin-bottom: 8px;
+                        font-weight: 600;
+                        color: #fff; /* White label color */
                         font-size: 16px;
-                        width: calc(100% - 22px); /* Adjust for padding and border */
                     }
+
+                    .form-group input {
+                        padding: 14px;
+                        border: 1px solid #555; /* Dark border */
+                        border-radius: 8px;
+                        font-size: 16px;
+                        width: 100%;
+                        box-sizing: border-box;
+                        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+                        background-color: #333; /* Dark input background */
+                        color: #fff; /* White text in inputs */
+                    }
+
                     .form-group input:focus {
-                        border-color: #007bff;
+                        border-color: #ff4500; /* Orange focus color */
                         outline: none;
-                        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+                        box-shadow: 0 0 8px rgba(255, 69, 0, 0.4);
                     }
+
                     .sso-button {
-                        padding: 10px;
-                        background-color: #007bff;
+                        padding: 14px 20px;
+                        background-color: #ff4500; /* Orange button */
                         color: white;
                         border: none;
-                        border-radius: 4px;
-                        font-size: 16px;
+                        border-radius: 8px;
+                        font-size: 18px;
                         cursor: pointer;
-                        transition: background-color 0.3s ease;
+                        transition: all 0.3s ease;
+                        font-weight: 600;
                     }
+
                     .sso-button:hover {
-                        background-color: #0056b3;
+                        background-color: #e03e00; /* Darker orange on hover */
+                        transform: translateY(-2px);
                     }
+
                     .forgot-password-container .message {
-                        margin-top: 15px;
-                        color: green;
+                        margin-top: 25px;
+                        color: #28a745; /* Green success message */
+                        font-size: 16px;
+                        text-align: center;
                     }
+
                     .forgot-password-container .back-to-login {
-                        margin-top: 15px;
-                        color: #007bff;
+                        margin-top: 20px;
+                        color: #ff4500; /* Orange link */
                         cursor: pointer;
+                        font-size: 16px;
                         text-decoration: underline;
+                        font-weight: 600;
+                        text-align: center;
+                        transition: color 0.3s ease;
+                    }
+
+                    .forgot-password-container .back-to-login:hover {
+                        color: #e03e00; /* Darker orange on hover */
                     }
                 `}
             </style>
+
             <div className="forgot-password-container">
                 <h2>Forgot Password</h2>
                 <p>Forgot your password? No problem! Reset it below</p>

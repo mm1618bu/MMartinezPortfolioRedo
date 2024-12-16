@@ -230,7 +230,7 @@ const Landing2 = () => {
         <div className="header">
           <div className="logo">
             <img src="https://via.placeholder.com/50" alt="Logo" />
-            <span>Radio App</span>
+            <span>Tenge Tenge Live</span>
           </div>
           <div className="menu">
             <a href="/">Home</a>
@@ -252,7 +252,7 @@ const Landing2 = () => {
             <button>⏭️</button>
           </div>
           <div className="details">
-            <div className="song-info">LostJons - Lartion Now</div>
+            <div className="song-info">The Cricket Corner</div>
             <div className="artist-info">Artist: Mitus</div>
           </div>
         </div>

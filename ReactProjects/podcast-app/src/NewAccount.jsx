@@ -6,115 +6,153 @@ const NewAccount = () => {
         <>
             <style>
                 {`
-                    .new-account-container {
+                    /* New layout container */
+                    .account-page {
                         display: flex;
-                        flex-direction: column;
-                        align-items: center;
                         justify-content: center;
-                        padding: 40px 30px;
-                        background-color: #ffffff;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                        align-items: center;
+                        height: 100vh;
+                        background-color: #000000; /* Black background */
+                    }
+
+                    .account-box {
+                        background-color: #222222;
+                        padding: 40px;
+                        border-radius: 15px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                        width: 100%;
                         max-width: 480px;
-                        margin: auto;
-                        color: #444;
+                        color: #fff; /* White text */
                     }
 
-                    .new-account-container h2 {
-                        font-size: 28px;
-                        margin-bottom: 30px;
-                        color: #333;
-                        font-weight: bold;
+                    .account-box h2 {
+                        font-size: 32px;
+                        color: #ff4500; /* Orange color */
                         text-align: center;
+                        margin-bottom: 20px;
                     }
 
-                    .new-account-form {
+                    .account-box p {
+                        text-align: center;
+                        color: #ccc;
+                        font-size: 16px;
+                        margin-bottom: 20px;
+                    }
+
+                    .input-group {
+                        margin-bottom: 20px;
                         display: flex;
                         flex-direction: column;
-                        width: 100%;
                     }
 
-                    .new-account-form input {
+                    .input-group label {
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #fff; /* White label */
+                        margin-bottom: 8px;
+                    }
+
+                    .input-group input {
                         padding: 14px;
-                        margin-bottom: 20px;
-                        border: 1px solid #ddd;
                         border-radius: 8px;
+                        border: 1px solid #444;
+                        background-color: #333; /* Dark input background */
+                        color: #fff; /* White text */
                         font-size: 16px;
                         width: 100%;
                         box-sizing: border-box;
                         transition: border-color 0.3s ease, box-shadow 0.3s ease;
                     }
 
-                    .new-account-form input:focus {
-                        border-color: #007bff;
+                    .input-group input:focus {
+                        border-color: #ff4500; /* Orange border on focus */
+                        box-shadow: 0 0 8px rgba(255, 69, 0, 0.5);
                         outline: none;
-                        box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
                     }
 
-                    .sso-button {
-                        padding: 14px;
-                        background-color: #007bff;
+                    .submit-btn {
+                        background-color: #ff4500; /* Orange button */
                         color: white;
+                        padding: 14px;
+                        font-size: 16px;
                         border: none;
                         border-radius: 8px;
-                        font-size: 16px;
                         cursor: pointer;
-                        transition: background-color 0.3s ease, transform 0.2s ease;
-                        margin-top: 20px;
                         width: 100%;
+                        transition: background-color 0.3s ease, transform 0.2s ease;
                     }
 
-                    .sso-button:hover {
-                        background-color: #0056b3;
+                    .submit-btn:hover {
+                        background-color: #e03e00; /* Darker orange on hover */
                         transform: translateY(-2px);
                     }
 
-                    .new-account-container p {
-                        margin-top: 25px;
-                        color: #666;
+                    .signin-link {
                         text-align: center;
+                        font-size: 14px;
+                        margin-top: 20px;
+                        color: #ff4500; /* Orange link */
                     }
 
-                    .new-account-container p a {
-                        color: #007bff;
+                    .signin-link a {
+                        color: #ff4500;
                         text-decoration: none;
                         font-weight: bold;
                     }
 
-                    .new-account-container p a:hover {
+                    .signin-link a:hover {
                         text-decoration: underline;
                     }
 
                     /* Responsive Design */
                     @media (max-width: 768px) {
-                        .new-account-container {
-                            padding: 30px 20px;
-                            max-width: 100%;
+                        .account-box {
+                            padding: 30px;
                         }
 
-                        .new-account-container h2 {
+                        .account-box h2 {
                             font-size: 24px;
                         }
 
-                        .new-account-form input {
+                        .input-group input {
                             font-size: 14px;
                         }
 
-                        .sso-button {
+                        .submit-btn {
                             font-size: 14px;
                         }
                     }
                 `}
             </style>
-            <div className="new-account-container">
-                <h2>Create a New Account</h2>
-                <form className="new-account-form">
-                    <input type="email" id="email" name="email" placeholder="Email Address" required />
-                    <input type="password" id="password" name="password" placeholder="Password" required />
-                    <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm Password" required />
-                    <button type="submit" className='sso-button'>Create Account</button>
-                </form>
-                <p>Already have an account? <Link to="/login">Sign in</Link></p>
+
+            <div className="account-page">
+                <div className="account-box">
+                    <h2>Create a New Account</h2>
+                    <p>Fill in the form below to create a new account.</p>
+
+                    <form>
+                        <div className="input-group">
+                            <label htmlFor="email">Email Address:</label>
+                            <input type="email" id="email" placeholder="Enter your email" required />
+                        </div>
+
+                        <div className="input-group">
+                            <label htmlFor="password">Password:</label>
+                            <input type="password" id="password" placeholder="Enter your password" required />
+                        </div>
+
+                        <div className="input-group">
+                            <label htmlFor="confirm-password">Confirm Password:</label>
+                            <input type="password" id="confirm-password" placeholder="Confirm your password" required />
+                        </div>
+
+                        <button type="submit" className="submit-btn">Create Account</button>
+                    </form>
+
+                    <div className="signin-link">
+                        <p>Already have an account? <Link to="/login">Sign in</Link></p>
+                    </div>
+                </div>
             </div>
         </>
     );
