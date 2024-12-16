@@ -230,7 +230,6 @@ const BroadcastRoom = () => {
           {["Tucker", "Chris"].map((name, index) => (
             <div key={index} className={`participant ${name === "Fiona" || name === "HORI" || name === "Suhrab" ? 'muted' : ''}`}>
               <img src={batman} alt={name} />
-              <div className="add">+</div>
               <Link to="/user-profile" className="name">{name}</Link>
             </div>
           ))}
@@ -242,7 +241,6 @@ const BroadcastRoom = () => {
           {["جنون", "Masoud", "Mona", "Fiona", "HORI", "Suhrab"].map((name, index) => (
             <div key={index} className={`participant`}>
               <img src={aqua} alt={name} />
-              <div className="add">+</div>
               <Link to="/user-profile" className="name">{name}</Link>
             </div>
           ))}

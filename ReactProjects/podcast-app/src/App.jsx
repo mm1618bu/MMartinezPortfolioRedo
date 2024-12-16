@@ -15,7 +15,11 @@ import BroadcastInfo from './BroadcastInfo';
 import UserProfile from './UserProfile';
 import Landing2 from './Landing2';
 import UserAccountSettings from './UserAccountSettings';
-import AdminDashboard from './AdminDashboard';
+import AdminDashboard from './admin/AdminDashboard';
+import UserManagement from './admin/UserManagement';
+import ManagePodcast from './admin/ManagePodcast';
+import Analytics from './admin/Analytics';
+import ContentModeration from './admin/ContentModeration';
 
 function App() {
 
@@ -37,7 +41,11 @@ function App() {
         <Route path="/user-profile" element={<UserProfile />} />
         <Route path="/landing2" element={<Landing2 />} />
         <Route path="/user-account-settings" element={<UserAccountSettings />} />
-        <Route path="/AdminDashboard" element={<AdminDashboard />} />
+        <Route path="/admin/AdminDashboard" element={<AdminDashboard />} />
+        <Route path="/admin/UserManagement" element={<UserManagement />} />
+        <Route path="/admin/ManagePodcast" element={<ManagePodcast />} />
+        <Route path="/admin/Analytics" element={<Analytics />} />
+        <Route path="/admin/ContentModeration" element={<ContentModeration />} />
       </Routes>
     </Router>
   );
