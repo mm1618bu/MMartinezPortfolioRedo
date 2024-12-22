@@ -1,5 +1,6 @@
 import React from 'react';
 import radio from './assets/radio.png';
+import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
   return (
@@ -17,9 +18,10 @@ const LoginPage = () => {
             <input type="password" id="password" placeholder="Enter the Password" />
           </div>
           <div className="forgot-password">
-            <a href="#">Forgot password?</a>
+            <Link to="/forgot-password" className="back-to-login">Forgot Password</Link>
           </div>
-          <button type="submit" className="signin-btn">Sign in</button>
+          <button type="submit" className="signin-btn">
+            <Link to="/for-you" className="signin-btn">Sign in</Link></button>
           <div className="divider">Or continue</div>
           <button type="button" className="google-btn">Log in with Google</button>
         </form>

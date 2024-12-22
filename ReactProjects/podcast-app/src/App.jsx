@@ -20,6 +20,7 @@ import UserManagement from './admin/UserManagement';
 import ManagePodcast from './admin/ManagePodcast';
 import Analytics from './admin/Analytics';
 import ContentModeration from './admin/ContentModeration';
+import ChatRoom from './ForYouDesktop';
 
 function App() {
 
@@ -46,6 +47,7 @@ function App() {
         <Route path="/admin/ManagePodcast" element={<ManagePodcast />} />
         <Route path="/admin/Analytics" element={<Analytics />} />
         <Route path="/admin/ContentModeration" element={<ContentModeration />} />
+        <Route path="/chatroom" element={<ChatRoom />} />
       </Routes>
     </Router>
   );
