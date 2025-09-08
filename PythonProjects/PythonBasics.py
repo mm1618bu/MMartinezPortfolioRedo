@@ -154,3 +154,227 @@ price5 = 1022.920202
 print(f"Price 1: ${price1:.2f}");
 print(f"Price 2: ${price2:.2f}");
 print(f"Price 3: ${price3:<10}");
+
+def print_symbol_grid():
+    rows = int(input("Enter number of rows: "))
+    columns = int(input("Enter number of columns: "))
+    symbol = input("Enter a symbol to use: ")
+    for x in range(rows):
+        for y in range(columns):
+            print(symbol, end=' ')
+        print()
+
+
+
+# Lists, Tuples, Sets
+fruits = ['Apple','Banana','Orange','Grapes']; # list
+print(fruits.index('Banana'));
+fruits.append('Mango');
+fruits.insert(1,'Strawberry');
+fruits.remove('Orange');
+fruits.pop();
+fruits.sort();
+fruits.reverse();
+print(fruits);
+
+fruitset = {"apple","peach","bananna","lemon"}; # set
+print(len(fruitset));
+fruitset.add("pineapple");
+fruitset.remove("apple");
+fruitset.pop();
+
+fruittuple = ("apple", "peach", "bananna","lemon") # tuple
+
+# 2D List
+fruits2D = ['Apple','Banana','Orange'];
+vegetables2D = ['Carrot','Potato','Onion'];
+meats2D = ['Chicken','Beef','Pork'];
+
+grocery2D = [fruits2D,vegetables2D,meats2D];
+grocery2DA = [['Apple','Banana','Orange'],['Carrot','Potato','Onion'],['Chicken','Beef','Pork']];
+for collection in grocery2DA:
+    for item in collection:
+        print(item);
+
+# Dictionaries
+capitals = {'USA':'Washington DC','India':'New Delhi','China':'Beijing','Russia':'Moscow'};
+print(capitals['India']);
+print(capitals.get('China'));
+print(capitals.keys());
+print(capitals.values());
+print(capitals.items());
+
+# Random Numbers
+import random;
+
+low = 1
+high = 100
+diceroll = random.randint(low,high);
+options = ("rock","paper","scissors");
+num = random.random(); # returns a random float between 0 and 1
+randomoption = random.choice(options);
+print(diceroll,num,randomoption);
+random.shuffle();
+
+# functions
+def net_price(list_price, discount=0, tax=0.05):
+    discount_amount = list_price * discount
+    price_after_discount = list_price - discount_amount
+    tax_amount = price_after_discount * tax
+    final_price = price_after_discount + tax_amount
+    return round(final_price, 2)
+
+def hello(greeting, title, first, last):
+    print(f"{greeting} {title} {first} {last}")
+    return
+hello("Hello","Mr.","John","Doe");
+
+# *args and **kwargs
+def add(*nums):
+    total = 0
+    for arg in args:
+        total += arg
+    return total
+
+# Match-Case Statements
+
+def is_weekend(day):
+    match day:
+        case "Saturday" | "Sunday":
+            return True
+        case "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday":
+            return False
+        case _:
+            return "Invalid day"
+
+# Object Oriented Programming
+class Car:
+
+    wheels = 4;
+    num_students = 0;
+    def __init__(self, make, model, year, color):
+        self.make = make
+        self.model = model
+        self.year = year
+        self.color = color
+        Car.num_students += 1;
+
+    def start(self):
+        print(f"The {self.color} {self.make} {self.model} is starting.")
+    def stop(self):
+        print(f"The {self.color} {self.make} {self.model} is stopping.")
+my_car = Car("Toyota", "Camry", 2020, "blue")
+my_car.start()
+my_car.stop()
+print(f"My car is a {my_car.year} {my_car.color} {my_car.make} {my_car.model}.")
+
+# Inheritance
+
+class Animal():
+    def __init__(self, name):
+        self.name = name
+        self.is_alive = True
+
+    def eat(self):
+        print(f"{self.name} is eating.")
+
+    def sleep(self):
+        print(f"{self.name} is sleeping.")
+
+class Dog(Animal):
+    def speek(self):
+        print(f"{self.name} says Woof!")
+
+class Cat(Animal):
+    def speek(self):
+        print(f"{self.name} says Meow!")
+
+class Mouse(Animal):
+    def speek(self):
+        print(f"{self.name} says Squeak!")
+
+dog = Dog("Buddy")
+cat = Cat("Whiskers")
+mouse = Mouse("Mickey") 
+
+dog.eat()
+cat.sleep()
+mouse.eat()
+dog.speek()
+cat.speek()
+mouse.speek()
+
+# Multiple Inheritance / Multilevel Inheritance
+
+class Prey:
+    def flee(self):
+        print(f"{self.name} is fleeing.")
+
+class Predator:
+    def hunt(self):
+        print(f"{self.name} is hunting.")
+
+class Rabbit(Prey):
+    pass
+
+class Hawk(Predator):
+    pass
+
+class Fish(Prey,Predator):
+    pass
+
+rabbit = Rabbit("Bugs")
+hawk = Hawk("Tony")
+fish = Fish("Nemo")
+
+fish.hunt()
+fish.flee()
+rabbit.flee()
+hawk.hunt()
+
+# Super
+
+class Shape:
+    def __inint__(self, color, fill):
+        self.color = color
+        self.fill = fill
+
+class Circle(Shape):
+    def __init__(self, color, fill, radius):
+        super().__init__(color, fill)
+        self.radius = radius
+
+class Square(Shape):
+    def __init__(self, color, fill, width):
+        super().__init__(color, fill)
+        self.width = width
+
+class Triangle(Shape):
+    def __init__(self, color, fill, height):
+        super().__init__(color, fill)
+        self.height = height
+
+circle = Circle("red",True,5)
+square = Square("blue",False,4)
+triangle = Triangle("green",True,3)
+print(circle.color,circle.fill,circle.radius)
+
+# Polymorphism
+
+class Shaper:
+    
+    def area(self):
+        pass
+
+class Circular(Shaper):
+    pass
+
+class Square(Shaper):
+    pass
+
+class Triangle(Shaper):
+    pass
+
+circle = Circular()
+square = Square()
+Shaper = [Circular(4),Square(5),Triangle(6,7)]
