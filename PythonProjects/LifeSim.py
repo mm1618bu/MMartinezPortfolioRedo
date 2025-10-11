@@ -903,7 +903,7 @@ def load_game(path: str):
 # ============================================================
 BUILTIN_EVENTS: List[Event] = [
     # Childhood & schooling
-    evt_childhood_checkup(),
+    # evt_childhood_checkup(),
     evt_school_path(),
     evt_highschool_decision(),
     evt_post_hs_paths(),
