@@ -378,3 +378,196 @@ class Triangle(Shaper):
 circle = Circular()
 square = Square()
 Shaper = [Circular(4),Square(5),Triangle(6,7)]
+
+# Static methods
+
+class Employee:
+
+    def __init__(self, name, position):
+        self.name = name
+        self.position = position
+
+    def get_info(self):
+        return f"{self.name} is a {self.position}"
+
+    @staticmethod
+    def is_valid_position(position):
+        valid_positions = ["Manager", "Developer", "Designer", "Intern"]
+        return position in valid_positions
+
+Employee1 = Employee("John Doe", "Developer")
+Employee2 = Employee("Jane Smith", "Manager")
+Employee3 = Employee("Alice Johnson", "CEO")
+Employee4 = Employee("Bob Brown", "Intern")
+print(Employee1.get_info()) # John Doe is a Developer
+print(Employee2.get_info()) # Jane Smith is a Manager
+print(Employee3.get_info()) # Alice Johnson is a CEO
+print(Employee4.get_info()) # Bob Brown is a Intern
+
+print(Employee.is_valid_position("Manager")) # True
+print(Employee.is_valid_position("CEO")) # False
+
+# class methods
+class Student:
+
+    count =0
+
+    def ___init__(self, name, gpa):
+        self.name = name
+        self.gpa = gpa
+        Student.count += 1
+
+    #THIS IS A INSTANCE METHOD
+    def get_info(self):
+        return f"{self.name} has a GPA of {self.gpa}"
+
+    @classmethod
+    def get_count(cls):
+        return f"There are {cls.count} students"
+
+student1 = Student("John Doe", 3.5)
+student2 = Student("Jane Smith", 3.8)
+print(student1.get_info()) # John Doe has a GPA of 3.5
+print(student2.get_info()) # Jane Smith has a GPA of 3.8
+
+print(Student.get_count()) # There are 0 students
+
+# Magic Method
+class Book:
+    
+    def __init__(self, title, author, pages):
+        self.title = title
+        self.author = author
+        self.pages = pages
+
+    def __str__(self):
+        return f"{self.title} by {self.author}"
+
+    def __len__(self):
+        return self.pages
+
+    def __del__(self):
+        print(f"{self.title} has been deleted")
+
+    def __gt__(self, other):
+        return self.pages > other.pages
+    
+book1 = Book("Python Basics", "John Doe", 200)
+book2 = Book("Advanced Python", "Jane Smith", 300)
+print(book1) # Python Basics by John Doe
+print(len(book2)) # 300
+
+# property decorator
+
+class Rectangle:
+    def __init__(self, width, height):
+        self._width = width
+        self._height = height
+
+    @property
+    def width(self):
+        return f"{self._width:.1f}"
+
+    @property
+    def height(self):
+        return f"{self._height:.1f}"
+
+    @width.setter
+    def width(self, new_width):
+        if new_width >= 0:
+            self._width = new_width
+        else:
+            raise ValueError("Width must be non-negative")
+
+    @width.deleter
+    def width(self):
+        del self._width
+        print("Width deleted")
+
+Rectangle = Rectangle(10, 5)
+print(Rectangle.width) # 10
+print(Rectangle.height) # 5
+
+def add_sprinkles(func):
+    def wrapper():
+        print("Adding sprinkles")
+        func()
+    return wrapper
+
+def add_fudge(func):
+    def wrapper():
+        print("Adding fudge")
+        func()
+    return wrapper
+
+@add_sprinkles
+def get_ice_cream():
+    print("Here's your ice cream")
+
+try:
+    number = int(input("Enter a number: "))
+    print(1/number)
+except ValueError:
+    print("Invalid input. Please enter a valid number.")
+finally:
+    print("Execution completed.")
+
+# file detection
+import os
+file_path = 'test.txt'
+if os.path.exists(file_path):
+    print("File exists")
+    with open(file_path, 'r') as file:
+        content = file.read()
+        print(content)
+else:
+    print("File does not exist")
+    with open(file_path, 'w') as file:
+        file.write("This is a test file.")
+        print("File created")
+
+# dates and times
+import datetime
+date = datetime.date(2023, 1, 1)
+print(date)
+today = datetime.date.today()
+print(today)
+time = datetime.time(12, 30, 45)
+print(time)
+now = datetime.datetime.now()
+now = now.strftime("%Y-%m-%d %H:%M:%S")
+print(now)
+target_date = datetime.date(2024, 12, 25)
+current_date = datetime.date.today()
+if target_date > current_date:
+    delta = target_date - current_date
+    print(f"There are {delta.days} days until {target_date}")
+else:
+    print(f"{target_date} has already passed")
+
+# multithreading
+import threading
+import time
+
+def walk_dog():
+    time.sleep(8)
+    print("Walking the dog {first} {last}")
+
+def take_out_trash():
+    time.sleep(2)
+    print("Taking out the trash")
+
+def get_mail():
+    time.sleep(4)
+    print("Getting the mail")
+
+chore1 = threading.Thread(target=walk_dog,args=("Leon","Parker"))
+chore1.start()
+chore2 = threading.Thread(target=take_out_trash)
+chore2.start()
+chore3 = threading.Thread(target=get_mail)
+chore3.start()
+
+chore1.join()
+chore2.join()
+chore3.join()
