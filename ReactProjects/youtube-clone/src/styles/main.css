@@ -1,0 +1,70 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+:root{
+    --primary-color: white;
+    --secondary-color: red;
+    --soft-color: gray;
+}
+
+.User-Form{
+
+    margin: auto;
+    margin-top:15%;
+    padding-top:60%;
+    width: 50%;
+    border: 2px solid var(--soft-color);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    justify-content: center;
+
+    form{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        margin: 40px;
+    }
+
+    input{
+        width: 300px;
+        margin: 10px;
+        color: red;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid var(--soft-color);
+    }
+
+    input:focus{
+        outline: 2px solid var(--secondary-color);
+        border: 2px solid var(--secondary-color);
+    }
+
+    label{
+        margin: 5px;
+        padding: 5px;
+        font-weight: 400;
+    }
+
+    button{
+        margin-top: 15px;
+        padding: 5px;
+        width: 100px;
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    a{
+        text-decoration: none;
+        color: var(--soft-color);
+        display: inline-flex;
+    }
+}

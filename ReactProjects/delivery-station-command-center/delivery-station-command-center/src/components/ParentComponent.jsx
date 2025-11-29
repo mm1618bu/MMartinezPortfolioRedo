@@ -4,6 +4,7 @@ import TruckUnloading from './TruckUnloading';
 import Inducting from './Inducting';
 import Stowing from './Stowing';
 import '../styles/main.scss';
+import TicketDiscussion from './TicketDiscussion';
 
 const ParentComponent = () => {
   const [totalPackages, setTotalPackages] = useState(0);
@@ -17,9 +18,9 @@ const ParentComponent = () => {
       <TruckUnloading onTotalPackagesChange={handleTotalPackagesChange} />
       <Inducting totalPackages={totalPackages} />
       <Stowing />
-    </span>
+    </span>   
   );
-};
+}
 
 ParentComponent.propTypes = {
   totalPackages: PropTypes.number,
