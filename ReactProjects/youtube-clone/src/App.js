@@ -6,6 +6,7 @@ import ForgotPassword from './front-end/components/ForgotPassword.jsx';
 import VideoUpload from './front-end/components/VideoUpload.jsx';
 import VideoGrid from './front-end/components/VideoGrid.jsx';
 import VideoPlayer from './front-end/components/VideoPlayer.jsx';
+import Channel from './front-end/components/Channel.jsx';
 
 function HomePage() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/watch/:videoId" element={<VideoPlayer />} />
+          <Route path="/channel" element={<Channel />} />
         </Routes>
       </div>
     </Router>

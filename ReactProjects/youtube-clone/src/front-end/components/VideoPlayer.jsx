@@ -47,33 +47,67 @@ export default function VideoPlayer() {
     console.log(isSubscribed ? "Unsubscribed" : "Subscribed!");
   };
 
-  const handleLike = () => {
+  const handleLike = async () => {
+    let newLikes = likes;
+    let newDislikes = dislikes;
+
     if (userReaction === 'like') {
       // Remove like
-      setLikes(likes - 1);
+      newLikes = likes - 1;
+      setLikes(newLikes);
       setUserReaction(null);
     } else {
       // Add like
       if (userReaction === 'dislike') {
-        setDislikes(dislikes - 1);
+        newDislikes = dislikes - 1;
+        setDislikes(newDislikes);
       }
-      setLikes(likes + 1);
+      newLikes = likes + 1;
+      setLikes(newLikes);
       setUserReaction('like');
+    }
+
+    // Update in Supabase
+    try {
+      await updateVideoInSupabase(videoId, { 
+        likes: newLikes,
+        dislikes: newDislikes 
+      });
+      console.log('✅ Like updated in database');
+    } catch (error) {
+      console.error('❌ Error updating like:', error);
     }
   };
 
-  const handleDislike = () => {
+  const handleDislike = async () => {
+    let newLikes = likes;
+    let newDislikes = dislikes;
+
     if (userReaction === 'dislike') {
       // Remove dislike
-      setDislikes(dislikes - 1);
+      newDislikes = dislikes - 1;
+      setDislikes(newDislikes);
       setUserReaction(null);
     } else {
       // Add dislike
       if (userReaction === 'like') {
-        setLikes(likes - 1);
+        newLikes = likes - 1;
+        setLikes(newLikes);
       }
-      setDislikes(dislikes + 1);
+      newDislikes = dislikes + 1;
+      setDislikes(newDislikes);
       setUserReaction('dislike');
+    }
+
+    // Update in Supabase
+    try {
+      await updateVideoInSupabase(videoId, { 
+        likes: newLikes,
+        dislikes: newDislikes 
+      });
+      console.log('✅ Dislike updated in database');
+    } catch (error) {
+      console.error('❌ Error updating dislike:', error);
     }
   };
 
@@ -193,6 +227,47 @@ export default function VideoPlayer() {
         }}>
           {video.title}
         </h1>
+
+        {/* Channel Info */}
+        {video.channel_name && (
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            marginBottom: "16px",
+            paddingBottom: "16px",
+            borderBottom: "1px solid #e0e0e0"
+          }}>
+            <div style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "24px",
+              color: "white",
+              fontWeight: "bold"
+            }}>
+              {video.channel_name.charAt(0).toUpperCase()}
+            </div>
+            <div style={{ flex: 1 }}>
+              <h3 style={{
+                margin: 0,
+                fontSize: "16px",
+                fontWeight: "600",
+                cursor: "pointer"
+              }}
+              onClick={() => navigate('/channel')}
+              onMouseEnter={(e) => e.currentTarget.style.color = "#007bff"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "inherit"}
+              >
+                {video.channel_name}
+              </h3>
+            </div>
+          </div>
+        )}
 
         <div style={{ 
           display: "flex", 

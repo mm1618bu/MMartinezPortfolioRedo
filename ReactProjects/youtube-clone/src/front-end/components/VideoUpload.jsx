@@ -5,6 +5,7 @@ export default function VideoUpload() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [keywords, setKeywords] = useState("");
+  const [channelName, setChannelName] = useState("");
   const [videoFile, setVideoFile] = useState(null);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -43,6 +44,7 @@ export default function VideoUpload() {
       setTitle("");
       setDescription("");
       setKeywords("");
+      setChannelName("");
       setVideoFile(null);
       setThumbnailFile(null);
       setVideoDuration(0);
@@ -87,6 +89,7 @@ export default function VideoUpload() {
       title: title,
       description: description || "",
       keywords: keywords.split(',').map(k => k.trim()).filter(k => k),
+      channel_name: channelName || "My Channel",
       thumbnail_url: thumbnailUrl || "https://placehold.co/320x180",
       video_url: videoUrl,
       views: 0,
@@ -248,6 +251,20 @@ export default function VideoUpload() {
             onChange={(e) => setKeywords(e.target.value)}
             style={{ width: "100%", padding: "8px", fontSize: "16px" }}
             placeholder="gaming, tutorial, vlog, etc. (comma separated)"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="channelName" style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+            Channel Name
+          </label>
+          <input
+            type="text"
+            id="channelName"
+            value={channelName}
+            onChange={(e) => setChannelName(e.target.value)}
+            style={{ width: "100%", padding: "8px", fontSize: "16px" }}
+            placeholder="Enter your channel name (optional)"
           />
         </div>
 
