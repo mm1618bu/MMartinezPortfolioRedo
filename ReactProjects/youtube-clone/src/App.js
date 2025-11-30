@@ -1,15 +1,34 @@
 import './styles/main.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './front-end/components/LoginPage.jsx';
 import RegisterPage from './front-end/components/RegisterPage.jsx';
 import ForgotPassword from './front-end/components/ForgotPassword.jsx';
+import VideoUpload from './front-end/components/VideoUpload.jsx';
+import VideoGrid from './front-end/components/VideoGrid.jsx';
+import VideoPlayer from './front-end/components/VideoPlayer.jsx';
 
-function App() {
+function HomePage() {
   return (
-    <div className="App">
+    <div>
       <LoginPage />
       <RegisterPage />
       <ForgotPassword />
+      <VideoUpload />
+      <VideoGrid />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/watch/:videoId" element={<VideoPlayer />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
