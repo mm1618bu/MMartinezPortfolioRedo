@@ -116,3 +116,78 @@ export const deleteVideoFromSupabase = async (videoId, videoUrl, thumbnailUrl) =
 
   if (error) throw error;
 };
+
+// ============================================
+// COMMENTS FUNCTIONS
+// ============================================
+
+// Get all comments for a video
+export const getCommentsForVideo = async (videoId) => {
+  const { data, error } = await supabase
+    .from('comments')
+    .select('*')
+    .eq('video_id', videoId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
+
+// Add a new comment
+export const addComment = async (videoId, userName, commentText) => {
+  const { data, error } = await supabase
+    .from('comments')
+    .insert([{
+      video_id: videoId,
+      user_name: userName,
+      comment_text: commentText
+    }])
+    .select();
+
+  if (error) throw error;
+  return data[0];
+};
+
+// Update a comment
+export const updateComment = async (commentId, commentText) => {
+  const { data, error } = await supabase
+    .from('comments')
+    .update({ comment_text: commentText })
+    .eq('id', commentId)
+    .select();
+
+  if (error) throw error;
+  return data[0];
+};
+
+// Delete a comment
+export const deleteComment = async (commentId) => {
+  const { error } = await supabase
+    .from('comments')
+    .delete()
+    .eq('id', commentId);
+
+  if (error) throw error;
+};
+
+// Like a comment
+export const likeComment = async (commentId) => {
+  // First get current likes
+  const { data: comment, error: fetchError } = await supabase
+    .from('comments')
+    .select('likes')
+    .eq('id', commentId)
+    .single();
+
+  if (fetchError) throw fetchError;
+
+  // Increment likes
+  const { data, error } = await supabase
+    .from('comments')
+    .update({ likes: (comment.likes || 0) + 1 })
+    .eq('id', commentId)
+    .select();
+
+  if (error) throw error;
+  return data[0];
+};

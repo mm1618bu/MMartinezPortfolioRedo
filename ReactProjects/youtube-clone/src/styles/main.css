@@ -473,3 +473,166 @@
     font-size: 11px;
     font-weight: 500;
 }
+
+/* Comments Section */
+.CommentsSection {
+    margin-top: 24px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.CommentsSection-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.CommentsSection-new {
+    margin-bottom: 24px;
+}
+
+.CommentsSection-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.CommentsSection-nameInput {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 300px;
+}
+
+.CommentsSection-nameInput:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+}
+
+.CommentsSection-textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.CommentsSection-textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+}
+
+.CommentsSection-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.CommentsSection-button {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.CommentsSection-button:hover:not(:disabled) {
+    background-color: #cc0000;
+}
+
+.CommentsSection-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.CommentsSection-error {
+    color: red;
+    font-size: 13px;
+}
+
+.CommentsSection-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.CommentsSection-empty {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+.CommentsSection-item {
+    padding: 16px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.CommentsSection-itemHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.CommentsSection-author {
+    font-weight: 600;
+    color: #333;
+}
+
+.CommentsSection-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.CommentsSection-text {
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.CommentsSection-itemActions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.CommentsSection-likeButton {
+    background-color: transparent;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.CommentsSection-likeButton:hover {
+    background-color: #f0f0f0;
+}
+
+.CommentsSection-deleteButton {
+    background-color: transparent;
+    border: 1px solid #ff4444;
+    color: #ff4444;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.CommentsSection-deleteButton:hover {
+    background-color: #ff4444;
+    color: white;
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getVideoFromSupabase, updateVideoInSupabase } from '../utils/supabase';
+import CommentFeed from './CommentFeed.jsx';
 
 export default function VideoPlayer() {
   const { videoId } = useParams();
@@ -402,6 +403,9 @@ export default function VideoPlayer() {
             </p>
           </div>
         )}
+        
+        {/* Comments Section */}
+        <CommentFeed videoId={videoId} />
       </div>
     </div>
   );
