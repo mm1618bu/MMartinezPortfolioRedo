@@ -41,10 +41,19 @@ export default function Channel() {
         
         setChannelData(channel);
         
-        // Fetch user data for avatar/banner if it's the current user
+        // Check if the logged-in user owns this channel
         const { data: { user: currentUser } } = await supabase.auth.getUser();
         if (currentUser && currentUser.id === channel.user_id) {
           setUserData(currentUser);
+        } else {
+          // For other users' channels, we'll need to fetch from a profiles table or use default
+          // For now, we can construct URLs based on user_id
+          setUserData({
+            user_metadata: {
+              avatar_url: `${supabase.storage.from('avatars').getPublicUrl(`profile-pictures/${channel.user_id}.jpg`).data.publicUrl}`,
+              banner_url: `${supabase.storage.from('avatars').getPublicUrl(`banners/${channel.user_id}.jpg`).data.publicUrl}`
+            }
+          });
         }
         
         // Fetch videos for this channel

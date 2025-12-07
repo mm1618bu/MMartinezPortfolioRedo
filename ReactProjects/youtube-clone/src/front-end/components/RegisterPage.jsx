@@ -51,7 +51,7 @@ export default function RegisterPage() {
     } else {
       alert('Registration complete! Please check your email to confirm your account.');
     }
-    navigate('/');
+    navigate('/home');
   };
 
   // Show channel creation if user wants one

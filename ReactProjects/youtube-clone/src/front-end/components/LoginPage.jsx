@@ -26,11 +26,11 @@ export default function LoginPage() {
     }
 
     // Logged in successfully
-    window.alert("User logged in:", data);
+    console.log("User logged in:", data);
     setLoading(false);
 
-    // Optional redirect
-    window.location.href = "/";
+    // Redirect to home page after login
+    window.location.href = "/home";
   };
 
   return (

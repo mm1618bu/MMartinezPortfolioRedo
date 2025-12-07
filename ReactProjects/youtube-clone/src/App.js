@@ -2,6 +2,8 @@ import './styles/main.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import TopNavBar from './front-end/components/TopNavBar.jsx';
+import LandingPage from './front-end/components/LandingPage.jsx';
 import LoginPage from './front-end/components/LoginPage.jsx';
 import RegisterPage from './front-end/components/RegisterPage.jsx';
 import ForgotPassword from './front-end/components/ForgotPassword.jsx';
@@ -16,7 +18,7 @@ import PlaylistGrid from './front-end/components/PlaylistGrid.jsx';
 import PlaylistViewer from './front-end/components/PlaylistViewer.jsx';
 import CreatePlaylist from './front-end/components/CreatePlaylist.jsx';
 import CreateChannel from './front-end/components/CreateChannel.jsx';
-
+import Sidebar from './front-end/components/Sidebar.jsx';
 // Create a client with enhanced rate limiting
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +40,7 @@ const queryClient = new QueryClient({
 function HomePage() {
   return (
     <div>
+      <Sidebar />
       <LoginPage />
       <RegisterPage />
       <ForgotPassword/>
@@ -56,15 +59,18 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/watch/:videoId" element={<VideoPlayer />} />
-            <Route path="/channel" element={<Channel />} />
-            <Route path="/channel/:channelTag" element={<Channel />} />
-            <Route path="/playlists" element={<PlaylistGrid />} />
-            <Route path="/playlists/:channelName" element={<PlaylistGrid />} />
-            <Route path="/playlist/:playlistId" element={<PlaylistViewer />} />
-            <Route path="/playlist/create" element={<CreatePlaylist channelName="DefaultChannel" />} />
-            <Route path="/channel/create" element={<CreateChannel skipable={false} />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/home" element={<><TopNavBar /><HomePage /></>} />
+            <Route path="/login" element={<><TopNavBar /><LoginPage /></>} />
+            <Route path="/register" element={<><TopNavBar /><RegisterPage /></>} />
+            <Route path="/watch/:videoId" element={<><TopNavBar /><VideoPlayer /></>} />
+            <Route path="/channel" element={<><TopNavBar /><Channel /></>} />
+            <Route path="/channel/:channelTag" element={<><TopNavBar /><Channel /></>} />
+            <Route path="/playlists" element={<><TopNavBar /><PlaylistGrid /></>} />
+            <Route path="/playlists/:channelName" element={<><TopNavBar /><PlaylistGrid /></>} />
+            <Route path="/playlist/:playlistId" element={<><TopNavBar /><PlaylistViewer /></>} />
+            <Route path="/playlist/create" element={<><TopNavBar /><CreatePlaylist channelName="DefaultChannel" /></>} />
+            <Route path="/channel/create" element={<><TopNavBar /><CreateChannel skipable={false} /></>} />
           </Routes>
         </div>
       </Router>
