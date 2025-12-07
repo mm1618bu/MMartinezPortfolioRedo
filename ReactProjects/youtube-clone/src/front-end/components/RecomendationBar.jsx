@@ -1,5 +1,5 @@
 // src/front-end/components/RecomendationBar.jsx
-import { useEffect, useState } from "react";
+import { useQuery } from '@tanstack/react-query';
 import { getAllVideosFromSupabase, getVideoFromSupabase } from "../utils/supabase";
 import "../../styles/main.css";
 
@@ -9,49 +9,34 @@ import "../../styles/main.css";
  *  - limit? (number, optional): how many recommendations to fetch (default 8)
  */
 export default function RecomendationBar({ videoId, limit = 8 }) {
-  const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
-
-  useEffect(() => {
-    if (!videoId) return;
-
-    async function fetchRecommendations() {
-      setLoading(true);
-      setErrorMsg("");
-
-      try {
-        // Get current video to find its keywords
-        const currentVideo = await getVideoFromSupabase(videoId);
-        
-        // Get all videos
-        const allVideos = await getAllVideosFromSupabase();
-        
-        // Filter out the current video and find videos with matching keywords
-        let filtered = allVideos.filter(v => v.id !== videoId);
-        
-        if (currentVideo?.keywords && currentVideo.keywords.length > 0) {
-          // Sort by number of matching keywords
-          filtered = filtered.map(video => {
-            const matchingKeywords = video.keywords?.filter(k => 
-              currentVideo.keywords.includes(k)
-            ).length || 0;
-            return { ...video, matchScore: matchingKeywords };
-          }).sort((a, b) => b.matchScore - a.matchScore);
-        }
-        
-        // Limit results
-        setRecommendations(filtered.slice(0, limit));
-      } catch (err) {
-        console.error("Error fetching recommendations:", err);
-        setErrorMsg(err.message || "Unable to load recommended videos.");
-      } finally {
-        setLoading(false);
+  // Fetch recommendations with caching
+  const { data: recommendations = [], isLoading: loading, error: errorMsg } = useQuery({
+    queryKey: ['recommendations', videoId, limit],
+    queryFn: async () => {
+      // Get current video to find its keywords
+      const currentVideo = await getVideoFromSupabase(videoId);
+      
+      // Get all videos
+      const allVideos = await getAllVideosFromSupabase();
+      
+      // Filter out the current video and find videos with matching keywords
+      let filtered = allVideos.filter(v => v.id !== videoId);
+      
+      if (currentVideo?.keywords && currentVideo.keywords.length > 0) {
+        // Sort by number of matching keywords
+        filtered = filtered.map(video => {
+          const matchingKeywords = video.keywords?.filter(k => 
+            currentVideo.keywords.includes(k)
+          ).length || 0;
+          return { ...video, matchScore: matchingKeywords };
+        }).sort((a, b) => b.matchScore - a.matchScore);
       }
-    }
-
-    fetchRecommendations();
-  }, [videoId, limit]);
+      
+      // Limit results
+      return filtered.slice(0, limit);
+    },
+    enabled: !!videoId,
+  });
 
   if (!videoId) {
     return null;
@@ -63,7 +48,7 @@ export default function RecomendationBar({ videoId, limit = 8 }) {
 
       {loading && <p>Loading recommendations...</p>}
 
-      {errorMsg && <p className="Error-Text">{errorMsg}</p>}
+      {errorMsg && <p className="Error-Text">{errorMsg.message}</p>}
 
       {!loading && !errorMsg && recommendations.length === 0 && (
         <p className="VideoRecommendations-empty">

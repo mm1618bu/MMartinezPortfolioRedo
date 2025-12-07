@@ -1,13 +1,19 @@
 import { useState } from "react";
-import { supabase } from "../../supabase.ts";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../utils/supabase";
+import CreateChannel from "./CreateChannel";
 import "../../styles/main.css";
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const [emailOrUser, setEmailOrUser] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [wantsChannel, setWantsChannel] = useState(null); // null = not decided, true = wants, false = doesn't want
+  const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [registeredUser, setRegisteredUser] = useState(null);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -19,7 +25,7 @@ export default function RegisterPage() {
       email: emailOrUser,
       password: password,
       options: {
-        emailRedirectTo: `${window.location.origin}/LoginPage`
+        emailRedirectTo: `${window.location.origin}/`
       }
     });
 
@@ -29,12 +35,66 @@ export default function RegisterPage() {
       return;
     }
 
-    setSuccessMsg("Success! Check your email to confirm your account.");
+    setRegisteredUser(data.user);
+    setRegistrationComplete(true);
+    setSuccessMsg("Registration successful! Do you want to create a channel?");
     setLoading(false);
-
-    // Optional: redirect after signup (if email confirmation is OFF)
-    // window.location.href = "/LoginPage";
   };
+
+  const handleChannelChoice = (choice) => {
+    setWantsChannel(choice);
+  };
+
+  const handleChannelCreated = (channel) => {
+    if (channel) {
+      alert('Channel created successfully! Please check your email to confirm your account.');
+    } else {
+      alert('Registration complete! Please check your email to confirm your account.');
+    }
+    navigate('/');
+  };
+
+  // Show channel creation if user wants one
+  if (registrationComplete && wantsChannel === true) {
+    return <CreateChannel onChannelCreated={handleChannelCreated} skipable={true} />;
+  }
+
+  // Show channel choice if registration is complete
+  if (registrationComplete && wantsChannel === null) {
+    return (
+      <div className="User-Form">
+        <div className="channel-choice-container">
+          <h2>✓ Registration Successful!</h2>
+          <p className="success-message">{successMsg}</p>
+          <p className="channel-choice-prompt">
+            Would you like to create a channel to upload videos and share content?
+          </p>
+          
+          <div className="channel-choice-buttons">
+            <button 
+              className="btn-yes-channel"
+              onClick={() => handleChannelChoice(true)}
+            >
+              Yes, Create a Channel
+            </button>
+            <button 
+              className="btn-no-channel"
+              onClick={() => {
+                handleChannelChoice(false);
+                handleChannelCreated(null);
+              }}
+            >
+              No, Just Browse Videos
+            </button>
+          </div>
+
+          <p className="channel-choice-note">
+            Don't worry! You can always create a channel later from your profile.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="User-Form">

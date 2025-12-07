@@ -1,26 +1,70 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getVideoFromSupabase, updateVideoInSupabase } from '../utils/supabase';
+import { throttle } from '../utils/rateLimiting';
 import CommentFeed from './CommentFeed.jsx';
 import RecomendationBar from "./RecomendationBar.jsx";
+import AddToPlaylistModal from './AddToPlaylistModal.jsx';
 
 export default function VideoPlayer() {
   const { videoId } = useParams();
   const navigate = useNavigate();
-  const [video, setVideo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [videoUrl, setVideoUrl] = useState(null);
-  const [thumbnailUrl, setThumbnailUrl] = useState(null);
+  const queryClient = useQueryClient();
+  
   const [timeAgo, setTimeAgo] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [likes, setLikes] = useState(0);
-  const [dislikes, setDislikes] = useState(0);
   const [userReaction, setUserReaction] = useState(null); // 'like', 'dislike', or null
+  const [showPlaylistModal, setShowPlaylistModal] = useState(false);
 
+  // Fetch video with caching
+  const { data: video, isLoading, error } = useQuery({
+    queryKey: ['video', videoId],
+    queryFn: async () => {
+      console.log(`📹 Loading video: ${videoId}`);
+      const videoData = await getVideoFromSupabase(videoId);
+      
+      if (!videoData) {
+        throw new Error("Video not found");
+      }
+      
+      console.log("✅ Video loaded successfully");
+      return videoData;
+    },
+    enabled: !!videoId,
+  });
+
+  // Increment view count mutation
+  const incrementViewsMutation = useMutation({
+    mutationFn: async () => {
+      const currentViews = video?.views || 0;
+      return await updateVideoInSupabase(videoId, { views: currentViews + 1 });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['video', videoId]);
+    },
+  });
+
+  // Update likes/dislikes mutation
+  const updateReactionMutation = useMutation({
+    mutationFn: async ({ likes, dislikes }) => {
+      return await updateVideoInSupabase(videoId, { likes, dislikes });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['video', videoId]);
+      console.log('✅ Reaction updated in database');
+    },
+    onError: (error) => {
+      console.error('❌ Error updating reaction:', error);
+    },
+  });
+
+  // Increment views on mount
   useEffect(() => {
-    loadVideo();
-  }, [videoId]);
+    if (video) {
+      incrementViewsMutation.mutate();
+    }
+  }, [video?.id]);
 
   useEffect(() => {
     const updateTimeAgo = () => {
@@ -49,103 +93,59 @@ export default function VideoPlayer() {
     console.log(isSubscribed ? "Unsubscribed" : "Subscribed!");
   };
 
+  // Throttle like/dislike to prevent spam (1 action per second)
+  const throttledLikeAction = useCallback(
+    throttle((newLikes, newDislikes) => {
+      updateReactionMutation.mutate({ likes: newLikes, dislikes: newDislikes });
+    }, 1000), // 1 second throttle
+    [updateReactionMutation]
+  );
+
   const handleLike = async () => {
-    let newLikes = likes;
-    let newDislikes = dislikes;
+    const currentLikes = video?.likes || 0;
+    const currentDislikes = video?.dislikes || 0;
+    let newLikes = currentLikes;
+    let newDislikes = currentDislikes;
 
     if (userReaction === 'like') {
       // Remove like
-      newLikes = likes - 1;
-      setLikes(newLikes);
+      newLikes = currentLikes - 1;
       setUserReaction(null);
     } else {
       // Add like
       if (userReaction === 'dislike') {
-        newDislikes = dislikes - 1;
-        setDislikes(newDislikes);
+        newDislikes = currentDislikes - 1;
       }
-      newLikes = likes + 1;
-      setLikes(newLikes);
+      newLikes = currentLikes + 1;
       setUserReaction('like');
     }
 
-    // Update in Supabase
-    try {
-      await updateVideoInSupabase(videoId, { 
-        likes: newLikes,
-        dislikes: newDislikes 
-      });
-      console.log('✅ Like updated in database');
-    } catch (error) {
-      console.error('❌ Error updating like:', error);
-    }
+    throttledLikeAction(newLikes, newDislikes);
   };
 
   const handleDislike = async () => {
-    let newLikes = likes;
-    let newDislikes = dislikes;
+    const currentLikes = video?.likes || 0;
+    const currentDislikes = video?.dislikes || 0;
+    let newLikes = currentLikes;
+    let newDislikes = currentDislikes;
 
     if (userReaction === 'dislike') {
       // Remove dislike
-      newDislikes = dislikes - 1;
-      setDislikes(newDislikes);
+      newDislikes = currentDislikes - 1;
       setUserReaction(null);
     } else {
       // Add dislike
       if (userReaction === 'like') {
-        newLikes = likes - 1;
-        setLikes(newLikes);
+        newLikes = currentLikes - 1;
       }
-      newDislikes = dislikes + 1;
-      setDislikes(newDislikes);
+      newDislikes = currentDislikes + 1;
       setUserReaction('dislike');
     }
 
-    // Update in Supabase
-    try {
-      await updateVideoInSupabase(videoId, { 
-        likes: newLikes,
-        dislikes: newDislikes 
-      });
-      console.log('✅ Dislike updated in database');
-    } catch (error) {
-      console.error('❌ Error updating dislike:', error);
-    }
+    throttledLikeAction(newLikes, newDislikes);
   };
 
-  const loadVideo = async () => {
-    try {
-      setLoading(true);
-      console.log(`📹 Loading video: ${videoId}`);
-      
-      const videoData = await getVideoFromSupabase(videoId);
-      
-      if (!videoData) {
-        setError("Video not found");
-        return;
-      }
-
-      setVideo(videoData);
-      setVideoUrl(videoData.video_url);
-      setThumbnailUrl(videoData.thumbnail_url);
-      
-      // Initialize likes/dislikes from video data or defaults
-      setLikes(videoData.likes || 0);
-      setDislikes(videoData.dislikes || 0);
-      
-      // Increment view count
-      await updateVideoInSupabase(videoId, { views: (videoData.views || 0) + 1 });
-      
-      console.log("✅ Video loaded successfully");
-    } catch (err) {
-      console.error("❌ Error loading video:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div style={{ padding: "40px", textAlign: "center" }}>
         <p>Loading video...</p>
@@ -213,8 +213,8 @@ export default function VideoPlayer() {
             maxHeight: "720px",
             display: "block"
           }}
-          src={videoUrl}
-          poster={thumbnailUrl}
+          src={video?.video_url}
+          poster={video?.thumbnail_url}
           onError={(e) => console.error("❌ Video playback error:", e)}
         />
       </div>
@@ -312,7 +312,7 @@ export default function VideoPlayer() {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = userReaction === 'like' ? "#e0e0e0" : "white"}
             >
               <span style={{ fontSize: "18px" }}>👍</span>
-              <span>{likes.toLocaleString()}</span>
+              <span>{(video?.likes || 0).toLocaleString()}</span>
             </button>
 
             <button
@@ -334,7 +334,29 @@ export default function VideoPlayer() {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = userReaction === 'dislike' ? "#e0e0e0" : "white"}
             >
               <span style={{ fontSize: "18px" }}>👎</span>
-              <span>{dislikes.toLocaleString()}</span>
+              <span>{(video?.dislikes || 0).toLocaleString()}</span>
+            </button>
+
+            <button
+              onClick={() => setShowPlaylistModal(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 16px",
+                backgroundColor: "white",
+                border: "1px solid #ddd",
+                borderRadius: "20px",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "500",
+                transition: "all 0.2s"
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f0f0f0"}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "white"}
+            >
+              <span style={{ fontSize: "18px" }}>📋</span>
+              <span>Save</span>
             </button>
 
             <button
@@ -410,6 +432,14 @@ export default function VideoPlayer() {
         <CommentFeed videoId={videoId} />
         <RecomendationBar videoId={videoId} />
       </div>
+
+      {/* Add to Playlist Modal */}
+      {showPlaylistModal && (
+        <AddToPlaylistModal
+          videoId={videoId}
+          onClose={() => setShowPlaylistModal(false)}
+        />
+      )}
     </div>
   );
 }

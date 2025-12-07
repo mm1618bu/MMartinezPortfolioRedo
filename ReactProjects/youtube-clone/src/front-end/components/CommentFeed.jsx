@@ -1,6 +1,20 @@
 // src/front-end/components/CommentFeed.jsx
-import { useEffect, useState } from "react";
-import { getCommentsForVideo, addComment, deleteComment, likeComment } from "../utils/supabase";
+import { useState, useCallback, useRef } from "react";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { 
+  getCommentsForVideo, 
+  addComment, 
+  deleteComment, 
+  updateComment,
+  likeComment,
+  getRepliesForComment,
+  addReply,
+  deleteReply,
+  updateReply,
+  likeReply 
+} from "../utils/supabase";
+import { debounce, rateLimit, preventDuplicateCalls } from "../utils/rateLimiting";
+import CommentItem from "./CommentItem";
 import "../../styles/main.css";
 
 /**
@@ -8,80 +22,261 @@ import "../../styles/main.css";
  *  - videoId: string (required)
  */
 export default function CommentFeed({ videoId }) {
-  const [comments, setComments] = useState([]);
-  const [loadingComments, setLoadingComments] = useState(true);
-  const [commentsError, setCommentsError] = useState("");
-
+  const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState("");
   const [userName, setUserName] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [replyingTo, setReplyingTo] = useState(null); // commentId being replied to
+  const [replyText, setReplyText] = useState("");
+  const [replyUserName, setReplyUserName] = useState("");
+  const [expandedReplies, setExpandedReplies] = useState(new Set()); // Set of comment IDs with expanded replies
+  const [editingComment, setEditingComment] = useState(null); // commentId being edited
+  const [editCommentText, setEditCommentText] = useState("");
+  const [editingReply, setEditingReply] = useState(null); // replyId being edited
+  const [editReplyText, setEditReplyText] = useState("");
 
-  // Load comments when videoId changes
-  useEffect(() => {
-    if (!videoId) return;
+  // Fetch comments with caching
+  const { data: comments = [], isLoading: loadingComments, error: commentsError } = useQuery({
+    queryKey: ['comments', videoId],
+    queryFn: () => getCommentsForVideo(videoId),
+    enabled: !!videoId,
+  });
 
-    async function fetchComments() {
-      setLoadingComments(true);
-      setCommentsError("");
+  // Add comment mutation
+  const addCommentMutation = useMutation({
+    mutationFn: ({ videoId, userName, commentText }) => 
+      addComment(videoId, userName, commentText),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['comments', videoId]);
+      setNewComment("");
+      setSubmitError("");
+    },
+    onError: (err) => {
+      console.error("Error submitting comment:", err);
+      setSubmitError(err.message || "Unable to post comment.");
+    },
+  });
 
-      try {
-        const data = await getCommentsForVideo(videoId);
-        setComments(data || []);
-      } catch (err) {
-        console.error("Error fetching comments:", err);
-        setCommentsError("Unable to load comments right now.");
-      } finally {
-        setLoadingComments(false);
-      }
-    }
+  // Like comment mutation
+  const likeCommentMutation = useMutation({
+    mutationFn: (commentId) => likeComment(commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['comments', videoId]);
+    },
+    onError: (err) => {
+      console.error("Error liking comment:", err);
+    },
+  });
 
-    fetchComments();
-  }, [videoId]);
+  // Delete comment mutation
+  const deleteCommentMutation = useMutation({
+    mutationFn: (commentId) => deleteComment(commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['comments', videoId]);
+    },
+    onError: (err) => {
+      console.error("Error deleting comment:", err);
+      alert("Failed to delete comment.");
+    },
+  });
+
+  // Add reply mutation
+  const addReplyMutation = useMutation({
+    mutationFn: ({ commentId, videoId, userName, replyText }) => 
+      addReply(commentId, videoId, userName, replyText),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries(['comments', videoId]);
+      queryClient.invalidateQueries(['replies', variables.commentId]);
+      setReplyText("");
+      setReplyUserName("");
+      setReplyingTo(null);
+    },
+    onError: (err) => {
+      console.error("Error submitting reply:", err);
+      alert("Unable to post reply.");
+    },
+  });
+
+  // Delete reply mutation
+  const deleteReplyMutation = useMutation({
+    mutationFn: (replyId) => deleteReply(replyId),
+    onSuccess: (data, replyId) => {
+      queryClient.invalidateQueries(['comments', videoId]);
+      queryClient.invalidateQueries(['replies']);
+    },
+    onError: (err) => {
+      console.error("Error deleting reply:", err);
+      alert("Failed to delete reply.");
+    },
+  });
+
+  // Like reply mutation
+  const likeReplyMutation = useMutation({
+    mutationFn: (replyId) => likeReply(replyId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['replies']);
+    },
+    onError: (err) => {
+      console.error("Error liking reply:", err);
+    },
+  });
+
+  // Update comment mutation
+  const updateCommentMutation = useMutation({
+    mutationFn: ({ commentId, commentText }) => updateComment(commentId, commentText),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['comments', videoId]);
+      setEditingComment(null);
+      setEditCommentText("");
+    },
+    onError: (err) => {
+      console.error("Error updating comment:", err);
+      alert("Failed to update comment.");
+    },
+  });
+
+  // Update reply mutation
+  const updateReplyMutation = useMutation({
+    mutationFn: ({ replyId, replyText }) => updateReply(replyId, replyText),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['replies']);
+      setEditingReply(null);
+      setEditReplyText("");
+    },
+    onError: (err) => {
+      console.error("Error updating reply:", err);
+      alert("Failed to update reply.");
+    },
+  });
+
+  // Rate-limited comment submission (max 5 per minute)
+  const rateLimitedSubmit = useCallback(
+    rateLimit((data) => {
+      addCommentMutation.mutate(data);
+    }, 5, 60000), // 5 comments per 60 seconds
+    [addCommentMutation]
+  );
+
+  // Prevent duplicate submissions while request is pending
+  const guardedSubmit = useCallback(
+    preventDuplicateCalls(async (data) => {
+      rateLimitedSubmit(data);
+    }),
+    [rateLimitedSubmit]
+  );
 
   async function handleSubmit(e) {
     e.preventDefault();
     if (!newComment.trim() || !userName.trim()) return;
 
-    setSubmitting(true);
-    setSubmitError("");
-
     try {
-      const created = await addComment(videoId, userName.trim(), newComment.trim());
-
-      // Add to top of list
-      setComments((prev) => [created, ...prev]);
-      setNewComment("");
-      // Don't clear userName so user doesn't have to retype it
-    } catch (err) {
-      console.error("Error submitting comment:", err);
-      setSubmitError(err.message || "Unable to post comment.");
-    } finally {
-      setSubmitting(false);
+      await guardedSubmit({
+        videoId,
+        userName: userName.trim(),
+        commentText: newComment.trim(),
+      });
+    } catch (error) {
+      setSubmitError(error.message);
     }
   }
 
+  // Debounced like handler to prevent spam clicks
+  const debouncedLike = useCallback(
+    debounce((commentId) => {
+      likeCommentMutation.mutate(commentId);
+    }, 500), // 500ms debounce
+    [likeCommentMutation]
+  );
+
   async function handleLikeComment(commentId) {
-    try {
-      const updated = await likeComment(commentId);
-      setComments((prev) =>
-        prev.map((c) => (c.id === commentId ? updated : c))
-      );
-    } catch (err) {
-      console.error("Error liking comment:", err);
-    }
+    debouncedLike(commentId);
   }
 
   async function handleDeleteComment(commentId) {
     if (!window.confirm("Delete this comment?")) return;
+    deleteCommentMutation.mutate(commentId);
+  }
 
-    try {
-      await deleteComment(commentId);
-      setComments((prev) => prev.filter((c) => c.id !== commentId));
-    } catch (err) {
-      console.error("Error deleting comment:", err);
-      alert("Failed to delete comment.");
-    }
+  function handleReplyClick(commentId) {
+    setReplyingTo(commentId);
+    // Expand replies when starting to reply
+    setExpandedReplies(prev => new Set(prev).add(commentId));
+  }
+
+  function handleCancelReply() {
+    setReplyingTo(null);
+    setReplyText("");
+    setReplyUserName("");
+  }
+
+  async function handleSubmitReply(e, commentId) {
+    e.preventDefault();
+    if (!replyText.trim() || !replyUserName.trim()) return;
+
+    addReplyMutation.mutate({
+      commentId,
+      videoId,
+      userName: replyUserName.trim(),
+      replyText: replyText.trim(),
+    });
+  }
+
+  function toggleReplies(commentId) {
+    setExpandedReplies(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(commentId)) {
+        newSet.delete(commentId);
+      } else {
+        newSet.add(commentId);
+      }
+      return newSet;
+    });
+  }
+
+  async function handleDeleteReply(replyId) {
+    if (!window.confirm("Delete this reply?")) return;
+    deleteReplyMutation.mutate(replyId);
+  }
+
+  const debouncedLikeReply = useCallback(
+    debounce((replyId) => {
+      likeReplyMutation.mutate(replyId);
+    }, 500),
+    [likeReplyMutation]
+  );
+
+  async function handleLikeReply(replyId) {
+    debouncedLikeReply(replyId);
+  }
+
+  function handleEditComment(comment) {
+    setEditingComment(comment.id);
+    setEditCommentText(comment.comment_text);
+  }
+
+  function handleCancelEditComment() {
+    setEditingComment(null);
+    setEditCommentText("");
+  }
+
+  function handleSaveEditComment(commentId) {
+    if (!editCommentText.trim()) return;
+    updateCommentMutation.mutate({ commentId, commentText: editCommentText.trim() });
+  }
+
+  function handleEditReply(reply) {
+    setEditingReply(reply.id);
+    setEditReplyText(reply.reply_text);
+  }
+
+  function handleCancelEditReply() {
+    setEditingReply(null);
+    setEditReplyText("");
+  }
+
+  function handleSaveEditReply(replyId) {
+    if (!editReplyText.trim()) return;
+    updateReplyMutation.mutate({ replyId, replyText: editReplyText.trim() });
   }
 
   function getTimeAgo(timestamp) {
@@ -132,10 +327,10 @@ export default function CommentFeed({ videoId }) {
             )}
             <button
               type="submit"
-              disabled={submitting || !newComment.trim() || !userName.trim()}
+              disabled={addCommentMutation.isPending || !newComment.trim() || !userName.trim()}
               className="CommentsSection-button"
             >
-              {submitting ? "Posting..." : "Comment"}
+              {addCommentMutation.isPending ? "Posting..." : "Comment"}
             </button>
           </div>
         </form>
@@ -153,33 +348,41 @@ export default function CommentFeed({ videoId }) {
         )}
 
         {comments.map((c) => (
-          <div key={c.id} className="CommentsSection-item">
-            <div className="CommentsSection-itemHeader">
-              <span className="CommentsSection-author">
-                {c.user_name || "Anonymous"}
-              </span>
-              {c.created_at && (
-                <span className="CommentsSection-date">
-                  {getTimeAgo(c.created_at)}
-                </span>
-              )}
-            </div>
-            <p className="CommentsSection-text">{c.comment_text}</p>
-            <div className="CommentsSection-itemActions">
-              <button
-                onClick={() => handleLikeComment(c.id)}
-                className="CommentsSection-likeButton"
-              >
-                👍 {c.likes || 0}
-              </button>
-              <button
-                onClick={() => handleDeleteComment(c.id)}
-                className="CommentsSection-deleteButton"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+          <CommentItem
+            key={c.id}
+            comment={c}
+            videoId={videoId}
+            expandedReplies={expandedReplies}
+            replyingTo={replyingTo}
+            replyText={replyText}
+            replyUserName={replyUserName}
+            editingComment={editingComment}
+            editCommentText={editCommentText}
+            editingReply={editingReply}
+            editReplyText={editReplyText}
+            onLikeComment={handleLikeComment}
+            onDeleteComment={handleDeleteComment}
+            onEditComment={handleEditComment}
+            onCancelEditComment={handleCancelEditComment}
+            onSaveEditComment={handleSaveEditComment}
+            onReplyClick={handleReplyClick}
+            onCancelReply={handleCancelReply}
+            onSubmitReply={handleSubmitReply}
+            onToggleReplies={toggleReplies}
+            onLikeReply={handleLikeReply}
+            onDeleteReply={handleDeleteReply}
+            onEditReply={handleEditReply}
+            onCancelEditReply={handleCancelEditReply}
+            onSaveEditReply={handleSaveEditReply}
+            setReplyText={setReplyText}
+            setReplyUserName={setReplyUserName}
+            setEditCommentText={setEditCommentText}
+            setEditReplyText={setEditReplyText}
+            getTimeAgo={getTimeAgo}
+            addReplyMutation={addReplyMutation}
+            updateCommentMutation={updateCommentMutation}
+            updateReplyMutation={updateReplyMutation}
+          />
         ))}
       </div>
     </div>

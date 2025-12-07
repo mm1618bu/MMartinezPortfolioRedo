@@ -1,105 +1,104 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from '@tanstack/react-query';
 import { getAllVideosFromSupabase, getChannelByTag, supabase } from '../utils/supabase';
+import { useEffect, useState } from "react";
 import '../../styles/main.css';
 
 export default function Channel() {
   const { channelTag } = useParams();
-  const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [channelData, setChannelData] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [channelStats, setChannelStats] = useState({
-    totalVideos: 0,
-    totalViews: 0,
-    totalLikes: 0
+  
+  // Fetch channel data if channelTag is provided
+  const { data: channelData, isLoading: channelLoading } = useQuery({
+    queryKey: ['channel', channelTag],
+    queryFn: async () => {
+      if (!channelTag) return null;
+      console.log(`📥 Loading channel data for @${channelTag}`);
+      const channel = await getChannelByTag(channelTag);
+      console.log('✅ Channel data loaded:', channel);
+      return channel;
+    },
+    enabled: !!channelTag,
   });
 
+  // Fetch user metadata for avatar/banner when we have a channel with user_id
   useEffect(() => {
-    fetchChannelData();
-  }, [channelTag]);
-
-  const fetchChannelData = async () => {
-    try {
-      console.log("Loading channel data from Supabase");
-      setLoading(true);
-      
-      let channel = null;
-      let videos = [];
-      
-      // If channelTag is provided, fetch specific channel
-      if (channelTag) {
-        console.log(`Fetching channel: @${channelTag}`);
-        channel = await getChannelByTag(channelTag);
-        
-        if (!channel) {
-          setError(`Channel @${channelTag} not found`);
-          setLoading(false);
-          return;
-        }
-        
-        setChannelData(channel);
-        
-        // Fetch user data for avatar/banner if it's the current user
+    async function fetchUserData() {
+      if (channelData?.user_id) {
+        // Check if it's the current user
         const { data: { user: currentUser } } = await supabase.auth.getUser();
-        if (currentUser && currentUser.id === channel.user_id) {
+        
+        if (currentUser && currentUser.id === channelData.user_id) {
+          // Use current user's metadata
           setUserData(currentUser);
         }
-        
-        // Fetch videos for this channel
-        const { data, error: videoError } = await supabase
-          .from('videos')
-          .select('*')
-          .eq('channel_id', channel.channel_id)
-          .order('created_at', { ascending: false });
-        
-        if (videoError) throw videoError;
-        videos = data || [];
-      } else {
-        // No channelTag - fetch all videos
-        videos = await getAllVideosFromSupabase();
+      }
+    }
+    
+    fetchUserData();
+  }, [channelData]);
+
+  // Fetch videos - filtered by channel if channelTag is provided
+          setUserData(user);
+        } else {
+          // Try getting user metadata directly from auth.users if admin API doesn't work
+          const { data, error: queryError } = await supabase
+            .from('auth.users')
+            .select('raw_user_meta_data')
+            .eq('id', channel.user_id)
+            .single();
+          
+          if (!queryError && data) {
+            setUserData({ user_metadata: data.raw_user_meta_data });
+          }
+        }
       }
       
-      console.log(`Loaded ${videos.length} video(s)`);
+      return channel;
+    },
+    enabled: !!channelTag,
+  });
+
+  // Fetch videos - filtered by channel if channelTag is provided
+  const { data: videos = [], isLoading: videosLoading, error, refetch } = useQuery({
+    queryKey: ['channel-videos', channelTag, channelData?.channel_id],
+    queryFn: async () => {
+      console.log("📥 Loading channel videos from Supabase");
       
-      // Calculate channel statistics
-      const stats = {
-        totalVideos: videos.length,
-        totalViews: videos.reduce((sum, video) => sum + (video.views || 0), 0),
-        totalLikes: videos.reduce((sum, video) => sum + (video.likes || 0), 0)
-      };
-      
-      setVideos(videos);
-      setChannelStats(stats);
-      setError(null);
-    } catch (err) {
-      console.error("Error loading channel data:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (channelData?.channel_id) {
+        // Fetch videos for specific channel
+        const { data, error } = await supabase
+          .from('videos')
+          .select('*')
+          .eq('channel_id', channelData.channel_id)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        console.log(`✅ Loaded ${data?.length || 0} video(s) for channel`);
+        return data || [];
+      } else {
+        // Fallback to all videos if no specific channel
+        const videos = await getAllVideosFromSupabase();
+        console.log(`✅ Loaded ${videos.length} video(s)`);
+        return videos;
+      }
+    },
+    enabled: !channelTag || !!channelData,
+  });
+
+  // Calculate channel statistics
+  const channelStats = useMemo(() => ({
+    totalVideos: videos.length,
+    totalViews: videos.reduce((sum, video) => sum + (video.views || 0), 0),
+    totalLikes: videos.reduce((sum, video) => sum + (video.likes || 0), 0)
+  }), [videos]);
+
+  const loading = channelLoading || videosLoading;
 
   if (loading) {
     return (
       <div className="channel-loading">
-        <p>Loading channel...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="channel-error">
-        <p>Error: {error}</p>
-        <button onClick={fetchChannelData} className="channel-retry-button">
-          Retry
-        </button>
-      </div>
-    );
-  }
-
   const displayName = channelData?.channel_name || (videos.length > 0 && videos[0].channel_name) || 'My Channel';
   const channelHandle = channelData?.channel_tag || '';
   const channelDesc = channelData?.channel_description || '';
@@ -122,19 +121,31 @@ export default function Channel() {
         >
           <div className="channel-avatar">
             {avatarUrl ? (
-              <img 
-                src={avatarUrl} 
-                alt={displayName} 
-                style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  objectFit: 'cover', 
-                  borderRadius: '50%' 
-                }} 
-              />
+              <img src={avatarUrl} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
             ) : (
               <span>{displayName.charAt(0).toUpperCase()}</span>
             )}
+          </div>
+          <div className="channel-info">
+            <h1 className="channel-name">{displayName}</h1>
+            {channelHandle && <p className="channel-handle">@{channelHandle}</p>}
+            {channelDesc && <p className="channel-description">{channelDesc}</p>}
+            <div className="channel-meta">.</p>
+      </div>
+    );
+  }
+
+  const displayName = channelData?.channel_name || (videos.length > 0 && videos[0].channel_name) || 'My Channel';
+  const channelHandle = channelData?.channel_tag || '';
+  const channelDesc = channelData?.channel_description || '';
+
+  return (
+    <div className="channel-container">
+      {/* Channel Header */}
+      <div className="channel-header">
+        <div className="channel-banner">
+          <div className="channel-avatar">
+            <span>{displayName.charAt(0).toUpperCase()}</span>
           </div>
           <div className="channel-info">
             <h1 className="channel-name">{displayName}</h1>
@@ -161,7 +172,7 @@ export default function Channel() {
       <div className="channel-content">
         <div className="channel-section-header">
           <h2>Uploads</h2>
-          <button onClick={fetchChannelData} className="channel-refresh-button">
+          <button onClick={() => refetch()} className="channel-refresh-button">
             Refresh
           </button>
         </div>

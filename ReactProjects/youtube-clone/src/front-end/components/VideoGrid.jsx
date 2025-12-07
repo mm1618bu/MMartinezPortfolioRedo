@@ -1,37 +1,21 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from '@tanstack/react-query';
 import { getAllVideosFromSupabase } from '../utils/supabase';
 import '../../styles/main.css';
+import { useEffect, useState } from "react";
 
 export default function VideoGrid() {
-  const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchVideos();
-  }, []);
-
-  const fetchVideos = async () => {
-    try {
+  const { data: videos = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['videos'],
+    queryFn: async () => {
       console.log("📥 Loading videos from Supabase");
-      setLoading(true);
-      
-      // Load from Supabase
       const videos = await getAllVideosFromSupabase();
       console.log(`✅ Loaded ${videos.length} video(s) from Supabase`);
-      
-      setVideos(videos);
-      setError(null);
-    } catch (err) {
-      console.error("❌ Error loading videos:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return videos;
+    },
+  });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="video-load-alert">
         <p>Loading videos...</p>
@@ -42,8 +26,8 @@ export default function VideoGrid() {
   if (error) {
     return (
       <div className="video-grid-error">
-        <p>Error: {error}</p>
-        <button onClick={fetchVideos} className="video-grid-retry-button">
+        <p>Error: {error.message}</p>
+        <button onClick={() => refetch()} className="video-grid-retry-button">
           Retry
         </button>
       </div>
@@ -54,7 +38,7 @@ export default function VideoGrid() {
     <div className="video-grid-container">
       <div className="video-grid-header">
         <h2 className="video-grid-title">Video Gallery</h2>
-        <button onClick={fetchVideos} className="video-grid-refresh-button">
+        <button onClick={() => refetch()} className="video-grid-refresh-button">
           Refresh
         </button>
       </div>
