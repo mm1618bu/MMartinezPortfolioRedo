@@ -15,7 +15,7 @@
 }
 
 :root{
-    --primary-color: var(--primary-color);
+    --primary-color: white;
     --secondary-color: red;
     --soft-color: gray;
 }
