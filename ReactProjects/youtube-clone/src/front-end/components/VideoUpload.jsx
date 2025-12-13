@@ -4,6 +4,12 @@ import {
   uploadThumbnailToSupabase,
   saveVideoMetadata,
 } from "../utils/supabase";
+import {
+  validateVideo,
+  formatBytes,
+  formatDuration,
+  getVideoConstraints,
+} from "../utils/videoValidation";
 
 import "../../styles/main.css";
 
@@ -18,6 +24,11 @@ export default function VideoUpload() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [message, setMessage] = useState("");
   const [videoDuration, setVideoDuration] = useState(0);
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [isValidating, setIsValidating] = useState(false);
+  const [videoInfo, setVideoInfo] = useState(null);
+  const [isPublic, setIsPublic] = useState(true);
+  const [videoMetadata, setVideoMetadata] = useState(null);
 
   /************************************
    * HANDLE FORM SUBMIT
@@ -27,6 +38,12 @@ export default function VideoUpload() {
 
     if (!title || !videoFile) {
       setMessage("Please provide a title and video file");
+      return;
+    }
+
+    // Check for validation errors
+    if (validationErrors.length > 0) {
+      setMessage("❌ Please fix validation errors before uploading");
       return;
     }
 
@@ -47,6 +64,10 @@ export default function VideoUpload() {
       setThumbnailFile(null);
       setVideoDuration(0);
       setUploadProgress(0);
+      setValidationErrors([]);
+      setVideoInfo(null);
+      setIsPublic(true);
+      setVideoMetadata(null);
 
       document.getElementById("videoInput").value = "";
       document.getElementById("thumbnailInput").value = "";
@@ -93,6 +114,14 @@ export default function VideoUpload() {
       likes: 0,
       dislikes: 0,
       duration: videoDuration,
+      is_public: isPublic,
+      // Video metadata
+      file_size: videoFile.size,
+      resolution: videoMetadata?.resolution || null,
+      width: videoMetadata?.width || null,
+      height: videoMetadata?.height || null,
+      aspect_ratio: videoMetadata?.aspectRatio || null,
+      quality: videoMetadata?.quality || null,
       created_at: new Date().toISOString(),
     };
 
@@ -181,26 +210,104 @@ export default function VideoUpload() {
             type="file"
             accept="video/*"
             className="VideoUpload-file"
-            onChange={(e) => {
+            onChange={async (e) => {
               const file = e.target.files[0];
               if (file) {
-                setVideoFile(file);
-                const video = document.createElement("video");
-                video.preloaded = "metadata";
-                video.onloadedmetadata = () => {
-                  window.URL.revokeObjectURL(video.src);
-                  setVideoDuration(Math.round(video.duration));
-                };
-                video.src = URL.createObjectURL(file);
+                setIsValidating(true);
+                setValidationErrors([]);
+                setVideoInfo(null);
+                
+                // Validate the video file
+                const validation = await validateVideo(file);
+                
+                if (validation.valid) {
+                  setVideoFile(file);
+                  setVideoDuration(validation.duration);
+                  setVideoMetadata(validation.metadata);
+                  setVideoInfo({
+                    name: validation.fileName,
+                    size: formatBytes(validation.fileSize),
+                    duration: formatDuration(validation.duration),
+                    type: validation.fileType,
+                    resolution: validation.metadata?.resolution || 'Unknown',
+                    quality: validation.metadata?.quality || 'Unknown',
+                    aspectRatio: validation.metadata?.aspectRatio || 'Unknown',
+                  });
+                  setValidationErrors([]);
+                  setMessage("");
+                } else {
+                  setVideoFile(null);
+                  setVideoDuration(0);
+                  setVideoMetadata(null);
+                  setValidationErrors(validation.errors);
+                  setMessage("❌ Video validation failed");
+                }
+                
+                setIsValidating(false);
               }
             }}
+            disabled={isValidating}
             required
           />
-          {videoFile && (
-            <p className="VideoUpload-fileInfo">
-              Selected: {videoFile.name}
+          {isValidating && (
+            <p className="VideoUpload-fileInfo" style={{ color: '#667eea' }}>
+              🔄 Validating video...
             </p>
           )}
+          {videoInfo && (
+            <div className="VideoUpload-fileInfo" style={{ color: '#22c55e' }}>
+              ✅ <strong>{videoInfo.name}</strong>
+              <div style={{ fontSize: '0.9em', marginTop: '4px' }}>
+                <div>Size: {videoInfo.size} | Duration: {videoInfo.duration}</div>
+                <div>Resolution: {videoInfo.resolution} ({videoInfo.quality}) | Aspect Ratio: {videoInfo.aspectRatio}</div>
+              </div>
+            </div>
+          )}
+          {validationErrors.length > 0 && (
+            <div className="VideoUpload-validationErrors">
+              {validationErrors.map((error, index) => (
+                <div key={index} className="VideoUpload-validationError">
+                  ❌ {error.message}
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="VideoUpload-constraints">
+            <small>
+              <strong>Requirements:</strong> Max size: {getVideoConstraints().maxSize}
+            </small>
+          </div>
+        </div>
+
+        {/* PRIVACY SETTING */}
+        <div className="VideoUpload-field">
+          <label className="VideoUpload-label">
+            Privacy Setting
+          </label>
+          <div className="VideoUpload-privacy-toggle">
+            <button
+              type="button"
+              className={`VideoUpload-privacy-button ${isPublic ? 'active' : ''}`}
+              onClick={() => setIsPublic(true)}
+            >
+              <span className="privacy-icon">🌐</span>
+              <div>
+                <div className="privacy-title">Public</div>
+                <div className="privacy-desc">Everyone can watch your video</div>
+              </div>
+            </button>
+            <button
+              type="button"
+              className={`VideoUpload-privacy-button ${!isPublic ? 'active' : ''}`}
+              onClick={() => setIsPublic(false)}
+            >
+              <span className="privacy-icon">🔒</span>
+              <div>
+                <div className="privacy-title">Private</div>
+                <div className="privacy-desc">Only you can watch your video</div>
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* THUMBNAIL FILE */}

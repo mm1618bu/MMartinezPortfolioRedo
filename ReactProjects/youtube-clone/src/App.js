@@ -18,6 +18,9 @@ import PlaylistGrid from './front-end/components/PlaylistGrid.jsx';
 import PlaylistViewer from './front-end/components/PlaylistViewer.jsx';
 import CreatePlaylist from './front-end/components/CreatePlaylist.jsx';
 import CreateChannel from './front-end/components/CreateChannel.jsx';
+import ChannelSettings from './front-end/components/ChannelSettings.jsx';
+import WatchHistory from './front-end/components/WatchHistory.jsx';
+import HomeFeed from './front-end/components/HomeFeed.jsx';
 import Sidebar from './front-end/components/Sidebar.jsx';
 // Create a client with enhanced rate limiting
 const queryClient = new QueryClient({
@@ -66,11 +69,13 @@ function App() {
             <Route path="/watch/:videoId" element={<><TopNavBar /><VideoPlayer /></>} />
             <Route path="/channel" element={<><TopNavBar /><Channel /></>} />
             <Route path="/channel/:channelTag" element={<><TopNavBar /><Channel /></>} />
+            <Route path="/channel/settings" element={<><TopNavBar /><ChannelSettings /></>} />
             <Route path="/playlists" element={<><TopNavBar /><PlaylistGrid /></>} />
             <Route path="/playlists/:channelName" element={<><TopNavBar /><PlaylistGrid /></>} />
             <Route path="/playlist/:playlistId" element={<><TopNavBar /><PlaylistViewer /></>} />
             <Route path="/playlist/create" element={<><TopNavBar /><CreatePlaylist channelName="DefaultChannel" /></>} />
             <Route path="/channel/create" element={<><TopNavBar /><CreateChannel skipable={false} /></>} />
+            <Route path="/history" element={<><TopNavBar /><WatchHistory /></>} />
           </Routes>
         </div>
       </Router>

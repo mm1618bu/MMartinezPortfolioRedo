@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getAllVideosFromSupabase, getChannelByTag, supabase } from '../utils/supabase';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getAllVideosFromSupabase, getChannelByTag, supabase, getSubscriberCount, isSubscribedToChannel, subscribeToChannel, unsubscribeFromChannel } from '../utils/supabase';
+import ChannelAbout from './ChannelAbout';
+import ChannelPlaylists from './ChannelPlaylists';
+import EditChannel from './EditChannel';
 import '../../styles/main.css';
 
 export default function Channel() {
   const { channelTag } = useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,7 +21,48 @@ export default function Channel() {
     totalViews: 0,
     totalLikes: 0
   });
+  const [activeTab, setActiveTab] = useState('videos');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
+  // Get subscriber count - MUST be before any returns
+  const { data: subscriberCount = 0 } = useQuery({
+    queryKey: ['subscriberCount', channelData?.channel_id],
+    queryFn: () => getSubscriberCount(channelData.channel_id),
+    enabled: !!channelData?.channel_id,
+  });
+
+  // Check if current user is subscribed - MUST be before any returns
+  const { data: isSubscribed = false } = useQuery({
+    queryKey: ['subscription', currentUserId, channelData?.channel_id],
+    queryFn: () => isSubscribedToChannel(currentUserId, channelData.channel_id),
+    enabled: !!currentUserId && !!channelData?.channel_id && !isOwner,
+  });
+
+  // Subscribe/unsubscribe mutation - MUST be before any returns
+  const subscribeMutation = useMutation({
+    mutationFn: () => {
+      if (isSubscribed) {
+        return unsubscribeFromChannel(currentUserId, channelData.channel_id);
+      } else {
+        return subscribeToChannel(currentUserId, channelData.channel_id);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['subscription', currentUserId, channelData?.channel_id]);
+      queryClient.invalidateQueries(['subscriberCount', channelData?.channel_id]);
+    },
+  });
+
+  const handleSubscribeClick = () => {
+    if (!currentUserId) {
+      alert('Please sign in to subscribe');
+      return;
+    }
+    subscribeMutation.mutate();
+  };
+  
   useEffect(() => {
     fetchChannelData();
   }, [channelTag]);
@@ -43,8 +90,10 @@ export default function Channel() {
         
         // Check if the logged-in user owns this channel
         const { data: { user: currentUser } } = await supabase.auth.getUser();
+        setCurrentUserId(currentUser?.id || null);
         if (currentUser && currentUser.id === channel.user_id) {
           setUserData(currentUser);
+          setIsOwner(true);
         } else {
           // For other users' channels, we'll need to fetch from a profiles table or use default
           // For now, we can construct URLs based on user_id
@@ -150,11 +199,42 @@ export default function Channel() {
             {channelHandle && <p className="channel-handle">@{channelHandle}</p>}
             {channelDesc && <p className="channel-description">{channelDesc}</p>}
             <div className="channel-meta">
+              <span>{subscriberCount.toLocaleString()} {subscriberCount === 1 ? 'subscriber' : 'subscribers'}</span>
+              <span>•</span>
               <span>{channelStats.totalVideos} videos</span>
               <span>•</span>
               <span>{channelStats.totalViews.toLocaleString()} views</span>
-              <span>•</span>
-              <span>{channelStats.totalLikes.toLocaleString()} likes</span>
+            </div>
+            <div className="channel-actions">
+              {!isOwner && currentUserId && (
+                <button 
+                  className={`channel-subscribe-btn ${isSubscribed ? 'subscribed' : ''}`}
+                  onClick={handleSubscribeClick}
+                  disabled={subscribeMutation.isPending}
+                >
+                  {subscribeMutation.isPending 
+                    ? '...' 
+                    : isSubscribed 
+                      ? 'Subscribed' 
+                      : 'Subscribe'}
+                </button>
+              )}
+              {isOwner && (
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button 
+                    className="channel-edit-btn"
+                    onClick={() => setShowEditModal(true)}
+                  >
+                    Edit Channel
+                  </button>
+                  <button 
+                    className="channel-settings-btn"
+                    onClick={() => navigate('/channel/settings')}
+                  >
+                    ⚙️ Settings
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -162,31 +242,70 @@ export default function Channel() {
 
       {/* Channel Navigation */}
       <div className="channel-nav">
-        <button className="channel-nav-button active">Videos</button>
-        <button className="channel-nav-button">About</button>
+        <button 
+          className={`channel-nav-button ${activeTab === 'videos' ? 'active' : ''}`}
+          onClick={() => setActiveTab('videos')}
+        >
+          Videos
+        </button>
+        <button 
+          className={`channel-nav-button ${activeTab === 'playlists' ? 'active' : ''}`}
+          onClick={() => setActiveTab('playlists')}
+        >
+          Playlists
+        </button>
+        <button 
+          className={`channel-nav-button ${activeTab === 'about' ? 'active' : ''}`}
+          onClick={() => setActiveTab('about')}
+        >
+          About
+        </button>
       </div>
 
-      {/* Videos Section */}
-      <div className="channel-content">
-        <div className="channel-section-header">
-          <h2>Uploads</h2>
-          <button onClick={fetchChannelData} className="channel-refresh-button">
-            Refresh
-          </button>
+      {/* Tab Content */}
+      {activeTab === 'videos' ? (
+        <div className="channel-content">
+          <div className="channel-section-header">
+            <h2>Uploads</h2>
+            <button onClick={fetchChannelData} className="channel-refresh-button">
+              Refresh
+            </button>
+          </div>
+
+          {videos.length === 0 ? (
+            <div className="channel-empty">
+              <p>No videos uploaded yet. Start creating content!</p>
+            </div>
+          ) : (
+            <div className="channel-video-grid">
+              {videos.map((video) => (
+                <ChannelVideoCard key={video.id} video={video} />
+              ))}
+            </div>
+          )}
         </div>
+      ) : activeTab === 'playlists' ? (
+        <ChannelPlaylists userId={channelData?.user_id} />
+      ) : (
+        <ChannelAbout 
+          channelData={channelData} 
+          channelStats={channelStats} 
+          userData={userData} 
+        />
+      )}
 
-        {videos.length === 0 ? (
-          <div className="channel-empty">
-            <p>No videos uploaded yet. Start creating content!</p>
-          </div>
-        ) : (
-          <div className="channel-video-grid">
-            {videos.map((video) => (
-              <ChannelVideoCard key={video.id} video={video} />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Edit Channel Modal */}
+      {showEditModal && (
+        <EditChannel
+          channelData={{
+            ...channelData,
+            avatar_url: avatarUrl,
+            banner_url: bannerUrl
+          }}
+          onClose={() => setShowEditModal(false)}
+          onUpdate={fetchChannelData}
+        />
+      )}
     </div>
   );
 }
@@ -239,6 +358,11 @@ function ChannelVideoCard({ video }) {
         {video.duration > 0 && (
           <div className="channel-video-duration">
             {formatDuration(video.duration)}
+          </div>
+        )}
+        {video.is_public === false && (
+          <div className="channel-video-privacy">
+            🔒 Private
           </div>
         )}
       </div>

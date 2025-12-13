@@ -30,6 +30,7 @@ export default function CommentFeed({ videoId }) {
   const [replyText, setReplyText] = useState("");
   const [replyUserName, setReplyUserName] = useState("");
   const [expandedReplies, setExpandedReplies] = useState(new Set()); // Set of comment IDs with expanded replies
+  const [sortBy, setSortBy] = useState('recent'); // 'recent' or 'top'
   const [editingComment, setEditingComment] = useState(null); // commentId being edited
   const [editCommentText, setEditCommentText] = useState("");
   const [editingReply, setEditingReply] = useState(null); // replyId being edited
@@ -294,13 +295,40 @@ export default function CommentFeed({ videoId }) {
     return created.toLocaleDateString();
   }
 
+  // Sort comments based on selected criteria
+  const sortedComments = [...(comments || [])].sort((a, b) => {
+    if (sortBy === 'top') {
+      // Sort by likes (descending)
+      return (b.likes || 0) - (a.likes || 0);
+    } else {
+      // Sort by date (most recent first)
+      return new Date(b.created_at) - new Date(a.created_at);
+    }
+  });
+
   return (
     <div className="CommentsSection">
       <h3 className="CommentsSection-title">
         Comments ({comments?.length || 0})
       </h3>
 
-      {/* New comment form */}
+      {/* Sort buttons */}
+      <div className="CommentsSection-sort">
+        <button
+          className={`CommentsSection-sortBtn ${sortBy === 'top' ? 'active' : ''}`}
+          onClick={() => setSortBy('top')}
+        >
+          Top
+        </button>
+        <button
+          className={`CommentsSection-sortBtn ${sortBy === 'recent' ? 'active' : ''}`}
+          onClick={() => setSortBy('recent')}
+        >
+          Recent
+        </button>
+      </div>
+
+      {/* New comment form */
       <div className="CommentsSection-new">
         <form onSubmit={handleSubmit} className="CommentsSection-form">
           <input
@@ -334,7 +362,7 @@ export default function CommentFeed({ videoId }) {
             </button>
           </div>
         </form>
-      </div>
+      </div>}
 
       {/* Comments list */}
       <div className="CommentsSection-list">
@@ -347,7 +375,7 @@ export default function CommentFeed({ videoId }) {
           <p className="CommentsSection-empty">No comments yet. Be the first!</p>
         )}
 
-        {comments.map((c) => (
+        {sortedComments.map((c) => (
           <CommentItem
             key={c.id}
             comment={c}

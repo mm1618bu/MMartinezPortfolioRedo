@@ -114,6 +114,13 @@ function VideoCard({ video }) {
             </div>
           )}
 
+          {/* Privacy badge */}
+          {video.is_public === false && (
+            <div className="video-card-privacy-badge">
+              🔒 Private
+            </div>
+          )}
+
           {video.video_url && (
             <div className="video-card-play-button">
               <div className="video-card-play-icon" />
@@ -136,6 +143,19 @@ function VideoCard({ video }) {
         
         <div className="video-card-views">
           {video.views.toLocaleString()} views
+          {video.quality && (
+            <span style={{
+              marginLeft: '8px',
+              padding: '2px 6px',
+              backgroundColor: '#667eea20',
+              color: '#667eea',
+              borderRadius: '3px',
+              fontSize: '11px',
+              fontWeight: '600'
+            }}>
+              {video.quality}
+            </span>
+          )}
         </div>
 
         {timeAgo && (
