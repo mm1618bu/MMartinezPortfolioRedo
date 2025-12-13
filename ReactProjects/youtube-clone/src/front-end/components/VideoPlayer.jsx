@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getVideoFromSupabase, updateVideoInSupabase, getAllVideosFromSupabase, getSubtitlesForVideo, supabase } from '../utils/supabase';
 import { throttle } from '../utils/rateLimiting';
 import { PlaybackTracker } from '../utils/playbackAnalytics';
+import ABRManager from '../utils/abrManager';
+import { QUALITY_LEVELS, formatBytes, formatBitrate } from '../utils/compressionUtils';
 import CommentFeed from './CommentFeed.jsx';
 import RecomendationBar from "./RecomendationBar.jsx";
 import SaveToPlaylist from './SaveToPlaylist.jsx';
@@ -30,8 +32,12 @@ export default function VideoPlayer() {
   // Video player controls
   const videoRef = useRef(null);
   const playbackTrackerRef = useRef(null);
+  const abrManagerRef = useRef(null);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [quality, setQuality] = useState('auto');
+  const [availableQualities, setAvailableQualities] = useState([]);
+  const [networkSpeed, setNetworkSpeed] = useState(0);
+  const [bufferingEvents, setBufferingEvents] = useState(0);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showQualityMenu, setShowQualityMenu] = useState(false);
   const [upNextVideos, setUpNextVideos] = useState([]);
@@ -92,12 +98,39 @@ export default function VideoPlayer() {
     fetchUser();
   }, []);
 
-  // Initialize playback tracker
+  // Initialize playback tracker and ABR manager
   useEffect(() => {
     if (!video || !videoRef.current) return;
 
     const tracker = new PlaybackTracker(videoId, currentUser?.id);
     playbackTrackerRef.current = tracker;
+
+    // Initialize ABR Manager
+    const abrManager = new ABRManager(videoRef.current, currentUser?.id);
+    abrManagerRef.current = abrManager;
+    
+    // Initialize ABR with video ID
+    abrManager.initialize(videoId).then(() => {
+      const metrics = abrManager.getMetrics();
+      setQuality(metrics.currentQuality);
+      setNetworkSpeed(metrics.currentSpeed);
+    });
+
+    // Listen for quality changes from ABR
+    const handleQualityChange = (event) => {
+      setQuality(event.detail.newQuality);
+      
+      // Log quality change to playback tracker
+      if (tracker) {
+        tracker.logEvent('quality_change', event.detail.newQuality, {
+          from: event.detail.oldQuality,
+          to: event.detail.newQuality,
+          auto: event.detail.auto
+        });
+      }
+    };
+
+    videoRef.current.addEventListener('qualitychange', handleQualityChange);
 
     // Start tracking session when video metadata is loaded
     const handleLoadedMetadata = async () => {
@@ -132,6 +165,10 @@ export default function VideoPlayer() {
       tracker.updateWatchTime(currentTime);
     };
 
+    const handleWaiting = () => {
+      setBufferingEvents(prev => prev + 1);
+    };
+
     const videoElement = videoRef.current;
     
     videoElement.addEventListener('loadedmetadata', handleLoadedMetadata);
@@ -140,9 +177,21 @@ export default function VideoPlayer() {
     videoElement.addEventListener('seeking', handleSeeking);
     videoElement.addEventListener('ended', handleEnded);
     videoElement.addEventListener('timeupdate', handleTimeUpdate);
+    videoElement.addEventListener('waiting', handleWaiting);
+
+    // Update network speed periodically
+    const speedInterval = setInterval(() => {
+      if (abrManager) {
+        const metrics = abrManager.getMetrics();
+        setNetworkSpeed(metrics.currentSpeed);
+        setBufferingEvents(metrics.bufferingEvents);
+      }
+    }, 2000);
 
     // Cleanup
     return () => {
+      clearInterval(speedInterval);
+      
       if (videoElement) {
         videoElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
         videoElement.removeEventListener('play', handlePlay);
@@ -150,12 +199,18 @@ export default function VideoPlayer() {
         videoElement.removeEventListener('seeking', handleSeeking);
         videoElement.removeEventListener('ended', handleEnded);
         videoElement.removeEventListener('timeupdate', handleTimeUpdate);
+        videoElement.removeEventListener('waiting', handleWaiting);
+        videoElement.removeEventListener('qualitychange', handleQualityChange);
       }
       
       if (tracker) {
         const currentTime = videoRef.current?.currentTime || 0;
         tracker.endSession(currentTime);
         tracker.destroy();
+      }
+
+      if (abrManager) {
+        abrManager.destroy(videoId);
       }
     };
   }, [video, videoId, currentUser]);
@@ -270,10 +325,20 @@ export default function VideoPlayer() {
     }
   };
 
-  // Quality handler (placeholder for future implementation)
+  // Quality handler
   const handleQualityChange = (qualityLevel) => {
     setQuality(qualityLevel);
     setShowQualityMenu(false);
+    
+    // Use ABR manager to change quality
+    if (abrManagerRef.current) {
+      if (qualityLevel === 'auto') {
+        abrManagerRef.current.setAutoQuality(true);
+      } else {
+        abrManagerRef.current.setAutoQuality(false);
+        abrManagerRef.current.setQuality(qualityLevel);
+      }
+    }
     
     // Log quality change event
     if (playbackTrackerRef.current && videoRef.current) {
@@ -486,7 +551,7 @@ export default function VideoPlayer() {
                   fontWeight: "600"
                 }}
               >
-                {quality === 'auto' ? 'Auto' : quality}
+                {quality === 'auto' ? `Auto (${networkSpeed > 0 ? formatBitrate(networkSpeed) : '...'})` : quality}
               </button>
               {showQualityMenu && (
                 <div style={{
@@ -496,29 +561,49 @@ export default function VideoPlayer() {
                   backgroundColor: "rgba(28, 28, 28, 0.95)",
                   borderRadius: "4px",
                   padding: "8px 0",
-                  minWidth: "120px",
+                  minWidth: "180px",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.5)"
                 }}>
-                  {['auto', '1080p', '720p', '480p', '360p'].map(q => (
-                    <button
-                      key={q}
-                      onClick={() => handleQualityChange(q)}
-                      style={{
-                        width: "100%",
-                        padding: "8px 16px",
-                        backgroundColor: quality === q ? "rgba(255, 255, 255, 0.2)" : "transparent",
-                        color: "white",
-                        border: "none",
-                        textAlign: "left",
-                        cursor: "pointer",
-                        fontSize: "13px"
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)"}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = quality === q ? "rgba(255, 255, 255, 0.2)" : "transparent"}
-                    >
-                      {q === 'auto' ? 'Auto' : q}
-                    </button>
-                  ))}
+                  <div style={{
+                    padding: "8px 16px",
+                    fontSize: "11px",
+                    color: "rgba(255, 255, 255, 0.6)",
+                    borderBottom: "1px solid rgba(255, 255, 255, 0.1)"
+                  }}>
+                    {networkSpeed > 0 && `Network: ${formatBitrate(networkSpeed)}`}
+                    {bufferingEvents > 0 && ` • ${bufferingEvents} buffering`}
+                  </div>
+                  {['auto', '2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p'].map(q => {
+                    const qualityInfo = QUALITY_LEVELS[q];
+                    return (
+                      <button
+                        key={q}
+                        onClick={() => handleQualityChange(q)}
+                        style={{
+                          width: "100%",
+                          padding: "8px 16px",
+                          backgroundColor: quality === q ? "rgba(255, 255, 255, 0.2)" : "transparent",
+                          color: "white",
+                          border: "none",
+                          textAlign: "left",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center"
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = quality === q ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)"}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = quality === q ? "rgba(255, 255, 255, 0.2)" : "transparent"}
+                      >
+                        <span>{q === 'auto' ? 'Auto (Recommended)' : qualityInfo?.label || q}</span>
+                        {qualityInfo && (
+                          <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.5)" }}>
+                            {formatBitrate(qualityInfo.bitrate)}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
