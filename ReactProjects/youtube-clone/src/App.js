@@ -22,6 +22,7 @@ import ChannelSettings from './front-end/components/ChannelSettings.jsx';
 import WatchHistory from './front-end/components/WatchHistory.jsx';
 import HomeFeed from './front-end/components/HomeFeed.jsx';
 import Sidebar from './front-end/components/Sidebar.jsx';
+import SearchResults from './front-end/components/SearchResults.jsx';
 // Create a client with enhanced rate limiting
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,6 +67,7 @@ function App() {
             <Route path="/home" element={<><TopNavBar /><HomePage /></>} />
             <Route path="/login" element={<><TopNavBar /><LoginPage /></>} />
             <Route path="/register" element={<><TopNavBar /><RegisterPage /></>} />
+            <Route path="/search" element={<><TopNavBar /><SearchResults /></>} />
             <Route path="/watch/:videoId" element={<><TopNavBar /><VideoPlayer /></>} />
             <Route path="/channel" element={<><TopNavBar /><Channel /></>} />
             <Route path="/channel/:channelTag" element={<><TopNavBar /><Channel /></>} />

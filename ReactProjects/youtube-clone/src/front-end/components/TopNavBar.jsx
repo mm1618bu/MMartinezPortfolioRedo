@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase, getCurrentUserChannel } from "../utils/supabase";
+import SearchBar from "./SearchBar";
 import "../../styles/main.css";
 
 export default function TopNavBar() {
@@ -88,6 +89,11 @@ export default function TopNavBar() {
         <div className="navbar-logo" onClick={() => navigate('/')}>
           <span className="navbar-logo-icon">▶</span>
           <span className="navbar-logo-text">VideoShare</span>
+        </div>
+
+        {/* Search Bar */}
+        <div className="navbar-search">
+          <SearchBar />
         </div>
 
         {/* Right side - User profile or Login */}

@@ -1,0 +1,242 @@
+/* Grid View */
+.video-card.grid-view {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.video-card.grid-view:hover {
+  transform: translateY(-4px);
+}
+
+.video-card-thumbnail-container {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+  background-color: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.video-card-thumbnail-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.video-card.grid-view:hover .video-card-thumbnail-image {
+  transform: scale(1.05);
+}
+
+.video-card-duration {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.video-card-quality {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(102, 126, 234, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.video-card-private {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.video-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.video-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  color: #030303;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.video-card-channel {
+  font-size: 13px;
+  color: #606060;
+  margin: 4px 0 0 0;
+}
+
+.video-card-meta {
+  font-size: 13px;
+  color: #606060;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.video-card-separator {
+  margin: 0 4px;
+}
+
+.video-card-description {
+  font-size: 12px;
+  color: #606060;
+  line-height: 1.4;
+  margin: 8px 0 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* List View */
+.video-card.list-view {
+  display: flex;
+  gap: 16px;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.video-card.list-view:hover {
+  background-color: #f9f9f9;
+}
+
+.video-card.list-view .video-card-thumbnail {
+  position: relative;
+  width: 360px;
+  height: 200px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.video-card.list-view .video-card-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.video-card.list-view:hover .video-card-thumbnail img {
+  transform: scale(1.05);
+}
+
+.video-card.list-view .video-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.video-card.list-view .video-card-title {
+  font-size: 18px;
+  line-height: 1.4;
+  -webkit-line-clamp: 2;
+}
+
+.video-card.list-view .video-card-meta {
+  order: 2;
+}
+
+.video-card.list-view .video-card-channel {
+  order: 3;
+  margin-top: 0;
+}
+
+.video-card.list-view .video-card-description {
+  order: 4;
+  -webkit-line-clamp: 3;
+  margin-top: 4px;
+}
+
+.video-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.video-card-tag {
+  padding: 4px 10px;
+  background-color: #f2f2f2;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #606060;
+}
+
+/* Highlight styling for search results */
+.video-card mark {
+  background-color: #ffd54f;
+  color: #000;
+  padding: 2px 0;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .video-card.list-view {
+    flex-direction: column;
+  }
+
+  .video-card.list-view .video-card-thumbnail {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+  }
+
+  .video-card.list-view .video-card-title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-card-thumbnail-container {
+    border-radius: 8px;
+  }
+
+  .video-card-title {
+    font-size: 13px;
+  }
+
+  .video-card-channel,
+  .video-card-meta {
+    font-size: 12px;
+  }
+
+  .video-card.list-view {
+    padding: 8px;
+  }
+}
