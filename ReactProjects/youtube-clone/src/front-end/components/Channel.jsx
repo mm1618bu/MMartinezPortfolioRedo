@@ -169,15 +169,7 @@ export default function Channel() {
       {/* Channel Header */}
       <div className="channel-header">
         <div 
-          className="channel-banner"
-          style={{
-            backgroundImage: bannerUrl 
-              ? `url(${bannerUrl})` 
-              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        >
+          className="channel-banner">
           <div className="channel-avatar">
             {avatarUrl ? (
               <img 

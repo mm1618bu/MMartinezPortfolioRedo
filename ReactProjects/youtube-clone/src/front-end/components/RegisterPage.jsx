@@ -128,7 +128,7 @@ export default function RegisterPage() {
         <br />
 
         <p>
-          <a href="/LoginPage">Have an Account?</a>
+          <a href="/login">Have an Account?</a>
         </p>
       </form>
     </div>

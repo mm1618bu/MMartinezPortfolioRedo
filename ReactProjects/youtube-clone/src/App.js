@@ -67,6 +67,7 @@ function App() {
             <Route path="/home" element={<><TopNavBar /><HomePage /></>} />
             <Route path="/login" element={<><TopNavBar /><LoginPage /></>} />
             <Route path="/register" element={<><TopNavBar /><RegisterPage /></>} />
+            <Route path="/forgot-password" element={<><TopNavBar /><ForgotPassword /></>} />
             <Route path="/search" element={<><TopNavBar /><SearchResults /></>} />
             <Route path="/watch/:videoId" element={<><TopNavBar /><VideoPlayer /></>} />
             <Route path="/channel" element={<><TopNavBar /><Channel /></>} />

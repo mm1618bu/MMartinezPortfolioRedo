@@ -65,8 +65,8 @@ export default function LoginPage() {
         <br />
 
         <p>
-          <a href="/ForgotPassword">Forgot Password?</a> |{" "}
-          <a href="/RegisterPage">Register</a>
+          <a href="/forgot-password">Forgot Password?</a> |{" "}
+          <a href="/register">Register</a>
         </p>
       </form>
     </div>
