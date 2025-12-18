@@ -110,9 +110,18 @@
   max-height: 500px;
   overflow-y: auto;
   z-index: 10000;
-  /* DEBUG: Make it very visible */
-  border: 3px solid red !important;
-  background: #fffacd !important;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .suggestion-section {
@@ -136,6 +145,26 @@
   letter-spacing: 0.5px;
 }
 
+.suggestion-section:has(.suggestion-item.trending) .suggestion-header {
+  color: #ff4444;
+}
+
+.suggestion-section:has(.suggestion-item.trending) .suggestion-header svg {
+  color: #ff4444;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
 .suggestion-item {
   display: flex;
   align-items: center;
@@ -148,6 +177,23 @@
 .suggestion-item:hover,
 .suggestion-item.active {
   background-color: #f2f2f2;
+}
+
+.suggestion-item.trending {
+  position: relative;
+}
+
+.suggestion-item.trending:hover {
+  background: linear-gradient(90deg, #fff5f5 0%, #f2f2f2 100%);
+}
+
+.suggestion-item.trending .trending-icon {
+  color: #ff4444;
+}
+
+.suggestion-item.trending .search-count {
+  color: #ff4444;
+  font-weight: 600;
 }
 
 .suggestion-item.loading,

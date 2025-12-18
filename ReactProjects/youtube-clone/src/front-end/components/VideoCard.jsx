@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { highlightSearchTerms } from '../utils/searchAPI';
 import './VideoCard.css';
 
-const VideoCard = ({ video, onClick, highlightQuery = '', viewMode = 'grid' }) => {
+const VideoCard = ({ video, onClick, highlightQuery = '', viewMode = 'grid', showRelevanceScore = false }) => {
   const [timeAgo, setTimeAgo] = useState('');
 
   // Calculate time ago
@@ -88,12 +88,14 @@ const VideoCard = ({ video, onClick, highlightQuery = '', viewMode = 'grid' }) =
             </span>
             <span className="video-card-separator">•</span>
             <span className="video-card-time">{timeAgo}</span>
-          </div>
-
-          <div className="video-card-channel">
-            {renderHighlightedText(video.channel_name || 'Unknown Channel')}
-          </div>
-
+          {showRelevanceScore && video.relevance_score !== undefined && (
+            <>
+              <span className="video-card-separator">•</span>
+              <span className="video-card-relevance" title="Relevance Score">
+                ⭐ {video.relevance_score.toFixed(1)}
+              </span>
+            </>
+          )}
           {video.description && (
             <p className="video-card-description">
               {renderHighlightedText(video.description)}
@@ -110,6 +112,7 @@ const VideoCard = ({ video, onClick, highlightQuery = '', viewMode = 'grid' }) =
             </div>
           )}
         </div>
+      </div>
       </div>
     );
   }
@@ -161,6 +164,14 @@ const VideoCard = ({ video, onClick, highlightQuery = '', viewMode = 'grid' }) =
           </span>
           <span className="video-card-separator">•</span>
           <span className="video-card-time">{timeAgo}</span>
+          {showRelevanceScore && video.relevance_score !== undefined && (
+            <>
+              <span className="video-card-separator">•</span>
+              <span className="video-card-relevance" title="Relevance Score">
+                ⭐ {video.relevance_score.toFixed(1)}
+              </span>
+            </>
+          )}
         </div>
 
         {video.description && (

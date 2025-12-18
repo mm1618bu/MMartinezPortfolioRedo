@@ -10,6 +10,8 @@ import {
   formatDuration,
   getVideoConstraints,
 } from "../utils/videoValidation";
+import { createEncodingJob } from "../utils/encodingQueueAPI";
+import { supabase } from "../utils/supabase";
 
 import "../../styles/main.css";
 
@@ -29,6 +31,8 @@ export default function VideoUpload() {
   const [videoInfo, setVideoInfo] = useState(null);
   const [isPublic, setIsPublic] = useState(true);
   const [videoMetadata, setVideoMetadata] = useState(null);
+  const [encodingJobId, setEncodingJobId] = useState(null);
+  const [showEncodingStatus, setShowEncodingStatus] = useState(false);
 
   /************************************
    * HANDLE FORM SUBMIT
@@ -53,7 +57,8 @@ export default function VideoUpload() {
 
     try {
       await uploadSingleFile();
-      setMessage("✅ Video uploaded successfully!");
+      setMessage("✅ Video uploaded successfully! Encoding job created.");
+      setShowEncodingStatus(true);
 
       // Reset form
       setTitle("");
@@ -126,6 +131,29 @@ export default function VideoUpload() {
     };
 
     await saveVideoMetadata(videoData);
+
+    setUploadProgress(90);
+
+    // Create encoding job
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const jobId = await createEncodingJob(
+          videoId,
+          user.id,
+          videoUrl,
+          videoFile.size,
+          videoMetadata?.resolution || null,
+          ['1080p', '720p', '480p', '360p'], // Output formats
+          5 // Priority (1-10, 5 is normal)
+        );
+        setEncodingJobId(jobId);
+        console.log('Encoding job created:', jobId);
+      }
+    } catch (error) {
+      console.error('Error creating encoding job:', error);
+      // Don't fail the upload if encoding job creation fails
+    }
 
     setUploadProgress(100);
   };

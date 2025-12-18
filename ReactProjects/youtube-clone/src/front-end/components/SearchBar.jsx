@@ -29,43 +29,11 @@ export default function SearchBar({ onSearch, autoFocus = false }) {
   const suggestionsRef = useRef(null);
   const navigate = useNavigate();
 
-  // DEBUG: Add sample data for testing
-  useEffect(() => {
-    console.log('🔍 SearchBar: Component mounted and rendering!');
-    console.log('🔍 SearchBar: DOM elements:', {
-      searchRef: searchRef.current,
-      suggestionsRef: suggestionsRef.current
-    });
-  }, []);
-
-  // DEBUG: Watch suggestions changes
-  useEffect(() => {
-    console.log('🔍 SearchBar: Suggestions changed!', {
-      count: suggestions.length,
-      showSuggestions,
-      suggestions: suggestions.slice(0, 3)
-    });
-    // If we have suggestions and query length >= 2, show them
-    if (suggestions.length > 0 && query.length >= 2) {
-      console.log('🔍 SearchBar: Auto-showing suggestions because we have data');
-      setShowSuggestions(true);
-    }
-  }, [suggestions, query]);
-
-  // DEBUG: Log render
-  console.log('🔍 SearchBar RENDER:', { 
-    query, 
-    showSuggestions, 
-    suggestionsCount: suggestions.length,
-    trendingCount: trending.length 
-  });
-
   // Get current user
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setCurrentUser(user);
-      console.log('SearchBar: Current user:', user?.email || 'Not logged in');
     };
     fetchUser();
   }, []);
@@ -98,23 +66,21 @@ export default function SearchBar({ onSearch, autoFocus = false }) {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setQuery(value);
-    console.log('🔍 SearchBar: Query changed to:', value, 'showSuggestions:', showSuggestions);
 
     if (value.length >= 2) {
       setLoading(true);
-      console.log('🔍 SearchBar: Calling debouncedSearch...');
       debouncedSearch(value, async (q) => {
-        console.log('🔍 SearchBar: Fetching suggestions for:', q);
         const data = await getSearchSuggestions(q, 8);
-        console.log('🔍 SearchBar: Got suggestions:', data, 'length:', data?.length);
         setSuggestions(data);
-        setShowSuggestions(true); // Make sure suggestions show when we get data
+        if (data && data.length > 0) {
+          setShowSuggestions(true);
+        }
         setLoading(false);
       }, 300);
     } else {
-      console.log('🔍 SearchBar: Query too short, clearing suggestions');
       setSuggestions([]);
       setLoading(false);
+      setShowSuggestions(false);
     }
   };
 
@@ -155,41 +121,28 @@ export default function SearchBar({ onSearch, autoFocus = false }) {
     }
   };
 
-  // Handle focus
+  // Handle focus - show suggestions if we have any
   const handleFocus = () => {
-    console.log('🔍 SearchBar: Input focused!', {
-      timestamp: Date.now(),
-      currentShowSuggestions: showSuggestions,
-      hasSuggestions: suggestions.length > 0,
-      hasTrending: trending.length > 0,
-      hasHistory: history.length > 0
-    });
-    setShowSuggestions(true);
-    console.log('🔍 SearchBar: setShowSuggestions(true) called');
+    // Show suggestions for queries >= 2 chars, or show trending/history when empty
+    if (query.length >= 2 || trending.length > 0 || history.length > 0) {
+      setShowSuggestions(true);
+    }
   };
 
-  // Handle click outside - using ref to avoid stale closure
+  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      console.log('🔍 SearchBar: Click detected', {
-        target: event.target?.className,
-        isInsideSearch: searchRef.current?.contains(event.target),
-        isInsideSuggestions: suggestionsRef.current?.contains(event.target)
-      });
-
       if (
         searchRef.current && 
         !searchRef.current.contains(event.target) &&
         suggestionsRef.current &&
         !suggestionsRef.current.contains(event.target)
       ) {
-        console.log('🔍 SearchBar: Outside click - hiding suggestions');
         setShowSuggestions(false);
         setActiveSuggestion(-1);
       }
     };
 
-    // Use 'click' instead of 'mousedown' to avoid race condition with focus
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []); // Empty deps is OK - we use refs to access current DOM state
@@ -208,20 +161,6 @@ export default function SearchBar({ onSearch, autoFocus = false }) {
     setActiveSuggestion(-1);
     searchRef.current?.focus();
   };
-
-  // DEBUG: Expose function to test state updates
-  useEffect(() => {
-    window.testShowSuggestions = () => {
-      console.log('TEST: Manual trigger - Before:', showSuggestions);
-      setShowSuggestions(true);
-      console.log('TEST: Manual trigger - After setState call');
-    };
-    console.log('🔍 SearchBar: RENDER', {
-      showSuggestions,
-      suggestionsCount: suggestions.length,
-      timestamp: Date.now()
-    });
-  });
 
   return (
     <div className="search-bar-container">

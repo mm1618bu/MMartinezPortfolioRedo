@@ -154,6 +154,11 @@ const SearchResults = () => {
             <p className="search-count">
               {formatResultCount(searchData.length)}
               {page > 1 && ` (Page ${page})`}
+              {sortBy === 'relevance' && (
+                <span className="sorting-badge" title="Smart ranking: title match, keywords, engagement, recency">
+                  • Ranked by Relevance
+                </span>
+              )}
             </p>
           )}
         </div>
@@ -180,11 +185,15 @@ const SearchResults = () => {
               onChange={(e) => handleSortChange(e.target.value)}
               className="sort-select"
             >
-              <option value="relevance">Relevance</option>
-              <option value="upload_date">Upload date</option>
-              <option value="view_count">View count</option>
-              <option value="rating">Rating</option>
+              <option value="relevance">Relevance ⭐</option>
+              <option value="date">Upload date</option>
+              <option value="views">View count</option>
             </select>
+            {sortBy === 'relevance' && (
+              <span className="relevance-info" title="Results ranked by: title match, keywords, engagement, recency, and popularity">
+                ℹ️
+              </span>
+            )}
           </div>
 
           {/* View mode toggle */}
@@ -276,6 +285,7 @@ const SearchResults = () => {
                   onClick={() => handleVideoClick(video.id)}
                   highlightQuery={query}
                   viewMode={viewMode}
+                  showRelevanceScore={sortBy === 'relevance' && process.env.NODE_ENV === 'development'}
                 />
               ))}
             </div>

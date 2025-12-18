@@ -23,6 +23,9 @@ import WatchHistory from './front-end/components/WatchHistory.jsx';
 import HomeFeed from './front-end/components/HomeFeed.jsx';
 import Sidebar from './front-end/components/Sidebar.jsx';
 import SearchResults from './front-end/components/SearchResults.jsx';
+import NotFound from './front-end/components/NotFound.jsx';
+import ServerError from './front-end/components/ServerError.jsx';
+import EncodingQueue from './front-end/components/EncodingQueue.jsx';
 // Create a client with enhanced rate limiting
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +82,9 @@ function App() {
             <Route path="/playlist/create" element={<><TopNavBar /><CreatePlaylist channelName="DefaultChannel" /></>} />
             <Route path="/channel/create" element={<><TopNavBar /><CreateChannel skipable={false} /></>} />
             <Route path="/history" element={<><TopNavBar /><WatchHistory /></>} />
+            <Route path="/encoding-queue" element={<><TopNavBar /><EncodingQueue /></>} />
+            <Route path="/error" element={<ServerError />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </Router>

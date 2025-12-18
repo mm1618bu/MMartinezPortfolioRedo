@@ -5,7 +5,7 @@ import { getVideoFromSupabase, updateVideoInSupabase, getAllVideosFromSupabase, 
 import { throttle } from '../utils/rateLimiting';
 import { PlaybackTracker } from '../utils/playbackAnalytics';
 import ABRManager from '../utils/abrManager';
-import { QUALITY_LEVELS, formatBytes, formatBitrate } from '../utils/compressionUtils';
+import { QUALITY_LEVELS, formatBytes, formatBitrate, getUserBandwidthPreferences, updateBandwidthPreferences } from '../utils/compressionUtils';
 import CommentFeed from './CommentFeed.jsx';
 import RecomendationBar from "./RecomendationBar.jsx";
 import SaveToPlaylist from './SaveToPlaylist.jsx';
@@ -43,6 +43,12 @@ export default function VideoPlayer() {
   const [upNextVideos, setUpNextVideos] = useState([]);
   const [subtitles, setSubtitles] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [autoplay, setAutoplay] = useState(() => {
+    // Get initial value from localStorage for non-logged-in users
+    const stored = localStorage.getItem('videoAutoplay');
+    return stored !== null ? stored === 'true' : true; // default to true
+  });
+  const [showAutoplayMenu, setShowAutoplayMenu] = useState(false);
 
   // Fetch video with caching
   const { data: video, isLoading, error } = useQuery({
@@ -89,11 +95,23 @@ export default function VideoPlayer() {
     }
   }, [video?.id]);
 
-  // Get current user
+  // Get current user and load autoplay preference
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setCurrentUser(user);
+      
+      // Load autoplay preference from user settings if logged in
+      if (user) {
+        try {
+          const preferences = await getUserBandwidthPreferences(user.id);
+          if (preferences && preferences.autoplay !== undefined) {
+            setAutoplay(preferences.autoplay);
+          }
+        } catch (error) {
+          console.error('Error loading autoplay preference:', error);
+        }
+      }
     };
     fetchUser();
   }, []);
@@ -239,6 +257,24 @@ export default function VideoPlayer() {
     }
   }, [playbackSpeed]);
 
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showSpeedMenu || showQualityMenu || showAutoplayMenu) {
+        const target = event.target;
+        const isInsideMenu = target.closest('[data-menu]');
+        if (!isInsideMenu) {
+          setShowSpeedMenu(false);
+          setShowQualityMenu(false);
+          setShowAutoplayMenu(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSpeedMenu, showQualityMenu, showAutoplayMenu]);
+
   // Load subtitles for the video
   useEffect(() => {
     const loadSubtitles = async () => {
@@ -349,6 +385,28 @@ export default function VideoPlayer() {
     console.log(`Quality changed to: ${qualityLevel}`);
   };
 
+  // Autoplay toggle handler
+  const handleAutoplayToggle = async () => {
+    const newAutoplay = !autoplay;
+    setAutoplay(newAutoplay);
+    setShowAutoplayMenu(false);
+    
+    // Save to localStorage for non-logged-in users
+    localStorage.setItem('videoAutoplay', newAutoplay.toString());
+    
+    // Save to user preferences if logged in
+    if (currentUser) {
+      try {
+        await updateBandwidthPreferences(currentUser.id, {
+          autoplay: newAutoplay
+        });
+        console.log(`Autoplay ${newAutoplay ? 'enabled' : 'disabled'}`);
+      } catch (error) {
+        console.error('Error saving autoplay preference:', error);
+      }
+    }
+  };
+
   // Format duration helper
   const formatDuration = (seconds) => {
     if (!seconds) return '0:00';
@@ -452,7 +510,7 @@ export default function VideoPlayer() {
           <video
             ref={videoRef}
             controls
-            autoPlay
+            autoPlay={autoplay}
             crossOrigin="anonymous"
             style={{
               width: "100%",
@@ -484,8 +542,76 @@ export default function VideoPlayer() {
             gap: "8px",
             zIndex: 10
           }}>
+            {/* Autoplay Toggle */}
+            <div style={{ position: "relative" }} data-menu>
+              <button
+                onClick={() => setShowAutoplayMenu(!showAutoplayMenu)}
+                title={autoplay ? "Autoplay: ON" : "Autoplay: OFF"}
+                style={{
+                  padding: "8px 12px",
+                  backgroundColor: autoplay ? "rgba(102, 126, 234, 0.9)" : "rgba(0, 0, 0, 0.7)",
+                  color: "white",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px"
+                }}
+              >
+                {autoplay ? "🔁" : "⏸️"}
+                <span>Autoplay</span>
+              </button>
+              {showAutoplayMenu && (
+                <div style={{
+                  position: "absolute",
+                  bottom: "calc(100% + 5px)",
+                  right: 0,
+                  backgroundColor: "rgba(0, 0, 0, 0.9)",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  borderRadius: "4px",
+                  padding: "8px",
+                  minWidth: "150px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)"
+                }}>
+                  <button
+                    onClick={handleAutoplayToggle}
+                    style={{
+                      width: "100%",
+                      padding: "8px 12px",
+                      backgroundColor: "transparent",
+                      color: "white",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "13px",
+                      textAlign: "left",
+                      borderRadius: "2px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between"
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)"}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                  >
+                    <span>{autoplay ? "Turn OFF" : "Turn ON"}</span>
+                    <span style={{ fontSize: "16px" }}>{autoplay ? "✓" : ""}</span>
+                  </button>
+                  <div style={{
+                    fontSize: "11px",
+                    color: "rgba(255, 255, 255, 0.6)",
+                    padding: "8px 12px 4px",
+                    lineHeight: "1.3"
+                  }}>
+                    {autoplay ? "Videos will play automatically" : "Videos require manual play"}
+                  </div>
+                </div>
+              )}
+            </div>
+            
             {/* Playback Speed Control */}
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative" }} data-menu>
               <button
                 onClick={() => setShowSpeedMenu(!showSpeedMenu)}
                 style={{
@@ -537,7 +663,7 @@ export default function VideoPlayer() {
             </div>
 
             {/* Quality Control */}
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative" }} data-menu>
               <button
                 onClick={() => setShowQualityMenu(!showQualityMenu)}
                 style={{

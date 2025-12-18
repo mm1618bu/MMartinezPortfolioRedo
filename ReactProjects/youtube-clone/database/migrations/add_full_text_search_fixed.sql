@@ -1,5 +1,52 @@
 -- Migration: Full-Text Search Implementation (Fixed)
 -- Run this in Supabase SQL Editor
+--
+-- RELEVANCE RANKING ALGORITHM:
+-- =============================
+-- The search_videos function uses a sophisticated multi-factor relevance scoring system:
+--
+-- 1. Full-Text Search (Weight: 10x)
+--    - Uses PostgreSQL tsvector/tsquery for semantic matching
+--    - Considers word stems and variations
+--
+-- 2. Exact Title Match (Score: +50)
+--    - Highest priority for perfect title matches
+--
+-- 3. Title Starts With Query (Score: +30)
+--    - High priority for titles beginning with search term
+--
+-- 4. Title Contains Query (Score: +15)
+--    - Medium priority for partial title matches
+--
+-- 5. Keyword Exact Match (Score: +25)
+--    - High priority for exact keyword tag matches
+--
+-- 6. Keyword Partial Match (Score: +10)
+--    - Medium priority for partial keyword matches
+--
+-- 7. Channel Name Match (Score: +12)
+--    - Medium priority for channel name matches
+--
+-- 8. Description Match (Score: +5)
+--    - Lower priority for description mentions
+--
+-- 9. Popularity Boost (Score: up to +20)
+--    - Logarithmic scale: LOG(views + 1) * 2
+--    - Capped at 20 to prevent dominance by viral videos
+--
+-- 10. Engagement Boost (Score: up to +10)
+--     - Based on likes-to-views ratio: (likes/views) * 15
+--     - Rewards videos with high engagement
+--
+-- 11. Recency Boost (Score: +8, +5, or +2)
+--     - Last 7 days: +8 points
+--     - Last 30 days: +5 points
+--     - Last 90 days: +2 points
+--     - Helps surface fresh content
+--
+-- Total Maximum Score: ~180 points
+-- Videos are sorted by total relevance score (highest first)
+--
 
 -- =====================================================
 -- 1. Enable Required Extensions
@@ -127,13 +174,48 @@ RETURNS TABLE(
 ) AS $$
 BEGIN
   RETURN QUERY
-  SELECT DISTINCT
-    v.title as suggestion,
-    'video'::VARCHAR(50) as category,
-    'video'::VARCHAR(20) as source
-  FROM videos v
-  WHERE v.title ILIKE '%' || p_partial_query || '%'
-  ORDER BY v.views DESC
+  SELECT * FROM (
+    -- Video titles
+    SELECT DISTINCT
+      v.title as suggestion,
+      'video'::VARCHAR(50) as category,
+      'video'::VARCHAR(20) as source,
+      v.views as sort_order
+    FROM videos v
+    WHERE v.title ILIKE '%' || p_partial_query || '%'
+    ORDER BY v.views DESC
+    LIMIT (p_limit / 2)
+    
+    UNION ALL
+    
+    -- Channel names
+    SELECT DISTINCT
+      v.channel_name as suggestion,
+      'channel'::VARCHAR(50) as category,
+      'channel'::VARCHAR(20) as source,
+      v.views as sort_order
+    FROM videos v
+    WHERE v.channel_name ILIKE '%' || p_partial_query || '%'
+    ORDER BY v.views DESC
+    LIMIT (p_limit / 3)
+    
+    UNION ALL
+    
+    -- Keywords (if column exists and is not null)
+    SELECT DISTINCT
+      unnest(v.keywords) as suggestion,
+      'keyword'::VARCHAR(50) as category,
+      'keyword'::VARCHAR(20) as source,
+      v.views as sort_order
+    FROM videos v
+    WHERE v.keywords IS NOT NULL
+      AND EXISTS (
+        SELECT 1 FROM unnest(v.keywords) kw 
+        WHERE kw ILIKE '%' || p_partial_query || '%'
+      )
+    LIMIT (p_limit / 3)
+  ) results
+  ORDER BY sort_order DESC
   LIMIT p_limit;
 END;
 $$ LANGUAGE plpgsql STABLE;
@@ -199,7 +281,7 @@ RETURNS TABLE(
   likes INT,
   channel_name TEXT,
   created_at TIMESTAMP WITH TIME ZONE,
-  rank REAL
+  relevance_score REAL
 ) AS $$
 DECLARE
   v_ts_query tsquery;
@@ -218,17 +300,93 @@ BEGIN
     v.likes,
     v.channel_name,
     v.created_at,
-    ts_rank(v.search_vector, v_ts_query) as rank
+    -- Advanced relevance scoring algorithm
+    (
+      -- Full-text search rank (weighted heavily)
+      ts_rank(v.search_vector, v_ts_query) * 10.0 +
+      
+      -- Exact title match (highest priority)
+      CASE WHEN LOWER(v.title) = LOWER(p_query) THEN 50.0 ELSE 0 END +
+      
+      -- Title starts with query (high priority)
+      CASE WHEN LOWER(v.title) LIKE LOWER(p_query) || '%' THEN 30.0 ELSE 0 END +
+      
+      -- Title contains query (medium priority)
+      CASE WHEN LOWER(v.title) LIKE '%' || LOWER(p_query) || '%' THEN 15.0 ELSE 0 END +
+      
+      -- Keyword exact match (high priority)
+      CASE WHEN v.keywords IS NOT NULL AND EXISTS (
+        SELECT 1 FROM unnest(v.keywords) kw 
+        WHERE LOWER(kw) = LOWER(p_query)
+      ) THEN 25.0 ELSE 0 END +
+      
+      -- Keyword partial match (medium priority)
+      CASE WHEN v.keywords IS NOT NULL AND EXISTS (
+        SELECT 1 FROM unnest(v.keywords) kw 
+        WHERE LOWER(kw) LIKE '%' || LOWER(p_query) || '%'
+      ) THEN 10.0 ELSE 0 END +
+      
+      -- Channel name match (medium priority)
+      CASE WHEN LOWER(v.channel_name) LIKE '%' || LOWER(p_query) || '%' THEN 12.0 ELSE 0 END +
+      
+      -- Description match (lower priority)
+      CASE WHEN LOWER(v.description) LIKE '%' || LOWER(p_query) || '%' THEN 5.0 ELSE 0 END +
+      
+      -- Popularity boost (logarithmic scale to prevent dominance)
+      LEAST(LOG(GREATEST(v.views, 1) + 1) * 2.0, 20.0) +
+      
+      -- Engagement boost (likes ratio)
+      CASE WHEN v.views > 0 
+        THEN LEAST((v.likes::FLOAT / NULLIF(v.views, 0)) * 15.0, 10.0)
+        ELSE 0 
+      END +
+      
+      -- Recency boost (decay over time)
+      CASE 
+        WHEN v.created_at > NOW() - INTERVAL '7 days' THEN 8.0
+        WHEN v.created_at > NOW() - INTERVAL '30 days' THEN 5.0
+        WHEN v.created_at > NOW() - INTERVAL '90 days' THEN 2.0
+        ELSE 0
+      END
+    ) as relevance_score
   FROM videos v
   WHERE 
     v.search_vector @@ v_ts_query
     OR v.title ILIKE '%' || p_query || '%'
     OR v.description ILIKE '%' || p_query || '%'
     OR v.channel_name ILIKE '%' || p_query || '%'
+    OR (v.keywords IS NOT NULL AND EXISTS (
+      SELECT 1 FROM unnest(v.keywords) kw 
+      WHERE kw ILIKE '%' || p_query || '%'
+    ))
   ORDER BY
-    CASE WHEN p_sort_by = 'relevance' THEN ts_rank(v.search_vector, v_ts_query) ELSE 0 END DESC,
+    CASE WHEN p_sort_by = 'relevance' THEN 
+      (
+        ts_rank(v.search_vector, v_ts_query) * 10.0 +
+        CASE WHEN LOWER(v.title) = LOWER(p_query) THEN 50.0 ELSE 0 END +
+        CASE WHEN LOWER(v.title) LIKE LOWER(p_query) || '%' THEN 30.0 ELSE 0 END +
+        CASE WHEN LOWER(v.title) LIKE '%' || LOWER(p_query) || '%' THEN 15.0 ELSE 0 END +
+        CASE WHEN v.keywords IS NOT NULL AND EXISTS (
+          SELECT 1 FROM unnest(v.keywords) kw WHERE LOWER(kw) = LOWER(p_query)
+        ) THEN 25.0 ELSE 0 END +
+        CASE WHEN v.keywords IS NOT NULL AND EXISTS (
+          SELECT 1 FROM unnest(v.keywords) kw WHERE LOWER(kw) LIKE '%' || LOWER(p_query) || '%'
+        ) THEN 10.0 ELSE 0 END +
+        CASE WHEN LOWER(v.channel_name) LIKE '%' || LOWER(p_query) || '%' THEN 12.0 ELSE 0 END +
+        CASE WHEN LOWER(v.description) LIKE '%' || LOWER(p_query) || '%' THEN 5.0 ELSE 0 END +
+        LEAST(LOG(GREATEST(v.views, 1) + 1) * 2.0, 20.0) +
+        CASE WHEN v.views > 0 THEN LEAST((v.likes::FLOAT / NULLIF(v.views, 0)) * 15.0, 10.0) ELSE 0 END +
+        CASE 
+          WHEN v.created_at > NOW() - INTERVAL '7 days' THEN 8.0
+          WHEN v.created_at > NOW() - INTERVAL '30 days' THEN 5.0
+          WHEN v.created_at > NOW() - INTERVAL '90 days' THEN 2.0
+          ELSE 0
+        END
+      )
+    ELSE 0 END DESC,
     CASE WHEN p_sort_by = 'date' THEN EXTRACT(EPOCH FROM v.created_at) ELSE 0 END DESC,
-    CASE WHEN p_sort_by = 'views' THEN v.views ELSE 0 END DESC
+    CASE WHEN p_sort_by = 'views' THEN v.views ELSE 0 END DESC,
+    v.views DESC -- Tiebreaker
   LIMIT p_limit
   OFFSET p_offset;
 END;

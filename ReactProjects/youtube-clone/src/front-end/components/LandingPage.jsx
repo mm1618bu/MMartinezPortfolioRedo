@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
+import { getTrendingSearches } from '../utils/searchAPI';
 import '../../styles/main.css';
 
 export default function LandingPage() {
@@ -8,10 +9,20 @@ export default function LandingPage() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'trending', 'recent'
+  const [trendingSearches, setTrendingSearches] = useState([]);
 
   useEffect(() => {
     fetchVideos();
   }, [filter]);
+
+  useEffect(() => {
+    fetchTrendingSearches();
+  }, []);
+
+  const fetchTrendingSearches = async () => {
+    const data = await getTrendingSearches(168, 8); // Last week, top 8
+    setTrendingSearches(data);
+  };
 
   const fetchVideos = async () => {
     setLoading(true);
@@ -120,6 +131,33 @@ export default function LandingPage() {
           </button>
         </div>
       </section>
+
+      {/* Trending Searches Section */}
+      {trendingSearches.length > 0 && (
+        <section className="trending-searches-section">
+          <div className="trending-searches-header">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+            </svg>
+            <h2>Trending Searches</h2>
+          </div>
+          <div className="trending-searches-grid">
+            {trendingSearches.map((item, index) => (
+              <button
+                key={index}
+                className="trending-search-chip"
+                onClick={() => navigate(`/search?q=${encodeURIComponent(item.query)}`)}
+              >
+                <span className="trending-rank">#{index + 1}</span>
+                <span className="trending-query">{item.query}</span>
+                <span className="trending-count">
+                  {item.search_count} {item.search_count === 1 ? 'search' : 'searches'}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Videos Grid */}
       <section className="landing-videos">

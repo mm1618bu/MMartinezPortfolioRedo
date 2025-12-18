@@ -1,6 +1,25 @@
 /**
  * Search API Utilities
  * Full-text search with filters, suggestions, and analytics
+ * 
+ * RELEVANCE RANKING:
+ * ==================
+ * When sortBy='relevance', videos are ranked using a multi-factor algorithm:
+ * 
+ * - Full-text search score (PostgreSQL ts_rank) × 10
+ * - Exact title match: +50 points
+ * - Title starts with query: +30 points  
+ * - Title contains query: +15 points
+ * - Exact keyword match: +25 points
+ * - Partial keyword match: +10 points
+ * - Channel name match: +12 points
+ * - Description match: +5 points
+ * - Popularity boost: up to +20 (logarithmic scale)
+ * - Engagement boost: up to +10 (likes/views ratio)
+ * - Recency boost: +8 (last 7d), +5 (last 30d), +2 (last 90d)
+ * 
+ * Total scores typically range from 0-180 points.
+ * Higher scores = more relevant results appear first.
  */
 
 import { supabase } from './supabase';
@@ -65,13 +84,13 @@ export const getSearchSuggestions = async (partialQuery, limit = 10) => {
  */
 const getSearchSuggestionsFallback = async (partialQuery, limit = 10) => {
   try {
-    // Get video titles that match (simpler query without is_public check)
+    // Search in title, channel_name, and keywords
     const { data: videos, error: videoError } = await supabase
       .from('videos')
-      .select('title, channel_name, views')
-      .ilike('title', `%${partialQuery}%`)
+      .select('title, channel_name, keywords, views')
+      .or(`title.ilike.%${partialQuery}%,channel_name.ilike.%${partialQuery}%,keywords.cs.{${partialQuery}}`)
       .order('views', { ascending: false })
-      .limit(limit);
+      .limit(limit * 2); // Get more to filter
 
     if (videoError) {
       console.error('Error fetching videos for suggestions:', videoError);
@@ -80,33 +99,50 @@ const getSearchSuggestionsFallback = async (partialQuery, limit = 10) => {
 
     // Format as suggestions
     const suggestions = [];
+    const seen = new Set();
+    
     if (videos) {
-      // Add unique video titles
-      const titleSuggestions = videos
-        .map(v => ({
-          suggestion: v.title,
-          category: 'video',
-          source: 'video'
-        }))
-        .slice(0, Math.floor(limit * 0.6));
-      
-      suggestions.push(...titleSuggestions);
+      // Add video titles
+      videos.forEach(v => {
+        if (v.title && v.title.toLowerCase().includes(partialQuery.toLowerCase()) && !seen.has(v.title)) {
+          suggestions.push({
+            suggestion: v.title,
+            category: 'video',
+            source: 'video'
+          });
+          seen.add(v.title);
+        }
+      });
 
-      // Add unique channel names
-      const uniqueChannels = [...new Set(videos.map(v => v.channel_name))];
-      const channelSuggestions = uniqueChannels
-        .filter(name => name && name.toLowerCase().includes(partialQuery.toLowerCase()))
-        .map(name => ({
-          suggestion: name,
-          category: 'channel',
-          source: 'channel'
-        }))
-        .slice(0, Math.floor(limit * 0.4));
-      
-      suggestions.push(...channelSuggestions);
+      // Add channel names
+      videos.forEach(v => {
+        if (v.channel_name && v.channel_name.toLowerCase().includes(partialQuery.toLowerCase()) && !seen.has(v.channel_name)) {
+          suggestions.push({
+            suggestion: v.channel_name,
+            category: 'channel',
+            source: 'channel'
+          });
+          seen.add(v.channel_name);
+        }
+      });
+
+      // Add keywords
+      videos.forEach(v => {
+        if (v.keywords && Array.isArray(v.keywords)) {
+          v.keywords.forEach(keyword => {
+            if (keyword && keyword.toLowerCase().includes(partialQuery.toLowerCase()) && !seen.has(keyword)) {
+              suggestions.push({
+                suggestion: keyword,
+                category: 'keyword',
+                source: 'keyword'
+              });
+              seen.add(keyword);
+            }
+          });
+        }
+      });
     }
 
-    console.log('🔍 Fallback suggestions returned:', suggestions.length, 'items');
     return suggestions.slice(0, limit);
   } catch (error) {
     console.error('Error in fallback suggestions:', error);

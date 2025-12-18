@@ -33,6 +33,20 @@
   margin: 0;
 }
 
+.sorting-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: help;
+}
+
 .search-controls {
   display: flex;
   align-items: center;
@@ -67,6 +81,24 @@
 .sort-select:focus {
   outline: none;
   border-color: #065fd4;
+}
+
+.relevance-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  cursor: help;
+  transition: transform 0.2s;
+}
+
+.relevance-info:hover {
+  transform: scale(1.1);
 }
 
 .filters-btn {

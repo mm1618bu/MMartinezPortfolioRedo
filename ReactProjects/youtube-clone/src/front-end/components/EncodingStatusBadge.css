@@ -1,0 +1,88 @@
+/* Encoding Status Badge - Compact widget for showing encoding status */
+
+.encoding-status-badge {
+  display: inline-flex;
+  background: white;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin: 8px 0;
+  animation: slideInBadge 0.3s ease-out;
+}
+
+@keyframes slideInBadge {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.badge-${status}.badge-queued {
+  border-left: 3px solid #ffa726;
+}
+
+.encoding-status-badge.badge-processing {
+  border-left: 3px solid #42a5f5;
+  background: linear-gradient(135deg, #fff 0%, #f3f8ff 100%);
+}
+
+.encoding-status-badge.badge-failed {
+  border-left: 3px solid #ef5350;
+}
+
+.badge-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.badge-icon {
+  font-size: 1.2rem;
+}
+
+.badge-info {
+  flex: 1;
+  min-width: 150px;
+}
+
+.badge-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #030303;
+  margin-bottom: 4px;
+}
+
+.badge-progress-mini {
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.badge-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.badge-step {
+  font-size: 0.75rem;
+  color: #606060;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.badge-percentage {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #667eea;
+  min-width: 40px;
+  text-align: right;
+}
