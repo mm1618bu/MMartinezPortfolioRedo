@@ -2,6 +2,7 @@ import './styles/main.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import TopNavBar from './front-end/components/TopNavBar.jsx';
 import LandingPage from './front-end/components/LandingPage.jsx';
 import LoginPage from './front-end/components/LoginPage.jsx';
@@ -26,6 +27,7 @@ import SearchResults from './front-end/components/SearchResults.jsx';
 import NotFound from './front-end/components/NotFound.jsx';
 import ServerError from './front-end/components/ServerError.jsx';
 import EncodingQueue from './front-end/components/EncodingQueue.jsx';
+import NotificationsPage from './front-end/components/NotificationsPage.jsx';
 // Create a client with enhanced rate limiting
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,10 +64,11 @@ function HomePage() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <div className="App">
-          <Routes>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <div className="App">
+            <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<><TopNavBar /><HomePage /></>} />
             <Route path="/login" element={<><TopNavBar /><LoginPage /></>} />
@@ -82,13 +85,15 @@ function App() {
             <Route path="/playlist/create" element={<><TopNavBar /><CreatePlaylist channelName="DefaultChannel" /></>} />
             <Route path="/channel/create" element={<><TopNavBar /><CreateChannel skipable={false} /></>} />
             <Route path="/history" element={<><TopNavBar /><WatchHistory /></>} />
+            <Route path="/notifications" element={<><TopNavBar /><NotificationsPage /></>} />
             <Route path="/encoding-queue" element={<><TopNavBar /><EncodingQueue /></>} />
             <Route path="/error" element={<ServerError />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-      </Router>
-    </QueryClientProvider>
+            </Routes>
+          </div>
+        </Router>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

@@ -14,13 +14,87 @@
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
+/* Base body styles */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 :root{
     --primary-color: white;
     --secondary-color: red;
     --soft-color: gray;
     --text: black;
-    
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9f9f9;
+    --bg-tertiary: #f0f0f0;
+    --border-color: #ddd;
+    --card-bg: #ffffff;
+    --input-bg: #ffffff;
+    --navbar-bg: #ffffff;
+    --navbar-text: #030303;
+    --dropdown-bg: #ffffff;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --shadow-hover: rgba(0, 0, 0, 0.15);
+    --text-primary: #030303;
+    --text-secondary: #606060;
+    --text-tertiary: #909090;
 }
+
+/* Dark Mode Variables */
+.dark-mode {
+    --primary-color: #0f0f0f;
+    --bg-primary: #0f0f0f;
+    --bg-secondary: #1a1a1a;
+    --bg-tertiary: #272727;
+    --border-color: #3f3f3f;
+    --card-bg: #1a1a1a;
+    --input-bg: #121212;
+    --navbar-bg: #0f0f0f;
+    --navbar-text: #f1f1f1;
+    --dropdown-bg: #282828;
+    --shadow: rgba(0, 0, 0, 0.4);
+    --shadow-hover: rgba(0, 0, 0, 0.6);
+    --text: #f1f1f1;
+    --text-primary: #f1f1f1;
+    --text-secondary: #aaaaaa;
+    --text-tertiary: #717171;
+    --soft-color: #aaaaaa;
+}
+
+/* Apply dark mode to body */
+.dark-mode body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Dark Mode Toggle Button */
+.navbar-theme-toggle {
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.3s ease;
+    margin-right: 15px;
+}
+
+.navbar-theme-toggle:hover {
+    background-color: var(--bg-tertiary);
+    transform: rotate(15deg);
+}
+
+.navbar-theme-toggle:active {
+    transform: scale(0.95);
+}
+    
+
 
 .User-Form{
 
@@ -33,6 +107,7 @@
     padding: 10px;
     text-align: center;
     justify-content: center;
+    background-color: var(--card-bg);
 
     form{
         display: flex;
@@ -45,10 +120,11 @@
     input{
         width: 300px;
         margin: 10px;
-        color: red;
+        color: var(--text-primary);
         padding: 8px;
         border-radius: 4px;
         border: 1px solid var(--soft-color);
+        background-color: var(--input-bg);
     }
 
     input:focus{
@@ -60,6 +136,7 @@
         margin: 5px;
         padding: 5px;
         font-weight: 400;
+        color: var(--text-primary);
     }
 
     button{
@@ -100,6 +177,7 @@
     padding: 20px;
     max-width: 1400px;
     margin: 0 auto;
+    background-color: var(--bg-primary);
 }
 
 .video-grid-header {
@@ -126,7 +204,7 @@
 .video-grid-empty {
     text-align: center;
     padding: 40px;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .video-grid {
@@ -137,17 +215,18 @@
 
 /* Video Card Styles */
 .video-card {
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     overflow: hidden;
-    background-color: var(--primary-color);
+    background-color: var(--card-bg);
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
+    color: var(--text-primary);
 }
 
 .video-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px var(--shadow-hover);
 }
 
 /* Channel Styles */
@@ -155,6 +234,7 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
+    background-color: var(--bg-primary);
 }
 
 .channel-loading,
@@ -4306,9 +4386,9 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: var(--primary-color);
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: var(--navbar-bg);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 .navbar-content {
@@ -4359,11 +4439,14 @@
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 0;
 }
 
 /* User Profile Section */
 .navbar-user-container {
+  display: flex;
+  align-items: center;
+  gap: 0;
   position: relative;
 }
 
@@ -4375,11 +4458,11 @@
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: #f5f7fa;
+  background: var(--bg-secondary);
 }
 
 .navbar-user-profile:hover {
-  background: #e8ecf1;
+  background: var(--bg-tertiary);
 }
 
 .navbar-user-avatar {
@@ -4405,7 +4488,7 @@
 .navbar-user-name {
   font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--navbar-text);
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4426,9 +4509,9 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: var(--primary-color);
+  background: var(--dropdown-bg);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px var(--shadow-hover);
   min-width: 220px;
   overflow: hidden;
   animation: dropdownSlide 0.2s ease;
@@ -4453,11 +4536,11 @@
   cursor: pointer;
   transition: background 0.2s ease;
   font-size: 0.95rem;
-  color: #333;
+  color: var(--navbar-text);
 }
 
 .navbar-dropdown-item:hover {
-  background: #f5f7fa;
+  background: var(--bg-secondary);
 }
 
 .navbar-dropdown-item span:first-child {
@@ -4466,7 +4549,7 @@
 
 .navbar-dropdown-divider {
   height: 1px;
-  background: #e0e0e0;
+  background: var(--border-color);
   margin: 8px 0;
 }
 

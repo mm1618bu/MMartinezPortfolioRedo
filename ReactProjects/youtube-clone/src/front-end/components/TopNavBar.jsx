@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase, getCurrentUserChannel } from "../utils/supabase";
+import { useTheme } from "../../contexts/ThemeContext";
 import SearchBar from "./SearchBar";
+import NotificationBell from "./NotificationBell";
 import "../../styles/main.css";
 
 export default function TopNavBar() {
   const navigate = useNavigate();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [user, setUser] = useState(null);
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -98,8 +101,21 @@ export default function TopNavBar() {
 
         {/* Right side - User profile or Login */}
         <div className="navbar-right">
+          {/* Dark Mode Toggle */}
+          <button 
+            className="navbar-theme-toggle"
+            onClick={toggleTheme}
+            aria-label="Toggle dark mode"
+            title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDarkMode ? '☀️' : '🌙'}
+          </button>
+
           {user ? (
             <div className="navbar-user-container">
+              {/* Notification Bell */}
+              <NotificationBell userId={user.id} />
+              
               <div 
                 className="navbar-user-profile"
                 onClick={() => setShowDropdown(!showDropdown)}
@@ -123,6 +139,14 @@ export default function TopNavBar() {
                   }}>
                     <span>🏠</span>
                     <span>Home</span>
+                  </div>
+                  
+                  <div className="navbar-dropdown-item" onClick={() => {
+                    navigate('/notifications');
+                    setShowDropdown(false);
+                  }}>
+                    <span>🔔</span>
+                    <span>Notifications</span>
                   </div>
                   
                   {channel && (

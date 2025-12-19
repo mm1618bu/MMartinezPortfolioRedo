@@ -21,7 +21,7 @@
   }
 }
 
-.badge-${status}.badge-queued {
+.encoding-status-badge.badge-queued {
   border-left: 3px solid #ffa726;
 }
 
