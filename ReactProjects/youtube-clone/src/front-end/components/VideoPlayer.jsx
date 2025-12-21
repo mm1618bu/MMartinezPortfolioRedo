@@ -9,9 +9,12 @@ import { QUALITY_LEVELS, formatBytes, formatBitrate, getUserBandwidthPreferences
 import { updateVideoInCache } from '../utils/videoCacheUtils';
 import { getSimilarVideos, trackVideoWatch, trackVideoLike } from '../utils/recommendationModel';
 import { collectDemographicData } from '../utils/demographicsUtils';
+import { getPreRollAd, getCompanionAd } from '../utils/adSimulationEngine';
 import CommentFeed from './CommentFeed.jsx';
 import RecomendationBar from "./RecomendationBar.jsx";
 import SaveToPlaylist from './SaveToPlaylist.jsx';
+import VideoAd from './VideoAd.jsx';
+import CompanionAd from './CompanionAd.jsx';
 
 // Helper function to format file size
 const formatFileSize = (bytes) => {
@@ -31,6 +34,11 @@ export default function VideoPlayer() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [userReaction, setUserReaction] = useState(null); // 'like', 'dislike', or null
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
+  
+  // Ad state
+  const [showPreRollAd, setShowPreRollAd] = useState(false);
+  const [preRollAd, setPreRollAd] = useState(null);
+  const [companionAd, setCompanionAd] = useState(null);
   
   // Video player controls
   const videoRef = useRef(null);
@@ -98,6 +106,45 @@ export default function VideoPlayer() {
     
     return recommendations;
   }, [allVideos, videoId, video]);
+
+  // Load ads when video loads
+  useEffect(() => {
+    if (video) {
+      // Get video categories for ad targeting
+      const categories = video.video_categories?.map(vc => vc.category) || [];
+      
+      // Load pre-roll ad (20% chance to show)
+      if (Math.random() < 0.2) {
+        const ad = getPreRollAd(categories);
+        if (ad) {
+          setPreRollAd(ad);
+          setShowPreRollAd(true);
+        }
+      }
+      
+      // Load companion ad for sidebar
+      const companion = getCompanionAd(categories);
+      setCompanionAd(companion);
+    }
+  }, [video]);
+
+  // Handle ad completion - start main video
+  const handleAdComplete = () => {
+    setShowPreRollAd(false);
+    // Auto-play main video after ad
+    if (videoRef.current) {
+      videoRef.current.play();
+    }
+  };
+
+  // Handle ad skip - start main video
+  const handleAdSkip = () => {
+    setShowPreRollAd(false);
+    // Auto-play main video after ad skip
+    if (videoRef.current) {
+      videoRef.current.play();
+    }
+  };
 
   // Track view with demographics when video loads
   useEffect(() => {
@@ -575,32 +622,41 @@ export default function VideoPlayer() {
           marginRight: theaterMode ? "-40px" : "0",
           width: theaterMode ? "calc(100% + 80px)" : "100%"
         }}>
-          <video
-            ref={videoRef}
-            controls
-            autoPlay={autoplay}
-            crossOrigin="anonymous"
-            aria-label={`Video player: ${video?.title || 'Video'}`}
-            style={{
-              width: "100%",
-              maxHeight: theaterMode ? "85vh" : "720px",
-              display: "block"
-            }}
-            src={video?.video_url}
-            poster={video?.thumbnail_url}
-            onError={(e) => console.error("❌ Video playback error:", e)}
-          >
-            {subtitles.map((subtitle) => (
-              <track
-                key={subtitle.id}
-                kind="captions"
-                src={subtitle.subtitle_url}
-                srcLang={subtitle.language}
-                label={subtitle.label}
-                default={subtitle.is_default}
-              />
-            ))}
-          </video>
+          {/* Show pre-roll ad if active */}
+          {showPreRollAd && preRollAd ? (
+            <VideoAd 
+              ad={preRollAd}
+              onComplete={handleAdComplete}
+              onSkip={handleAdSkip}
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              controls
+              autoPlay={autoplay && !showPreRollAd}
+              crossOrigin="anonymous"
+              aria-label={`Video player: ${video?.title || 'Video'}`}
+              style={{
+                width: "100%",
+                maxHeight: theaterMode ? "85vh" : "720px",
+                display: "block"
+              }}
+              src={video?.video_url}
+              poster={video?.thumbnail_url}
+              onError={(e) => console.error("❌ Video playback error:", e)}
+            >
+              {subtitles.map((subtitle) => (
+                <track
+                  key={subtitle.id}
+                  kind="captions"
+                  src={subtitle.subtitle_url}
+                  srcLang={subtitle.language}
+                  label={subtitle.label}
+                  default={subtitle.is_default}
+                />
+              ))}
+            </video>
+          )}
           
           {/* Custom Controls Overlay */}
           <div 
@@ -1050,6 +1106,9 @@ export default function VideoPlayer() {
           width: "400px",
           flexShrink: 0
         }}>
+          {/* Companion Ad */}
+          {companionAd && <CompanionAd ad={companionAd} />}
+          
           <h2 style={{
             fontSize: "18px",
             fontWeight: "600",

@@ -37,6 +37,7 @@ import MentionsDemo from './front-end/components/MentionsDemo.jsx';
 import AudienceDemographics from './front-end/components/AudienceDemographics.jsx';
 import CreatorDashboard from './front-end/components/CreatorDashboard.jsx';
 import AdminDashboard from './front-end/components/AdminDashboard.jsx';
+import AdAnalyticsDashboard from './front-end/components/AdAnalyticsDashboard.jsx';
 import SkipLink from './front-end/components/SkipLink.jsx';
 import { prefetchVideos } from './front-end/utils/videoCacheUtils.js';
 
@@ -112,6 +113,7 @@ function App() {
             <Route path="/analytics/demographics" element={<><TopNavBar /><AudienceDemographics /></>} />
             <Route path="/analytics/demographics/video/:videoId" element={<><TopNavBar /><AudienceDemographics /></>} />
             <Route path="/analytics/demographics/channel/:channelId" element={<><TopNavBar /><AudienceDemographics /></>} />
+            <Route path="/analytics/ads" element={<><TopNavBar /><AdAnalyticsDashboard /></>} />
             <Route path="/notifications" element={<><TopNavBar /><NotificationsPage /></>} />
             <Route path="/encoding-queue" element={<><TopNavBar /><EncodingQueue /></>} />
             <Route path="/error" element={<ServerError />} />
