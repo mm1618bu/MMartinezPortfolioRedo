@@ -11,10 +11,14 @@ import {
   addReply,
   deleteReply,
   updateReply,
-  likeReply 
+  likeReply,
+  getChannelByTagForMention
 } from "../utils/supabase";
 import { debounce, rateLimit, preventDuplicateCalls } from "../utils/rateLimiting";
+import { processMentionsAndNotify } from "../utils/mentionUtils";
+import { notifyChannelMention } from "../utils/notificationAPI";
 import CommentItem from "./CommentItem";
+import MentionInput from "./MentionInput";
 import "../../styles/main.css";
 
 /**
@@ -170,12 +174,30 @@ export default function CommentFeed({ videoId }) {
     e.preventDefault();
     if (!newComment.trim() || !userName.trim()) return;
 
+    const commentText = newComment.trim();
+
     try {
+      // Submit comment
       await guardedSubmit({
         videoId,
         userName: userName.trim(),
-        commentText: newComment.trim(),
+        commentText,
       });
+
+      // Process mentions and send notifications asynchronously
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user.id) {
+        processMentionsAndNotify(
+          commentText,
+          videoId,
+          user.id,
+          getChannelByTagForMention,
+          notifyChannelMention
+        ).catch(err => {
+          console.error('Error processing mentions:', err);
+          // Don't block comment submission if mention notifications fail
+        });
+      }
     } catch (error) {
       setSubmitError(error.message);
     }
@@ -214,12 +236,28 @@ export default function CommentFeed({ videoId }) {
     e.preventDefault();
     if (!replyText.trim() || !replyUserName.trim()) return;
 
+    const trimmedReplyText = replyText.trim();
+
     addReplyMutation.mutate({
       commentId,
       videoId,
       userName: replyUserName.trim(),
-      replyText: replyText.trim(),
+      replyText: trimmedReplyText,
     });
+
+    // Process mentions in reply
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.id) {
+      processMentionsAndNotify(
+        trimmedReplyText,
+        videoId,
+        user.id,
+        getChannelByTagForMention,
+        notifyChannelMention
+      ).catch(err => {
+        console.error('Error processing mentions in reply:', err);
+      });
+    }
   }
 
   function toggleReplies(commentId) {

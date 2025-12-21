@@ -28,7 +28,15 @@ import NotFound from './front-end/components/NotFound.jsx';
 import ServerError from './front-end/components/ServerError.jsx';
 import EncodingQueue from './front-end/components/EncodingQueue.jsx';
 import NotificationsPage from './front-end/components/NotificationsPage.jsx';
-// Create a client with enhanced rate limiting
+import PersonalizedFeed from './front-end/components/PersonalizedFeed.jsx';
+import UserInterests from './front-end/components/UserInterests.jsx';
+import ManageSubscriptions from './front-end/components/ManageSubscriptions.jsx';
+import SubscriptionsFeed from './front-end/components/SubscriptionsFeed.jsx';
+import MentionsDemo from './front-end/components/MentionsDemo.jsx';
+import AudienceDemographics from './front-end/components/AudienceDemographics.jsx';
+import { prefetchVideos } from './front-end/utils/videoCacheUtils.js';
+
+// Create a client with enhanced caching and rate limiting
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -45,6 +53,9 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Prefetch videos on app initialization for better performance
+prefetchVideos(queryClient);
 
 function HomePage() {
   return (
@@ -71,6 +82,7 @@ function App() {
             <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<><TopNavBar /><HomePage /></>} />
+            <Route path="/feed" element={<><TopNavBar /><PersonalizedFeed /></>} />
             <Route path="/login" element={<><TopNavBar /><LoginPage /></>} />
             <Route path="/register" element={<><TopNavBar /><RegisterPage /></>} />
             <Route path="/forgot-password" element={<><TopNavBar /><ForgotPassword /></>} />
@@ -85,6 +97,13 @@ function App() {
             <Route path="/playlist/create" element={<><TopNavBar /><CreatePlaylist channelName="DefaultChannel" /></>} />
             <Route path="/channel/create" element={<><TopNavBar /><CreateChannel skipable={false} /></>} />
             <Route path="/history" element={<><TopNavBar /><WatchHistory /></>} />
+            <Route path="/interests" element={<><TopNavBar /><UserInterests /></>} />
+            <Route path="/subscriptions" element={<><TopNavBar /><ManageSubscriptions /></>} />
+            <Route path="/subscriptions/feed" element={<><TopNavBar /><SubscriptionsFeed /></>} />
+            <Route path="/mentions-demo" element={<><TopNavBar /><MentionsDemo /></>} />
+            <Route path="/analytics/demographics" element={<><TopNavBar /><AudienceDemographics /></>} />
+            <Route path="/analytics/demographics/video/:videoId" element={<><TopNavBar /><AudienceDemographics /></>} />
+            <Route path="/analytics/demographics/channel/:channelId" element={<><TopNavBar /><AudienceDemographics /></>} />
             <Route path="/notifications" element={<><TopNavBar /><NotificationsPage /></>} />
             <Route path="/encoding-queue" element={<><TopNavBar /><EncodingQueue /></>} />
             <Route path="/error" element={<ServerError />} />

@@ -115,8 +115,8 @@ export default function Channel() {
         if (videoError) throw videoError;
         videos = data || [];
       } else {
-        // No channelTag - fetch all videos
-        videos = await getAllVideosFromSupabase();
+        // No channelTag - use shared cache for all videos
+        videos = queryClient.getQueryData(['allVideos']) || await getAllVideosFromSupabase();
       }
       
       console.log(`Loaded ${videos.length} video(s)`);

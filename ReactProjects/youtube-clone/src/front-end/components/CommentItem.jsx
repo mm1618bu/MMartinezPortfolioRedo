@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getRepliesForComment } from '../utils/supabase';
+import MentionText from './MentionText';
 
 export default function CommentItem({ 
   comment, 
@@ -89,7 +90,9 @@ export default function CommentItem({
           </div>
         </div>
       ) : (
-        <p className="CommentsSection-text">{comment.comment_text}</p>
+        <p className="CommentsSection-text">
+          <MentionText text={comment.comment_text} />
+        </p>
       )}
       
       <div className="CommentsSection-itemActions">
@@ -223,7 +226,9 @@ export default function CommentItem({
                     </div>
                   </div>
                 ) : (
-                  <p className="CommentsSection-replyText">{reply.reply_text}</p>
+                  <p className="CommentsSection-replyText">
+                    <MentionText text={reply.reply_text} />
+                  </p>
                 )}
                 
                 <div className="CommentsSection-replyActions">

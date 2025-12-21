@@ -363,3 +363,19 @@ export const notifyNewUpload = async (subscriberId, channelOwnerId, videoId, vid
     metadata: { channelName, videoTitle }
   });
 };
+
+/**
+ * Helper: Create notification for channel mention
+ */
+export const notifyChannelMention = async (channelOwnerId, actorUserId, videoId, commentText, channelTag) => {
+  return createNotification({
+    userId: channelOwnerId,
+    type: 'mention',
+    title: 'You were mentioned in a comment',
+    message: `@${channelTag} was mentioned: ${commentText.substring(0, 100)}${commentText.length > 100 ? '...' : ''}`,
+    videoId,
+    actorUserId,
+    actionUrl: `/watch/${videoId}`,
+    metadata: { channelTag, commentText }
+  });
+};

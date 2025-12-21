@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from '@tanstack/react-query';
 import {
   uploadVideoToSupabase,
   uploadThumbnailToSupabase,
@@ -12,10 +13,12 @@ import {
 } from "../utils/videoValidation";
 import { createEncodingJob } from "../utils/encodingQueueAPI";
 import { supabase } from "../utils/supabase";
+import { invalidateVideoCache } from "../utils/videoCacheUtils";
 
 import "../../styles/main.css";
 
 export default function VideoUpload() {
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [keywords, setKeywords] = useState("");
@@ -57,6 +60,10 @@ export default function VideoUpload() {
 
     try {
       await uploadSingleFile();
+      
+      // Invalidate video cache to refresh lists
+      invalidateVideoCache(queryClient);
+      
       setMessage("✅ Video uploaded successfully! Encoding job created.");
       setShowEncodingStatus(true);
 

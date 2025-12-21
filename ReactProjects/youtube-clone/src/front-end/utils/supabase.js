@@ -478,6 +478,53 @@ export const getCurrentUserChannel = async () => {
   return await getChannelByUserId(user.id);
 };
 
+// Get all channels (for mentions autocomplete)
+export const getAllChannels = async (limit = 50) => {
+  const { data, error } = await supabase
+    .from('channels')
+    .select('id, channel_name, channel_tag, avatar_url, subscriber_count')
+    .order('subscriber_count', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data || [];
+};
+
+// Search channels by name or tag
+export const searchChannels = async (query, limit = 20) => {
+  if (!query || query.trim().length < 2) {
+    return await getAllChannels(limit);
+  }
+
+  const searchTerm = `%${query.trim().toLowerCase()}%`;
+  
+  const { data, error } = await supabase
+    .from('channels')
+    .select('id, channel_name, channel_tag, avatar_url, subscriber_count')
+    .or(`channel_name.ilike.${searchTerm},channel_tag.ilike.${searchTerm}`)
+    .order('subscriber_count', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data || [];
+};
+
+// Get channel by tag (for mention verification)
+export const getChannelByTagForMention = async (channelTag) => {
+  const { data, error } = await supabase
+    .from('channels')
+    .select('id, channel_name, channel_tag, user_id')
+    .eq('channel_tag', channelTag)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    throw error;
+  }
+  
+  return data;
+};
+
 // ============================================
 // PLAYLIST FUNCTIONS
 // ============================================
@@ -942,6 +989,131 @@ export const getSubtitlesForVideo = async (videoId) => {
 
   if (error) throw error;
   return data || [];
+};
+
+// ============================================
+// ANALYTICS & DEMOGRAPHICS FUNCTIONS
+// ============================================
+
+// Track video view with demographic data
+export const trackVideoView = async (videoId, demographicData) => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    const viewData = {
+      video_id: videoId,
+      user_id: user?.id || null,
+      device: demographicData.device,
+      browser: demographicData.browser,
+      os: demographicData.os,
+      resolution: demographicData.resolution,
+      timezone: demographicData.timezone,
+      locale: demographicData.locale,
+      region: demographicData.region,
+      time_of_day: demographicData.timeOfDay,
+      day_of_week: demographicData.dayOfWeek,
+      screen_width: demographicData.screenWidth,
+      screen_height: demographicData.screenHeight,
+      viewport_width: demographicData.viewportWidth,
+      viewport_height: demographicData.viewportHeight,
+      viewed_at: demographicData.timestamp
+    };
+
+    const { data, error } = await supabase
+      .from('video_views')
+      .insert([viewData])
+      .select();
+
+    if (error) {
+      console.error('Error tracking view:', error);
+      return null;
+    }
+
+    return data?.[0];
+  } catch (err) {
+    console.error('Error in trackVideoView:', err);
+    return null;
+  }
+};
+
+// Get video analytics with demographic data
+export const getVideoAnalytics = async (videoId) => {
+  try {
+    const { data, error } = await supabase
+      .from('video_views')
+      .select('*')
+      .eq('video_id', videoId)
+      .order('viewed_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching video analytics:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (err) {
+    console.error('Error in getVideoAnalytics:', err);
+    return [];
+  }
+};
+
+// Get channel analytics (all videos)
+export const getChannelAnalytics = async (channelIdOrUserId) => {
+  try {
+    // First get all videos for this channel/user
+    const { data: videos, error: videosError } = await supabase
+      .from('videos')
+      .select('id')
+      .eq('user_id', channelIdOrUserId);
+
+    if (videosError || !videos || videos.length === 0) {
+      return [];
+    }
+
+    const videoIds = videos.map(v => v.id);
+
+    // Get all views for these videos
+    const { data, error } = await supabase
+      .from('video_views')
+      .select('*')
+      .in('video_id', videoIds)
+      .order('viewed_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching channel analytics:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (err) {
+    console.error('Error in getChannelAnalytics:', err);
+    return [];
+  }
+};
+
+// Get analytics for specific time range
+export const getAnalyticsByTimeRange = async (videoId, days = 30) => {
+  try {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const { data, error } = await supabase
+      .from('video_views')
+      .select('*')
+      .eq('video_id', videoId)
+      .gte('viewed_at', startDate.toISOString())
+      .order('viewed_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching analytics by time range:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (err) {
+    console.error('Error in getAnalyticsByTimeRange:', err);
+    return [];
+  }
 };
 
 // Update subtitle

@@ -1,11 +1,14 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getVideoFromSupabase, updateVideoInSupabase, getAllVideosFromSupabase, getSubtitlesForVideo, supabase } from '../utils/supabase';
+import { getVideoFromSupabase, updateVideoInSupabase, getAllVideosFromSupabase, getSubtitlesForVideo, supabase, trackVideoView } from '../utils/supabase';
 import { throttle } from '../utils/rateLimiting';
 import { PlaybackTracker } from '../utils/playbackAnalytics';
 import ABRManager from '../utils/abrManager';
 import { QUALITY_LEVELS, formatBytes, formatBitrate, getUserBandwidthPreferences, updateBandwidthPreferences } from '../utils/compressionUtils';
+import { updateVideoInCache } from '../utils/videoCacheUtils';
+import { getSimilarVideos, trackVideoWatch, trackVideoLike } from '../utils/recommendationModel';
+import { collectDemographicData } from '../utils/demographicsUtils';
 import CommentFeed from './CommentFeed.jsx';
 import RecomendationBar from "./RecomendationBar.jsx";
 import SaveToPlaylist from './SaveToPlaylist.jsx';
@@ -40,7 +43,6 @@ export default function VideoPlayer() {
   const [bufferingEvents, setBufferingEvents] = useState(0);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showQualityMenu, setShowQualityMenu] = useState(false);
-  const [upNextVideos, setUpNextVideos] = useState([]);
   const [subtitles, setSubtitles] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [autoplay, setAutoplay] = useState(() => {
@@ -49,6 +51,36 @@ export default function VideoPlayer() {
     return stored !== null ? stored === 'true' : true; // default to true
   });
   const [showAutoplayMenu, setShowAutoplayMenu] = useState(false);
+  const [theaterMode, setTheaterMode] = useState(() => {
+    // Get initial value from localStorage
+    const stored = localStorage.getItem('theaterMode');
+    return stored !== null ? stored === 'true' : false;
+  });
+
+  // Fetch all videos with aggressive caching for "up next" recommendations
+  const { data: allVideos = [] } = useQuery({
+    queryKey: ['allVideos'],
+    queryFn: async () => {
+      console.log('📥 Fetching all videos for cache');
+      const videos = await getAllVideosFromSupabase();
+      console.log(`✅ Cached ${videos.length} videos`);
+      return videos;
+    },
+    staleTime: 1000 * 60 * 10, // Data stays fresh for 10 minutes
+    cacheTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+
+  // Compute up next videos using recommendation model
+  const upNextVideos = React.useMemo(() => {
+    if (!allVideos.length || !video) return [];
+    
+    // Use recommendation model for personalized similar videos
+    const recommendations = getSimilarVideos(allVideos, video, 10);
+    
+    return recommendations;
+  }, [allVideos, videoId, video]);
 
   // Fetch video with caching
   const { data: video, isLoading, error } = useQuery({
@@ -67,31 +99,52 @@ export default function VideoPlayer() {
     enabled: !!videoId,
   });
 
-  // Increment view count mutation
+  // Track view with demographics when video loads
+  useEffect(() => {
+    if (video && videoId) {
+      const demographicData = collectDemographicData();
+      trackVideoView(videoId, demographicData).catch(err => {
+        console.error('Failed to track view:', err);
+      });
+    }
+  }, [video, videoId]);
+
+  // Increment view count mutation with optimistic update
   const incrementViewsMutation = useMutation({
     mutationFn: async () => {
       const currentViews = video?.views || 0;
       return await updateVideoInSupabase(videoId, { views: currentViews + 1 });
     },
+    onMutate: async () => {
+      // Optimistically update the cache
+      const newViews = (video?.views || 0) + 1;
+      updateVideoInCache(queryClient, videoId, { views: newViews });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['video', videoId]);
     },
   });
 
-  // Update likes/dislikes mutation
+  // Update likes/dislikes mutation with optimistic update
   const updateReactionMutation = useMutation({
     mutationFn: async ({ likes, dislikes }) => {
       return await updateVideoInSupabase(videoId, { likes, dislikes });
     },
+    onMutate: async ({ likes, dislikes }) => {
+      // Optimistically update the cache
+      updateVideoInCache(queryClient, videoId, { likes, dislikes });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['video', videoId]);
     },
   });
 
-  // Increment views on mount
+  // Increment views and track watch on mount
   useEffect(() => {
     if (video) {
       incrementViewsMutation.mutate();
+      // Track video watch for personalized recommendations
+      trackVideoWatch(video);
     }
   }, [video?.id]);
 
@@ -233,23 +286,6 @@ export default function VideoPlayer() {
     };
   }, [video, videoId, currentUser]);
 
-  // Load up next videos
-  useEffect(() => {
-    const loadUpNextVideos = async () => {
-      try {
-        const allVideos = await getAllVideosFromSupabase();
-        // Filter out current video and get 10 random videos
-        const filtered = allVideos
-          .filter(v => v.id !== videoId)
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 10);
-        setUpNextVideos(filtered);
-      } catch (error) {
-        console.error('Error loading up next videos:', error);
-      }
-    };
-    loadUpNextVideos();
-  }, [videoId]);
   // Apply playback speed when it changes
   useEffect(() => {
     if (videoRef.current) {
@@ -344,6 +380,9 @@ export default function VideoPlayer() {
       }
       newLikes = currentLikes + 1;
       setUserReaction('like');
+      
+      // Track like for personalized recommendations
+      trackVideoLike(video);
     }
 
     throttledLikeAction(newLikes, newDislikes);
@@ -383,6 +422,13 @@ export default function VideoPlayer() {
     }
     
     console.log(`Quality changed to: ${qualityLevel}`);
+  };
+
+  // Theater mode toggle handler
+  const handleTheaterModeToggle = () => {
+    const newTheaterMode = !theaterMode;
+    setTheaterMode(newTheaterMode);
+    localStorage.setItem('theaterMode', newTheaterMode.toString());
   };
 
   // Autoplay toggle handler
@@ -481,9 +527,21 @@ export default function VideoPlayer() {
   }
 
   return (
-    <div style={{ display: "flex", gap: "20px", maxWidth: "1800px", margin: "0 auto", padding: "20px" }}>
+    <div style={{ 
+      display: "flex", 
+      flexDirection: theaterMode ? "column" : "row",
+      gap: "20px", 
+      maxWidth: theaterMode ? "100%" : "1800px", 
+      margin: "0 auto", 
+      padding: theaterMode ? "0" : "20px"
+    }}>
       {/* Main Content */}
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ 
+        flex: 1, 
+        minWidth: 0,
+        maxWidth: theaterMode ? "100%" : "none",
+        padding: theaterMode ? "0 40px 20px" : "0"
+      }}>
         {/* Back Button */}
         <button 
           onClick={() => navigate('/')}
@@ -506,7 +564,16 @@ export default function VideoPlayer() {
         </button>
 
         {/* Video Player Container */}
-        <div style={{ position: "relative", backgroundColor: "#000", borderRadius: "8px", overflow: "hidden", marginBottom: "20px" }}>
+        <div style={{ 
+          position: "relative", 
+          backgroundColor: "#000", 
+          borderRadius: theaterMode ? "0" : "8px", 
+          overflow: "hidden", 
+          marginBottom: "20px",
+          marginLeft: theaterMode ? "-40px" : "0",
+          marginRight: theaterMode ? "-40px" : "0",
+          width: theaterMode ? "calc(100% + 80px)" : "100%"
+        }}>
           <video
             ref={videoRef}
             controls
@@ -514,7 +581,7 @@ export default function VideoPlayer() {
             crossOrigin="anonymous"
             style={{
               width: "100%",
-              maxHeight: "720px",
+              maxHeight: theaterMode ? "85vh" : "720px",
               display: "block"
             }}
             src={video?.video_url}
@@ -542,6 +609,30 @@ export default function VideoPlayer() {
             gap: "8px",
             zIndex: 10
           }}>
+            {/* Theater Mode Toggle */}
+            <button
+              onClick={handleTheaterModeToggle}
+              title={theaterMode ? "Exit Theater Mode" : "Theater Mode"}
+              style={{
+                padding: "8px 12px",
+                backgroundColor: theaterMode ? "rgba(102, 126, 234, 0.9)" : "rgba(0, 0, 0, 0.7)",
+                color: "white",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "13px",
+                fontWeight: "600",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px"
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theaterMode ? "rgba(102, 126, 234, 1)" : "rgba(0, 0, 0, 0.85)"}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theaterMode ? "rgba(102, 126, 234, 0.9)" : "rgba(0, 0, 0, 0.7)"}
+            >
+              {theaterMode ? "⬛" : "▭"}
+              <span>{theaterMode ? "Exit" : "Theater"}</span>
+            </button>
+            
             {/* Autoplay Toggle */}
             <div style={{ position: "relative" }} data-menu>
               <button
@@ -924,28 +1015,29 @@ export default function VideoPlayer() {
         <CommentFeed videoId={videoId} />
       </div>
 
-      {/* Up Next Sidebar */}
-      <div style={{
-        width: "400px",
-        flexShrink: 0
-      }}>
-        <h2 style={{
-          fontSize: "18px",
-          fontWeight: "600",
-          marginBottom: "16px",
-          color: "#333"
-        }}>
-          Up Next
-        </h2>
+      {/* Up Next Sidebar - Only show in normal mode (not theater mode) */}
+      {!theaterMode && (
         <div style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "12px",
-          maxHeight: "calc(100vh - 120px)",
-          overflowY: "auto",
-          paddingRight: "8px"
+          width: "400px",
+          flexShrink: 0
         }}>
-          {upNextVideos.map((upNextVideo) => (
+          <h2 style={{
+            fontSize: "18px",
+            fontWeight: "600",
+            marginBottom: "16px",
+            color: "#333"
+          }}>
+            Up Next
+          </h2>
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            maxHeight: "calc(100vh - 120px)",
+            overflowY: "auto",
+            paddingRight: "8px"
+          }}>
+            {upNextVideos.map((upNextVideo) => (
             <div
               key={upNextVideo.id}
               onClick={() => navigate(`/watch/${upNextVideo.id}`)}
@@ -1047,6 +1139,136 @@ export default function VideoPlayer() {
           ))}
         </div>
       </div>
+      )}
+
+      {/* Theater Mode - Up Next Section (shown below video) */}
+      {theaterMode && (
+        <div style={{
+          padding: "0 40px 40px",
+          maxWidth: "100%"
+        }}>
+          <h2 style={{
+            fontSize: "20px",
+            fontWeight: "600",
+            marginBottom: "20px",
+            color: "#333"
+          }}>
+            Up Next
+          </h2>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gap: "16px"
+          }}>
+            {upNextVideos.slice(0, 12).map((upNextVideo) => (
+              <div
+                key={upNextVideo.id}
+                onClick={() => navigate(`/watch/${upNextVideo.id}`)}
+                style={{
+                  cursor: "pointer",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  backgroundColor: "white"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                {/* Thumbnail */}
+                <div style={{
+                  position: "relative",
+                  width: "100%",
+                  paddingTop: "56.25%",
+                  backgroundColor: "#e0e0e0",
+                  overflow: "hidden"
+                }}>
+                  <img
+                    src={upNextVideo.thumbnail_url || "https://placehold.co/320x180?text=No+Thumbnail"}
+                    alt={upNextVideo.title}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                  />
+                  {upNextVideo.duration > 0 && (
+                    <div style={{
+                      position: "absolute",
+                      bottom: "8px",
+                      right: "8px",
+                      backgroundColor: "rgba(0, 0, 0, 0.8)",
+                      color: "white",
+                      padding: "3px 6px",
+                      borderRadius: "3px",
+                      fontSize: "12px",
+                      fontWeight: "600"
+                    }}>
+                      {formatDuration(upNextVideo.duration)}
+                    </div>
+                  )}
+                </div>
+
+                {/* Video Info */}
+                <div style={{ padding: "12px" }}>
+                  <h3 style={{
+                    margin: "0 0 8px 0",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    color: "#333",
+                    lineHeight: "1.4",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden"
+                  }}>
+                    {upNextVideo.title}
+                  </h3>
+                  <p style={{
+                    margin: "0 0 4px 0",
+                    fontSize: "13px",
+                    color: "#666"
+                  }}>
+                    {upNextVideo.channel_name}
+                  </p>
+                  <div style={{
+                    fontSize: "12px",
+                    color: "#666",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}>
+                    <span>{upNextVideo.views?.toLocaleString() || 0} views</span>
+                    {upNextVideo.quality && (
+                      <>
+                        <span>•</span>
+                        <span style={{
+                          backgroundColor: "#667eea20",
+                          color: "#667eea",
+                          padding: "2px 6px",
+                          borderRadius: "3px",
+                          fontSize: "11px",
+                          fontWeight: "600"
+                        }}>
+                          {upNextVideo.quality}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Save to Playlist Modal */}
       {showPlaylistModal && (

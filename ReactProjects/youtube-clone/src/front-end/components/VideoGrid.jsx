@@ -1,19 +1,45 @@
 import { useNavigate } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
 import { getAllVideosFromSupabase } from '../utils/supabase';
+import { scoreAndRankVideos } from '../utils/videoScoringSystem';
 import '../../styles/main.css';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 export default function VideoGrid() {
+  const [sortBy, setSortBy] = useState('score'); // 'score', 'newest', 'views'
+  
   const { data: videos = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['videos'],
+    queryKey: ['allVideos'], // Use same cache key as VideoPlayer
     queryFn: async () => {
       console.log("📥 Loading videos from Supabase");
       const videos = await getAllVideosFromSupabase();
       console.log(`✅ Loaded ${videos.length} video(s) from Supabase`);
       return videos;
     },
+    staleTime: 1000 * 60 * 10, // Data stays fresh for 10 minutes
+    cacheTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    refetchOnWindowFocus: false,
   });
+
+  // Sort videos based on selected option
+  const sortedVideos = useMemo(() => {
+    if (!videos.length) return [];
+    
+    switch (sortBy) {
+      case 'score':
+        return scoreAndRankVideos(videos);
+      case 'newest':
+        return [...videos].sort((a, b) => 
+          new Date(b.created_at) - new Date(a.created_at)
+        );
+      case 'views':
+        return [...videos].sort((a, b) => 
+          (b.views || 0) - (a.views || 0)
+        );
+      default:
+        return videos;
+    }
+  }, [videos, sortBy]);
 
   if (isLoading) {
     return (
@@ -38,19 +64,37 @@ export default function VideoGrid() {
     <div className="video-grid-container">
       <div className="video-grid-header">
         <h2 className="video-grid-title">Video Gallery</h2>
-        <button onClick={() => refetch()} className="video-grid-refresh-button">
-          Refresh
-        </button>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <select 
+            value={sortBy} 
+            onChange={(e) => setSortBy(e.target.value)}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '4px',
+              border: '1px solid #ddd',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            <option value="score">🎯 Smart Ranking</option>
+            <option value="newest">🆕 Newest First</option>
+            <option value="views">👁️ Most Viewed</option>
+          </select>
+          <button onClick={() => refetch()} className="video-grid-refresh-button">
+            Refresh
+          </button>
+        </div>
       </div>
 
-      {videos.length === 0 ? (
+      {sortedVideos.length === 0 ? (
         <div className="video-grid-empty">
           <p>No videos yet. Upload your first video!</p>
         </div>
       ) : (
         <div className="video-grid">
-          {videos.map((video) => (
-            <VideoCard key={video.id} video={video} />
+          {sortedVideos.map((video) => (
+            <VideoCard key={video.id} video={video} showScore={sortBy === 'score'} />
           ))}
         </div>
       )}
@@ -58,7 +102,7 @@ export default function VideoGrid() {
   );
 }
 
-function VideoCard({ video }) {
+function VideoCard({ video, showScore = false }) {
   const [timeAgo, setTimeAgo] = useState('');
   const navigate = useNavigate();
 
@@ -154,6 +198,19 @@ function VideoCard({ video }) {
               fontWeight: '600'
             }}>
               {video.quality}
+            </span>
+          )}
+          {showScore && video.score && (
+            <span style={{
+              marginLeft: '8px',
+              padding: '2px 6px',
+              backgroundColor: '#10b98120',
+              color: '#10b981',
+              borderRadius: '3px',
+              fontSize: '11px',
+              fontWeight: '600'
+            }} title={`Engagement: ${video.score.breakdown.engagement.toFixed(0)} | Recency: ${video.score.breakdown.recency.toFixed(0)} | Quality: ${video.score.breakdown.quality.toFixed(0)}`}>
+              ⭐ {video.score.total.toFixed(0)}
             </span>
           )}
         </div>

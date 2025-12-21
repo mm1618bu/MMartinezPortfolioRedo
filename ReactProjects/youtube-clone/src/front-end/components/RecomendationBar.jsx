@@ -1,6 +1,7 @@
 // src/front-end/components/RecomendationBar.jsx
 import { useQuery } from '@tanstack/react-query';
 import { getAllVideosFromSupabase, getVideoFromSupabase } from "../utils/supabase";
+import { getSimilarVideos } from '../utils/recommendationModel';
 import "../../styles/main.css";
 
 /**
@@ -9,33 +10,37 @@ import "../../styles/main.css";
  *  - limit? (number, optional): how many recommendations to fetch (default 8)
  */
 export default function RecomendationBar({ videoId, limit = 8 }) {
-  // Fetch recommendations with caching
+  // Fetch all videos with shared cache
+  const { data: allVideos = [] } = useQuery({
+    queryKey: ['allVideos'], // Use shared cache
+    queryFn: async () => {
+      const videos = await getAllVideosFromSupabase();
+      return videos;
+    },
+    staleTime: 1000 * 60 * 10, // 10 minutes
+    cacheTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnWindowFocus: false,
+  });
+
+  // Fetch current video with caching
+  const { data: currentVideo } = useQuery({
+    queryKey: ['video', videoId],
+    queryFn: () => getVideoFromSupabase(videoId),
+    enabled: !!videoId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Compute recommendations using recommendation model
   const { data: recommendations = [], isLoading: loading, error: errorMsg } = useQuery({
     queryKey: ['recommendations', videoId, limit],
     queryFn: async () => {
-      // Get current video to find its keywords
-      const currentVideo = await getVideoFromSupabase(videoId);
+      // Use recommendation model for personalized suggestions
+      const recommended = getSimilarVideos(allVideos, currentVideo, limit);
       
-      // Get all videos
-      const allVideos = await getAllVideosFromSupabase();
-      
-      // Filter out the current video and find videos with matching keywords
-      let filtered = allVideos.filter(v => v.id !== videoId);
-      
-      if (currentVideo?.keywords && currentVideo.keywords.length > 0) {
-        // Sort by number of matching keywords
-        filtered = filtered.map(video => {
-          const matchingKeywords = video.keywords?.filter(k => 
-            currentVideo.keywords.includes(k)
-          ).length || 0;
-          return { ...video, matchScore: matchingKeywords };
-        }).sort((a, b) => b.matchScore - a.matchScore);
-      }
-      
-      // Limit results
-      return filtered.slice(0, limit);
+      return recommended;
     },
-    enabled: !!videoId,
+    enabled: !!videoId && allVideos.length > 0 && !!currentVideo,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   if (!videoId) {
