@@ -50,7 +50,7 @@ export const uploadVideoToSupabase = async (file, videoId) => {
   const { data, error } = await supabase.storage
     .from('videos')
     .upload(filePath, file, {
-      cacheControl: '3600',
+      cacheControl: '31536000', // 1 year - videos are immutable
       upsert: false
     });
 
@@ -75,7 +75,7 @@ export const uploadProfilePicture = async (file, userId) => {
   const { data, error } = await supabase.storage
     .from('avatars')
     .upload(filePath, compressedFile, {
-      cacheControl: '3600',
+      cacheControl: '86400', // 1 day - profile pics change occasionally
       upsert: true, // Overwrite existing profile picture
       contentType: 'image/jpeg'
     });
@@ -101,7 +101,7 @@ export const uploadBannerImage = async (file, userId) => {
   const { data, error } = await supabase.storage
     .from('avatars')
     .upload(filePath, compressedFile, {
-      cacheControl: '3600',
+      cacheControl: '86400', // 1 day - banners change occasionally
       upsert: true, // Overwrite existing banner
       contentType: 'image/jpeg'
     });
@@ -136,7 +136,7 @@ export const uploadThumbnailToSupabase = async (file, videoId) => {
   const { data, error } = await supabase.storage
     .from('videos')
     .upload(filePath, compressedFile, {
-      cacheControl: '3600',
+      cacheControl: '2592000', // 30 days - thumbnails rarely change
       upsert: false,
       contentType: 'image/jpeg'
     });
@@ -952,7 +952,7 @@ export const uploadSubtitleToSupabase = async (file, videoId, language) => {
   const { data, error } = await supabase.storage
     .from('subtitles')
     .upload(filePath, file, {
-      cacheControl: '3600',
+      cacheControl: '604800', // 7 days - subtitles may be updated
       upsert: true // Allow updating existing subtitles
     });
 
@@ -1158,4 +1158,388 @@ export const setDefaultSubtitle = async (videoId, subtitleId) => {
 
   if (error) throw error;
   return data;
+};
+
+// FLAGGING FUNCTIONS
+
+// Flag a comment
+export const flagComment = async (commentId, videoId, flaggedByUserId, flaggedByUsername, reason) => {
+  const { data, error } = await supabase
+    .from('flagged_comments')
+    .insert({
+      comment_id: commentId,
+      video_id: videoId,
+      flagged_by_user_id: flaggedByUserId,
+      flagged_by_username: flaggedByUsername,
+      reason: reason
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+// Flag a video
+export const flagVideo = async (videoId, videoTitle, channelId, flaggedByUserId, flaggedByUsername, reason) => {
+  const { data, error } = await supabase
+    .from('flagged_videos')
+    .insert({
+      video_id: videoId,
+      video_title: videoTitle,
+      channel_id: channelId,
+      flagged_by_user_id: flaggedByUserId,
+      flagged_by_username: flaggedByUsername,
+      reason: reason
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+// Get flagged comments for a channel (all videos)
+export const getFlaggedCommentsForChannel = async (channelId) => {
+  const { data, error } = await supabase
+    .from('flagged_comments')
+    .select(`
+      *,
+      comments (
+        comment_text,
+        user_name,
+        created_at
+      )
+    `)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  
+  // Filter by channel - need to get videos for this channel first
+  const { data: videos } = await supabase
+    .from('videos')
+    .select('id')
+    .eq('channel_id', channelId);
+  
+  const videoIds = videos?.map(v => v.id) || [];
+  const filteredData = data?.filter(flag => videoIds.includes(flag.video_id)) || [];
+  
+  return filteredData;
+};
+
+// Get flagged videos for a channel
+export const getFlaggedVideosForChannel = async (channelId) => {
+  const { data, error } = await supabase
+    .from('flagged_videos')
+    .select('*')
+    .eq('channel_id', channelId)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+// Update flag status (comment)
+export const updateCommentFlagStatus = async (flagId, status, reviewedBy) => {
+  const { data, error } = await supabase
+    .from('flagged_comments')
+    .update({
+      status: status,
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: reviewedBy
+    })
+    .eq('id', flagId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+// Update flag status (video)
+export const updateVideoFlagStatus = async (flagId, status, reviewedBy) => {
+  const { data, error } = await supabase
+    .from('flagged_videos')
+    .update({
+      status: status,
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: reviewedBy
+    })
+    .eq('id', flagId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+// Get all channel stats for dashboard
+export const getChannelDashboardStats = async (channelId) => {
+  // Get total videos
+  const { data: videos, error: videosError } = await supabase
+    .from('videos')
+    .select('id, views, likes, dislikes, created_at')
+    .eq('channel_id', channelId);
+
+  if (videosError) throw videosError;
+
+  // Get total comments across all videos
+  const videoIds = videos?.map(v => v.id) || [];
+  const { count: totalComments } = await supabase
+    .from('comments')
+    .select('*', { count: 'exact', head: true })
+    .in('video_id', videoIds);
+
+  // Get flagged items counts
+  const { count: flaggedCommentsCount } = await supabase
+    .from('flagged_comments')
+    .select('*', { count: 'exact', head: true })
+    .in('video_id', videoIds)
+    .eq('status', 'pending');
+
+  const { count: flaggedVideosCount } = await supabase
+    .from('flagged_videos')
+    .select('*', { count: 'exact', head: true })
+    .eq('channel_id', channelId)
+    .eq('status', 'pending');
+
+  const totalViews = videos?.reduce((sum, v) => sum + (v.views || 0), 0) || 0;
+  const totalLikes = videos?.reduce((sum, v) => sum + (v.likes || 0), 0) || 0;
+
+  return {
+    totalVideos: videos?.length || 0,
+    totalViews,
+    totalLikes,
+    totalComments: totalComments || 0,
+    flaggedComments: flaggedCommentsCount || 0,
+    flaggedVideos: flaggedVideosCount || 0,
+    recentVideos: videos?.filter(v => {
+      const createdDate = new Date(v.created_at);
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      return createdDate >= thirtyDaysAgo;
+    }).length || 0
+  };
+};
+
+// ============================================
+// RBAC (ROLE-BASED ACCESS CONTROL) FUNCTIONS
+// ============================================
+
+// Get current user's role
+export const getUserRole = async (userId) => {
+  const { data, error } = await supabase
+    .rpc('get_user_role', { p_user_id: userId });
+  
+  if (error) {
+    console.error('Error getting user role:', error);
+    return 'viewer'; // Default to viewer if error
+  }
+  return data || 'viewer';
+};
+
+// Check if user has specific permission
+export const userHasPermission = async (userId, permission) => {
+  const { data, error } = await supabase
+    .rpc('user_has_permission', {
+      p_user_id: userId,
+      p_permission: permission
+    });
+  
+  if (error) {
+    console.error('Error checking permission:', error);
+    return false;
+  }
+  return data === true;
+};
+
+// Grant role to user (admin only)
+export const grantUserRole = async (userId, role, grantedBy, expiresAt = null) => {
+  const { data, error } = await supabase
+    .rpc('grant_user_role', {
+      p_user_id: userId,
+      p_role: role,
+      p_granted_by: grantedBy,
+      p_expires_at: expiresAt
+    });
+  
+  if (error) throw error;
+  return data;
+};
+
+// Revoke user role (admin only)
+export const revokeUserRole = async (userId) => {
+  const { data, error } = await supabase
+    .rpc('revoke_user_role', { p_user_id: userId });
+  
+  if (error) throw error;
+  return data;
+};
+
+// Log admin action
+export const logAdminAction = async (adminUserId, action, targetType = null, targetId = null, details = {}) => {
+  const { data, error } = await supabase
+    .rpc('log_admin_action', {
+      p_admin_user_id: adminUserId,
+      p_action: action,
+      p_target_type: targetType,
+      p_target_id: targetId,
+      p_details: details
+    });
+  
+  if (error) throw error;
+  return data;
+};
+
+// Get all users with their roles (admin only)
+export const getAllUsersWithRoles = async () => {
+  // Get all users from auth
+  const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+  if (authError) throw authError;
+
+  // Get all user roles
+  const { data: userRoles, error: rolesError } = await supabase
+    .from('user_roles')
+    .select('*')
+    .eq('is_active', true);
+  
+  if (rolesError) throw rolesError;
+
+  // Merge data
+  const usersWithRoles = authUsers.users.map(user => {
+    const roleData = userRoles.find(r => r.user_id === user.id);
+    return {
+      ...user,
+      role: roleData?.role || 'viewer',
+      granted_at: roleData?.granted_at,
+      granted_by: roleData?.granted_by,
+      expires_at: roleData?.expires_at
+    };
+  });
+
+  return usersWithRoles;
+};
+
+// Get user by ID with role (admin only)
+export const getUserWithRole = async (userId) => {
+  const { data: user, error: userError } = await supabase.auth.admin.getUserById(userId);
+  if (userError) throw userError;
+
+  const { data: roleData, error: roleError } = await supabase
+    .from('user_roles')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .single();
+  
+  if (roleError && roleError.code !== 'PGRST116') throw roleError;
+
+  return {
+    ...user,
+    role: roleData?.role || 'viewer',
+    granted_at: roleData?.granted_at,
+    granted_by: roleData?.granted_by,
+    expires_at: roleData?.expires_at
+  };
+};
+
+// Get admin audit log
+export const getAdminAuditLog = async (limit = 100) => {
+  const { data, error } = await supabase
+    .from('admin_audit_log')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  
+  if (error) throw error;
+  return data;
+};
+
+// Get role statistics
+export const getRoleStatistics = async () => {
+  const { data, error } = await supabase
+    .from('role_statistics')
+    .select('*');
+  
+  if (error) throw error;
+  return data;
+};
+
+// Get all permissions for a role
+export const getRolePermissions = async (role) => {
+  const { data, error } = await supabase
+    .from('role_permissions')
+    .select('*')
+    .eq('role', role);
+  
+  if (error) throw error;
+  return data;
+};
+
+// Admin: Delete any video
+export const adminDeleteVideo = async (adminUserId, videoId) => {
+  // Log the action first
+  await logAdminAction(adminUserId, 'delete_video', 'video', videoId);
+  
+  // Get video details for cleanup
+  const video = await getVideoFromSupabase(videoId);
+  
+  // Delete the video
+  await deleteVideoFromSupabase(videoId, video.video_url, video.thumbnail_url);
+  
+  return true;
+};
+
+// Admin: Suspend user
+export const adminSuspendUser = async (adminUserId, targetUserId, reason) => {
+  await logAdminAction(adminUserId, 'suspend_user', 'user', targetUserId, { reason });
+  
+  // Update user metadata to mark as suspended
+  const { error } = await supabase.auth.admin.updateUserById(targetUserId, {
+    user_metadata: {
+      suspended: true,
+      suspended_at: new Date().toISOString(),
+      suspended_by: adminUserId,
+      suspension_reason: reason
+    }
+  });
+  
+  if (error) throw error;
+  return true;
+};
+
+// Admin: Unsuspend user
+export const adminUnsuspendUser = async (adminUserId, targetUserId) => {
+  await logAdminAction(adminUserId, 'unsuspend_user', 'user', targetUserId);
+  
+  const { error } = await supabase.auth.admin.updateUserById(targetUserId, {
+    user_metadata: {
+      suspended: false,
+      unsuspended_at: new Date().toISOString(),
+      unsuspended_by: adminUserId
+    }
+  });
+  
+  if (error) throw error;
+  return true;
+};
+
+// Check if current user is admin
+export const isCurrentUserAdmin = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  
+  const role = await getUserRole(user.id);
+  return role === 'admin';
+};
+
+// Check if current user is moderator or admin
+export const isCurrentUserModerator = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  
+  const role = await getUserRole(user.id);
+  return role === 'admin' || role === 'moderator';
 };

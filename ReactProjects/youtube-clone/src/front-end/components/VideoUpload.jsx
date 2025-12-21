@@ -172,7 +172,7 @@ export default function VideoUpload() {
     <div className="VideoUpload-container">
       <h2 className="VideoUpload-title">Upload Video</h2>
 
-      <form onSubmit={handleSubmit} className="VideoUpload-form">
+      <form onSubmit={handleSubmit} className="VideoUpload-form" aria-label="Video upload form">
 
         {/* TITLE */}
         <div className="VideoUpload-field">
@@ -245,6 +245,8 @@ export default function VideoUpload() {
             type="file"
             accept="video/*"
             className="VideoUpload-file"
+            aria-required="true"
+            aria-describedby="video-file-help"
             onChange={async (e) => {
               const file = e.target.files[0];
               if (file) {
@@ -284,6 +286,9 @@ export default function VideoUpload() {
             disabled={isValidating}
             required
           />
+          <p id="video-file-help" className="visually-hidden">
+            Upload a video file. Accepted formats: MP4, WebM, MOV. Maximum size may apply.
+          </p>
           {isValidating && (
             <p className="VideoUpload-fileInfo" style={{ color: '#667eea' }}>
               🔄 Validating video...

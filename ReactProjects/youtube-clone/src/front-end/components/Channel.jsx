@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAllVideosFromSupabase, getChannelByTag, supabase, getSubscriberCount, isSubscribedToChannel, subscribeToChannel, unsubscribeFromChannel } from '../utils/supabase';
 import ChannelAbout from './ChannelAbout';
 import ChannelPlaylists from './ChannelPlaylists';
+import ChannelAnalytics from './ChannelAnalytics';
 import EditChannel from './EditChannel';
 import '../../styles/main.css';
 
@@ -214,6 +215,13 @@ export default function Channel() {
               {isOwner && (
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <button 
+                    className="channel-dashboard-btn"
+                    onClick={() => navigate('/dashboard')}
+                    title="Creator Dashboard"
+                  >
+                    📊 Dashboard
+                  </button>
+                  <button 
                     className="channel-edit-btn"
                     onClick={() => setShowEditModal(true)}
                   >
@@ -246,6 +254,14 @@ export default function Channel() {
         >
           Playlists
         </button>
+        {isOwner && (
+          <button 
+            className={`channel-nav-button ${activeTab === 'analytics' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            Analytics
+          </button>
+        )}
         <button 
           className={`channel-nav-button ${activeTab === 'about' ? 'active' : ''}`}
           onClick={() => setActiveTab('about')}
@@ -278,6 +294,11 @@ export default function Channel() {
         </div>
       ) : activeTab === 'playlists' ? (
         <ChannelPlaylists userId={channelData?.user_id} />
+      ) : activeTab === 'analytics' ? (
+        <ChannelAnalytics 
+          channelId={channelData?.channel_id}
+          channelData={channelData}
+        />
       ) : (
         <ChannelAbout 
           channelData={channelData} 

@@ -1,4 +1,5 @@
 import './styles/main.css';
+import './styles/accessibility.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -34,6 +35,9 @@ import ManageSubscriptions from './front-end/components/ManageSubscriptions.jsx'
 import SubscriptionsFeed from './front-end/components/SubscriptionsFeed.jsx';
 import MentionsDemo from './front-end/components/MentionsDemo.jsx';
 import AudienceDemographics from './front-end/components/AudienceDemographics.jsx';
+import CreatorDashboard from './front-end/components/CreatorDashboard.jsx';
+import AdminDashboard from './front-end/components/AdminDashboard.jsx';
+import SkipLink from './front-end/components/SkipLink.jsx';
 import { prefetchVideos } from './front-end/utils/videoCacheUtils.js';
 
 // Create a client with enhanced caching and rate limiting
@@ -79,7 +83,9 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <Router>
           <div className="App">
-            <Routes>
+            <SkipLink />
+            <main id="main-content" tabIndex="-1" role="main" aria-label="Main content">
+              <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<><TopNavBar /><HomePage /></>} />
             <Route path="/feed" element={<><TopNavBar /><PersonalizedFeed /></>} />
@@ -91,6 +97,8 @@ function App() {
             <Route path="/channel" element={<><TopNavBar /><Channel /></>} />
             <Route path="/channel/:channelTag" element={<><TopNavBar /><Channel /></>} />
             <Route path="/channel/settings" element={<><TopNavBar /><ChannelSettings /></>} />
+            <Route path="/dashboard" element={<><TopNavBar /><CreatorDashboard /></>} />
+            <Route path="/admin" element={<><TopNavBar /><AdminDashboard /></>} />
             <Route path="/playlists" element={<><TopNavBar /><PlaylistGrid /></>} />
             <Route path="/playlists/:channelName" element={<><TopNavBar /><PlaylistGrid /></>} />
             <Route path="/playlist/:playlistId" element={<><TopNavBar /><PlaylistViewer /></>} />
@@ -109,6 +117,7 @@ function App() {
             <Route path="/error" element={<ServerError />} />
             <Route path="*" element={<NotFound />} />
             </Routes>
+            </main>
           </div>
         </Router>
       </QueryClientProvider>

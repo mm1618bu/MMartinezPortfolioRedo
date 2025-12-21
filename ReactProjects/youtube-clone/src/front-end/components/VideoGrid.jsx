@@ -65,9 +65,12 @@ export default function VideoGrid() {
       <div className="video-grid-header">
         <h2 className="video-grid-title">Video Gallery</h2>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <label htmlFor="video-sort" className="visually-hidden">Sort videos by</label>
           <select 
+            id="video-sort"
             value={sortBy} 
             onChange={(e) => setSortBy(e.target.value)}
+            aria-label="Sort videos by"
             style={{
               padding: '6px 12px',
               borderRadius: '4px',
@@ -81,7 +84,7 @@ export default function VideoGrid() {
             <option value="newest">🆕 Newest First</option>
             <option value="views">👁️ Most Viewed</option>
           </select>
-          <button onClick={() => refetch()} className="video-grid-refresh-button">
+          <button onClick={() => refetch()} aria-label="Refresh video list" className="video-grid-refresh-button">
             Refresh
           </button>
         </div>
@@ -141,19 +144,32 @@ function VideoCard({ video, showScore = false }) {
   };
 
   return (
-    <div onClick={handleCardClick} className="video-card">
+    <article 
+      onClick={handleCardClick} 
+      className="video-card"
+      role="button"
+      tabIndex={0}
+      aria-label={`Watch ${video.title}, ${video.views.toLocaleString()} views, uploaded ${timeAgo}`}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCardClick();
+        }
+      }}
+    >
       {/* Thumbnail/Video */}
       <div className="video-card-thumbnail-container">
         <div className="video-card-thumbnail-wrapper">
           <img
             src={video.thumbnail_url || "https://placehold.co/320x180?text=No+Thumbnail"}
-            alt={video.title}
+            alt={`Thumbnail for ${video.title}`}
             className="video-card-thumbnail-image"
+            loading="lazy"
           />
           
           {/* Duration badge */}
           {video.duration > 0 && (
-            <div className="video-card-duration-badge">
+            <div className="video-card-duration-badge" aria-label={`Duration: ${formatDuration(video.duration)}`}>
               {formatDuration(video.duration)}
             </div>
           )}
@@ -231,7 +247,7 @@ function VideoCard({ video, showScore = false }) {
           </div>
         )}
       </div>
-    </div>
+    </article>
   );
 }
 

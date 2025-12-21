@@ -72,16 +72,6 @@ export default function VideoPlayer() {
     refetchOnMount: false,
   });
 
-  // Compute up next videos using recommendation model
-  const upNextVideos = React.useMemo(() => {
-    if (!allVideos.length || !video) return [];
-    
-    // Use recommendation model for personalized similar videos
-    const recommendations = getSimilarVideos(allVideos, video, 10);
-    
-    return recommendations;
-  }, [allVideos, videoId, video]);
-
   // Fetch video with caching
   const { data: video, isLoading, error } = useQuery({
     queryKey: ['video', videoId],
@@ -98,6 +88,16 @@ export default function VideoPlayer() {
     },
     enabled: !!videoId,
   });
+
+  // Compute up next videos using recommendation model
+  const upNextVideos = React.useMemo(() => {
+    if (!allVideos.length || !video) return [];
+    
+    // Use recommendation model for personalized similar videos
+    const recommendations = getSimilarVideos(allVideos, video, 10);
+    
+    return recommendations;
+  }, [allVideos, videoId, video]);
 
   // Track view with demographics when video loads
   useEffect(() => {
@@ -545,6 +545,7 @@ export default function VideoPlayer() {
         {/* Back Button */}
         <button 
           onClick={() => navigate('/')}
+          aria-label="Go back to home page"
           style={{
             marginBottom: "20px",
             padding: "8px 16px",
@@ -560,7 +561,7 @@ export default function VideoPlayer() {
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#e0e0e0"}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#f0f0f0"}
         >
-          <span>←</span> Back
+          <span aria-hidden="true">←</span> Back
         </button>
 
         {/* Video Player Container */}
@@ -579,6 +580,7 @@ export default function VideoPlayer() {
             controls
             autoPlay={autoplay}
             crossOrigin="anonymous"
+            aria-label={`Video player: ${video?.title || 'Video'}`}
             style={{
               width: "100%",
               maxHeight: theaterMode ? "85vh" : "720px",
@@ -601,17 +603,22 @@ export default function VideoPlayer() {
           </video>
           
           {/* Custom Controls Overlay */}
-          <div style={{
-            position: "absolute",
-            bottom: "60px",
-            right: "10px",
-            display: "flex",
-            gap: "8px",
-            zIndex: 10
-          }}>
+          <div 
+            role="toolbar"
+            aria-label="Video player controls"
+            style={{
+              position: "absolute",
+              bottom: "60px",
+              right: "10px",
+              display: "flex",
+              gap: "8px",
+              zIndex: 10
+            }}>
             {/* Theater Mode Toggle */}
             <button
               onClick={handleTheaterModeToggle}
+              aria-label={theaterMode ? "Exit theater mode" : "Enter theater mode"}
+              aria-pressed={theaterMode}
               title={theaterMode ? "Exit Theater Mode" : "Theater Mode"}
               style={{
                 padding: "8px 12px",
@@ -637,6 +644,9 @@ export default function VideoPlayer() {
             <div style={{ position: "relative" }} data-menu>
               <button
                 onClick={() => setShowAutoplayMenu(!showAutoplayMenu)}
+                aria-label={`Autoplay ${autoplay ? 'on' : 'off'}, click to toggle settings`}
+                aria-expanded={showAutoplayMenu}
+                aria-pressed={autoplay}
                 title={autoplay ? "Autoplay: ON" : "Autoplay: OFF"}
                 style={{
                   padding: "8px 12px",
@@ -705,6 +715,9 @@ export default function VideoPlayer() {
             <div style={{ position: "relative" }} data-menu>
               <button
                 onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                aria-label={`Playback speed: ${playbackSpeed}x, click to change`}
+                aria-expanded={showSpeedMenu}
+                aria-haspopup="menu"
                 style={{
                   padding: "8px 12px",
                   backgroundColor: "rgba(0, 0, 0, 0.7)",
@@ -719,19 +732,25 @@ export default function VideoPlayer() {
                 {playbackSpeed}x
               </button>
               {showSpeedMenu && (
-                <div style={{
-                  position: "absolute",
-                  bottom: "40px",
-                  right: 0,
-                  backgroundColor: "rgba(28, 28, 28, 0.95)",
-                  borderRadius: "4px",
-                  padding: "8px 0",
-                  minWidth: "100px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.5)"
-                }}>
+                <div 
+                  role="menu"
+                  aria-label="Playback speed options"
+                  style={{
+                    position: "absolute",
+                    bottom: "40px",
+                    right: 0,
+                    backgroundColor: "rgba(28, 28, 28, 0.95)",
+                    borderRadius: "4px",
+                    padding: "8px 0",
+                    minWidth: "100px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.5)"
+                  }}>
                   {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
                     <button
                       key={speed}
+                      role="menuitem"
+                      aria-label={`Set playback speed to ${speed === 1 ? 'normal' : speed + 'x'}`}
+                      aria-checked={playbackSpeed === speed}
                       onClick={() => handleSpeedChange(speed)}
                       style={{
                         width: "100%",
@@ -757,6 +776,9 @@ export default function VideoPlayer() {
             <div style={{ position: "relative" }} data-menu>
               <button
                 onClick={() => setShowQualityMenu(!showQualityMenu)}
+                aria-label={`Video quality: ${quality === 'auto' ? 'Auto' : quality}, click to change`}
+                aria-expanded={showQualityMenu}
+                aria-haspopup="menu"
                 style={{
                   padding: "8px 12px",
                   backgroundColor: "rgba(0, 0, 0, 0.7)",
@@ -925,6 +947,8 @@ export default function VideoPlayer() {
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <button
               onClick={handleLike}
+              aria-label={`${userReaction === 'like' ? 'Unlike' : 'Like'} this video, ${(video?.likes || 0).toLocaleString()} likes`}
+              aria-pressed={userReaction === 'like'}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -947,6 +971,8 @@ export default function VideoPlayer() {
 
             <button
               onClick={handleDislike}
+              aria-label={`${userReaction === 'dislike' ? 'Remove dislike from' : 'Dislike'} this video, ${(video?.dislikes || 0).toLocaleString()} dislikes`}
+              aria-pressed={userReaction === 'dislike'}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -963,12 +989,13 @@ export default function VideoPlayer() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f0f0f0"}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = userReaction === 'dislike' ? "#e0e0e0" : "white"}
             >
-              <span style={{ fontSize: "18px" }}>👎</span>
+              <span aria-hidden="true" style={{ fontSize: "18px" }}>👎</span>
               <span>{(video?.dislikes || 0).toLocaleString()}</span>
             </button>
 
             <button
               onClick={() => setShowPlaylistModal(true)}
+              aria-label="Save video to playlist"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -985,12 +1012,14 @@ export default function VideoPlayer() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f0f0f0"}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "white"}
             >
-              <span style={{ fontSize: "18px" }}>📋</span>
+              <span aria-hidden="true" style={{ fontSize: "18px" }}>📋</span>
               <span>Save</span>
             </button>
 
             <button
               onClick={handleSubscribe}
+              aria-label={isSubscribed ? `Unsubscribe from ${video.channel_name}` : `Subscribe to ${video.channel_name}`}
+              aria-pressed={isSubscribed}
               style={{
                 padding: "10px 20px",
                 backgroundColor: isSubscribed ? "#606060" : "#cc0000",

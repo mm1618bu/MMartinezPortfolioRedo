@@ -86,11 +86,23 @@ export default function TopNavBar() {
   }
 
   return (
-    <nav className="top-navbar">
+    <nav className="top-navbar" role="navigation" aria-label="Main navigation">
       <div className="navbar-content">
         {/* Logo */}
-        <div className="navbar-logo" onClick={() => navigate('/')}>
-          <span className="navbar-logo-icon">▶</span>
+        <div 
+          className="navbar-logo" 
+          onClick={() => navigate('/')}
+          role="button"
+          tabIndex={0}
+          aria-label="VideoShare home"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              navigate('/');
+            }
+          }}
+        >
+          <span className="navbar-logo-icon" aria-hidden="true">▶</span>
           <span className="navbar-logo-text">VideoShare</span>
         </div>
 
@@ -119,12 +131,27 @@ export default function TopNavBar() {
               <div 
                 className="navbar-user-profile"
                 onClick={() => setShowDropdown(!showDropdown)}
+                role="button"
+                tabIndex={0}
+                aria-label={`User menu for ${getDisplayName()}`}
+                aria-expanded={showDropdown}
+                aria-haspopup="menu"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setShowDropdown(!showDropdown);
+                  }
+                }}
               >
                 <div className="navbar-user-avatar">
                   {getAvatarUrl() ? (
-                    <img src={getAvatarUrl()} alt={getDisplayName()} />
+                    <img 
+                      src={getAvatarUrl()} 
+                      alt={`${getDisplayName()}'s profile picture`}
+                      loading="lazy"
+                    />
                   ) : (
-                    <span>{getInitials()}</span>
+                    <span aria-label={`${getDisplayName()}'s initial`}>{getInitials()}</span>
                   )}
                 </div>
                 <span className="navbar-user-name">{getDisplayName()}</span>
@@ -132,12 +159,24 @@ export default function TopNavBar() {
               </div>
 
               {showDropdown && (
-                <div className="navbar-dropdown">
-                  <div className="navbar-dropdown-item" onClick={() => {
-                    navigate('/home');
-                    setShowDropdown(false);
-                  }}>
-                    <span>🏠</span>
+                <div className="navbar-dropdown" role="menu" aria-label="User menu">
+                  <div 
+                    className="navbar-dropdown-item" 
+                    role="menuitem"
+                    tabIndex={0}
+                    onClick={() => {
+                      navigate('/home');
+                      setShowDropdown(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        navigate('/home');
+                        setShowDropdown(false);
+                      }
+                    }}
+                  >
+                    <span aria-hidden="true">🏠</span>
                     <span>Home</span>
                   </div>
                   
@@ -191,12 +230,14 @@ export default function TopNavBar() {
               <button 
                 className="navbar-btn navbar-btn-login"
                 onClick={() => navigate('/login')}
+                aria-label="Sign in to your account"
               >
                 Sign In
               </button>
               <button 
                 className="navbar-btn navbar-btn-register"
                 onClick={() => navigate('/register')}
+                aria-label="Create a new account"
               >
                 Sign Up
               </button>
