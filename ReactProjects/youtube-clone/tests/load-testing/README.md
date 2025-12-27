@@ -1,0 +1,58 @@
+# Load Testing Suite for Personalized Recommendations
+
+Comprehensive load testing tools to ensure the recommendation system performs well under real-world conditions.
+
+## Overview
+
+This test suite includes:
+- **k6 Load Tests**: HTTP endpoint load testing
+- **Artillery Tests**: Alternative HTTP load testing with detailed reporting
+- **Performance Benchmarks**: Algorithm performance testing
+- **Test Data Generator**: Creates realistic mock data
+
+## Prerequisites
+
+### For k6 Tests
+```bash
+# macOS
+brew install k6
+
+# Linux
+sudo gpg -k
+sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+sudo apt-get update
+sudo apt-get install k6
+
+# Windows
+choco install k6
+```
+
+### For Artillery Tests
+```bash
+npm install -g artillery
+```
+
+### For Benchmarks
+```bash
+npm install
+```
+
+## Test Files
+
+### 1. k6 Load Test (`recommendation-load-test.js`)
+Full HTTP load test simulating real user behavior.
+
+**Run:**
+```bash
+# Basic run
+k6 run recommendation-load-test.js
+
+# Custom load
+k6 run --vus 100 --duration 5m recommendation-load-test.js
+
+# With environment variables
+export SUPABASE_URL="https://your-project.supabase.co"
+export SUPABASE_ANON_KEY="your-anon-key"
+k6 run recommendation-load-test.js
+```
