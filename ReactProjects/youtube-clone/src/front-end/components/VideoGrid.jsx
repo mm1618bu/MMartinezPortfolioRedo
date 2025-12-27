@@ -38,10 +38,7 @@ export default function VideoGrid() {
       
       let query = supabase
         .from('videos')
-        .select(`
-          *,
-          video_categories (category)
-        `, { count: 'exact' });
+        .select('*', { count: 'exact' });
 
       // Filter by category if selected
       if (selectedCategory) {
@@ -57,11 +54,12 @@ export default function VideoGrid() {
       if (error) throw error;
 
       // Filter by category on client side if needed
+      // Note: video_categories table doesn't exist, using meta_tags or keywords instead
       let filteredData = data;
       if (selectedCategory) {
         filteredData = data.filter(video => {
-          const videoCategories = video.video_categories?.map(vc => vc.category) || [];
-          return videoCategories.includes(selectedCategory);
+          const metaTags = video.meta_tags?.toLowerCase() || '';
+          return metaTags.includes(selectedCategory.toLowerCase());
         });
       }
       
@@ -386,40 +384,7 @@ function VideoCard({ video, showScore = false }) {
           </div>
         )}
 
-        {/* Category badges */}
-        {video.video_categories && video.video_categories.length > 0 && (
-          <div className="video-card-categories" style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '4px',
-            marginTop: '8px'
-          }}>
-            {video.video_categories.slice(0, 3).map((vc, index) => (
-              <span key={index} style={{
-                padding: '2px 8px',
-                backgroundColor: '#f3f4f6',
-                color: '#374151',
-                borderRadius: '12px',
-                fontSize: '11px',
-                fontWeight: '500'
-              }}>
-                {vc.category}
-              </span>
-            ))}
-            {video.video_categories.length > 3 && (
-              <span style={{
-                padding: '2px 8px',
-                backgroundColor: '#f3f4f6',
-                color: '#6b7280',
-                borderRadius: '12px',
-                fontSize: '11px',
-                fontWeight: '500'
-              }}>
-                +{video.video_categories.length - 3}
-              </span>
-            )}
-          </div>
-        )}
+        {/* Category badges - removed since video_categories table doesn't exist */}
 
         {video.keywords && video.keywords.length > 0 && (
           <div className="video-card-keywords">

@@ -1,0 +1,99 @@
+# Automated Backup Scheduling Configuration
+# Add these entries to your crontab: crontab -e
+
+# YouTube Clone Backup Schedule
+# ==============================
+
+# Daily database backup at 2:00 AM
+0 2 * * * cd /path/to/youtube-clone && ./scripts/backup-database.sh >> logs/backup-db.log 2>&1
+
+# Weekly full backup on Sundays at 3:00 AM
+0 3 * * 0 cd /path/to/youtube-clone && ./scripts/backup-all.sh >> logs/backup-full.log 2>&1
+
+# Daily backup verification at 6:00 AM
+0 6 * * * cd /path/to/youtube-clone && ./scripts/verify-backup.sh >> logs/verify-backup.log 2>&1
+
+# Weekly storage backup on Sundays at 4:00 AM
+0 4 * * 0 cd /path/to/youtube-clone && ./scripts/backup-storage.sh >> logs/backup-storage.log 2>&1
+
+# Monthly backup cleanup on 1st of month at 1:00 AM
+0 1 1 * * find /path/to/youtube-clone/backups -type f -mtime +90 -delete
+
+# Alert if no backup in last 48 hours (runs daily at 8:00 AM)
+0 8 * * * cd /path/to/youtube-clone && ./scripts/check-backup-freshness.sh || echo "ALERT: No recent backup!" | mail -s "Backup Alert" admin@example.com
+
+# ==============================
+# Installation Instructions:
+# ==============================
+# 
+# 1. Open crontab editor:
+#    crontab -e
+#
+# 2. Copy the cron entries above
+#
+# 3. Update /path/to/youtube-clone with actual path
+#
+# 4. Update admin@example.com with actual email
+#
+# 5. Save and exit
+#
+# 6. Verify cron jobs:
+#    crontab -l
+#
+# 7. Create logs directory:
+#    mkdir -p logs
+#
+# ==============================
+# For systemd timer alternative (Linux):
+# ==============================
+#
+# Create timer units in /etc/systemd/system/
+# 
+# Example: youtube-backup.service
+# [Unit]
+# Description=YouTube Clone Database Backup
+# 
+# [Service]
+# Type=oneshot
+# User=www-data
+# WorkingDirectory=/path/to/youtube-clone
+# ExecStart=/path/to/youtube-clone/scripts/backup-database.sh
+# 
+# ---
+# 
+# Example: youtube-backup.timer
+# [Unit]
+# Description=Daily YouTube Clone Backup
+# 
+# [Timer]
+# OnCalendar=daily
+# OnCalendar=02:00
+# Persistent=true
+# 
+# [Install]
+# WantedBy=timers.target
+#
+# Enable timer:
+# sudo systemctl enable youtube-backup.timer
+# sudo systemctl start youtube-backup.timer
+#
+# ==============================
+# Windows Task Scheduler (Alternative):
+# ==============================
+#
+# 1. Open Task Scheduler
+# 2. Create Basic Task
+# 3. Name: YouTube Clone Database Backup
+# 4. Trigger: Daily at 2:00 AM
+# 5. Action: Start a program
+# 6. Program: bash.exe
+# 7. Arguments: ./scripts/backup-database.sh
+# 8. Start in: C:\path\to\youtube-clone
+#
+# ==============================
+# GitHub Actions (CI/CD Alternative):
+# ==============================
+#
+# See .github/workflows/backup.yml for automated backups
+# Runs on schedule or manual trigger
+#

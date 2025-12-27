@@ -110,8 +110,8 @@ export default function VideoPlayer() {
   // Load ads when video loads
   useEffect(() => {
     if (video) {
-      // Get video categories for ad targeting
-      const categories = video.video_categories?.map(vc => vc.category) || [];
+      // Get video categories for ad targeting - video_categories table doesn't exist
+      const categories = []; // video.video_categories?.map(vc => vc.category) || [];
       
       // Load pre-roll ad (20% chance to show)
       if (Math.random() < 0.2) {

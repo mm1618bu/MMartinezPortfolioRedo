@@ -21,3 +21,16 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Backup files (contains sensitive data - DO NOT COMMIT)
+/backups/
+*.sql
+*.sql.gz
+*.tar.gz
+*.backup
+*.dump
+*.meta
+
+# Log files
+/logs/
+*.log

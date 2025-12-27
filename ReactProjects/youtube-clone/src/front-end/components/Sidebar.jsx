@@ -47,66 +47,89 @@ export default function Sidebar() {
     return location.pathname === path;
   };
 
-  const menuItems = [
+  const menuSections = [
     {
-      icon: "🏠",
-      label: "Home",
-      path: "/home",
-      requiresAuth: false
+      title: "Main",
+      items: [
+        {
+          icon: "🏠",
+          label: "Home",
+          path: "/home",
+          requiresAuth: false
+        },
+        {
+          icon: "🎥",
+          label: "All Videos",
+          path: "/channel",
+          requiresAuth: false
+        },
+        {
+          icon: "📋",
+          label: "Playlists",
+          path: "/playlists",
+          requiresAuth: false
+        }
+      ]
     },
     {
-      icon: "🎥",
-      label: "All Videos",
-      path: "/channel",
-      requiresAuth: false
+      title: "Your Channel",
+      show: !!user,
+      items: [
+        {
+          icon: "📺",
+          label: "My Channel",
+          path: channel ? `/channel/${channel.channel_tag}` : "/channel/create",
+          requiresAuth: true,
+          show: !!user
+        },
+        {
+          icon: "📊",
+          label: "Creator Studio",
+          path: "/dashboard",
+          requiresAuth: true,
+          show: !!user && !!channel
+        },
+        {
+          icon: "📤",
+          label: "Upload Video",
+          path: "/home",
+          requiresAuth: true,
+          show: !!user
+        }
+      ]
     },
     {
-      icon: "📺",
-      label: "My Channel",
-      path: channel ? `/channel/${channel.channel_tag}` : "/channel/create",
-      requiresAuth: true,
-      show: !!user
+      title: "Library",
+      show: !!user,
+      items: [
+        {
+          icon: "➕",
+          label: "Create Playlist",
+          path: "/playlist/create",
+          requiresAuth: true,
+          show: !!user
+        },
+        {
+          icon: "👤",
+          label: "Profile",
+          path: "/home",
+          requiresAuth: true,
+          show: !!user
+        }
+      ]
     },
     {
-      icon: "�",
-      label: "Creator Studio",
-      path: "/dashboard",
-      requiresAuth: true,
-      show: !!user && !!channel
-    },
-    {
-      icon: "�📤",
-      label: "Upload Video",
-      path: "/home", // VideoUpload is in home page
-      requiresAuth: true,
-      show: !!user
-    },
-    {
-      icon: "📋",
-      label: "Playlists",
-      path: "/playlists",
-      requiresAuth: false
-    },
-    {
-      icon: "➕",
-      label: "Create Playlist",
-      path: "/playlist/create",
-      requiresAuth: true,
-      show: !!user
-    },
-    {
-      icon: "👤",
-      label: "Profile",
-      path: "/home", // UserProfilePage is in home page
-      requiresAuth: true,
-      show: !!user
-    },
-    {
-      icon: "🔧",
-      label: "Create Channel",
-      path: "/channel/create",
-      requiresAuth: true,
-      show: user && !channel
+      title: "Setup",
+      show: user && !channel,
+      items: [
+        {
+          icon: "🔧",
+          label: "Create Channel",
+          path: "/channel/create",
+          requiresAuth: true,
+          show: user && !channel
+        }
+      ]
     }
   ];
 
@@ -129,45 +152,68 @@ export default function Sidebar() {
       </button>
 
       <nav className="sidebar-nav">
-        {menuItems.map((item, index) => {
-          // Skip items that shouldn't be shown
-          if (item.show === false) return null;
+        {menuSections.map((section, sectionIndex) => {
+          // Skip sections that shouldn't be shown
+          if (section.show === false) return null;
+          
+          // Filter items that should be shown
+          const visibleItems = section.items.filter(item => item.show !== false);
+          if (visibleItems.length === 0) return null;
 
           return (
-            <div
-              key={index}
-              className={`sidebar-item ${isActive(item.path) ? 'sidebar-item-active' : ''}`}
-              onClick={() => handleNavigation(item.path, item.requiresAuth)}
-            >
-              <span className="sidebar-item-icon">{item.icon}</span>
-              {!isCollapsed && <span className="sidebar-item-label">{item.label}</span>}
+            <div key={sectionIndex} className="sidebar-section">
+              {!isCollapsed && section.title && (
+                <div className="sidebar-section-title">{section.title}</div>
+              )}
+              {visibleItems.map((item, itemIndex) => (
+                <div
+                  key={itemIndex}
+                  className={`sidebar-item ${isActive(item.path) ? 'sidebar-item-active' : ''}`}
+                  onClick={() => handleNavigation(item.path, item.requiresAuth)}
+                  title={isCollapsed ? item.label : ''}
+                >
+                  <span className="sidebar-item-icon">{item.icon}</span>
+                  {!isCollapsed && <span className="sidebar-item-label">{item.label}</span>}
+                </div>
+              ))}
+              {sectionIndex < menuSections.length - 1 && !isCollapsed && (
+                <div className="sidebar-section-divider"></div>
+              )}
             </div>
           );
         })}
       </nav>
 
-      {!isCollapsed && (
-        <div className="sidebar-footer">
-          <div className="sidebar-divider"></div>
-          {user ? (
-            <div className="sidebar-user-info">
-              <span className="sidebar-user-icon">👋</span>
-              <span className="sidebar-user-text">
-                {channel?.channel_name || user.email?.split('@')[0] || 'User'}
-              </span>
+      <div className="sidebar-footer">
+        <div className="sidebar-divider"></div>
+        {user ? (
+          <div className="sidebar-user-info" title={isCollapsed ? (channel?.channel_name || user.email?.split('@')[0]) : ''}>
+            <div className="sidebar-user-avatar">
+              {channel?.channel_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '👤'}
             </div>
-          ) : (
-            <div className="sidebar-auth-prompt">
-              <button 
-                className="sidebar-login-btn"
-                onClick={() => navigate('/login')}
-              >
-                Sign In
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+            {!isCollapsed && (
+              <div className="sidebar-user-details">
+                <div className="sidebar-user-name">
+                  {channel?.channel_name || user.email?.split('@')[0] || 'User'}
+                </div>
+                <div className="sidebar-user-email">
+                  {user.email}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="sidebar-auth-prompt">
+            <button 
+              className="sidebar-login-btn"
+              onClick={() => navigate('/login')}
+              title={isCollapsed ? 'Sign In' : ''}
+            >
+              {isCollapsed ? '🔐' : 'Sign In'}
+            </button>
+          </div>
+        )}
+      </div>
     </aside>
   );
 }

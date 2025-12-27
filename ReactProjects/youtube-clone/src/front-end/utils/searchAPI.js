@@ -36,18 +36,65 @@ export const searchVideos = async (query, options = {}) => {
       filters = {}
     } = options;
 
-    const { data, error } = await supabase.rpc('search_videos', {
-      p_query: query,
-      p_limit: limit,
-      p_offset: offset,
-      p_sort_by: sortBy,
-      p_filters: filters
-    });
+    // Build query with basic ILIKE search (RPC function not available)
+    // Note: keywords is JSONB so we can't search it with ILIKE
+    let queryBuilder = supabase
+      .from('videos')
+      .select('*')
+      .or(`title.ilike.%${query}%,description.ilike.%${query}%,channel_name.ilike.%${query}%,meta_tags.ilike.%${query}%`)
+      .range(offset, offset + limit - 1);
 
-    if (error) throw error;
+    // Apply filters
+    if (filters.duration) {
+      if (filters.duration === 'short') {
+        queryBuilder = queryBuilder.lt('duration', 240); // < 4 minutes
+      } else if (filters.duration === 'medium') {
+        queryBuilder = queryBuilder.gte('duration', 240).lte('duration', 1200); // 4-20 minutes
+      } else if (filters.duration === 'long') {
+        queryBuilder = queryBuilder.gt('duration', 1200); // > 20 minutes
+      }
+    }
+
+    if (filters.uploadDate) {
+      const now = new Date();
+      let dateThreshold;
+      
+      if (filters.uploadDate === 'hour') {
+        dateThreshold = new Date(now.getTime() - 60 * 60 * 1000);
+      } else if (filters.uploadDate === 'today') {
+        dateThreshold = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      } else if (filters.uploadDate === 'week') {
+        dateThreshold = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else if (filters.uploadDate === 'month') {
+        dateThreshold = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      } else if (filters.uploadDate === 'year') {
+        dateThreshold = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+      }
+      
+      if (dateThreshold) {
+        queryBuilder = queryBuilder.gte('created_at', dateThreshold.toISOString());
+      }
+    }
+
+    // Apply sorting
+    if (sortBy === 'date' || sortBy === 'relevance') {
+      queryBuilder = queryBuilder.order('created_at', { ascending: false });
+    } else if (sortBy === 'views') {
+      queryBuilder = queryBuilder.order('views', { ascending: false });
+    } else if (sortBy === 'rating') {
+      queryBuilder = queryBuilder.order('likes', { ascending: false });
+    }
+
+    const { data, error } = await queryBuilder;
+
+    if (error) {
+      console.warn('Error searching videos:', error);
+      return [];
+    }
+
     return data || [];
   } catch (error) {
-    console.error('Error searching videos:', error);
+    console.warn('Error searching videos:', error);
     return [];
   }
 };
@@ -59,23 +106,11 @@ export const getSearchSuggestions = async (partialQuery, limit = 10) => {
   if (!partialQuery || partialQuery.length < 2) return [];
 
   try {
-    // Try RPC function first
-    const { data, error } = await supabase.rpc('get_search_suggestions', {
-      p_partial_query: partialQuery,
-      p_limit: limit
-    });
-
-    if (error) {
-      console.warn('RPC get_search_suggestions error, falling back to direct query:', error);
-      // Fallback to direct query if RPC fails
-      return await getSearchSuggestionsFallback(partialQuery, limit);
-    }
-    
-    return data || [];
-  } catch (error) {
-    console.error('Error getting search suggestions:', error);
-    // Try fallback
+    // Use direct query since RPC function is not available
     return await getSearchSuggestionsFallback(partialQuery, limit);
+  } catch (error) {
+    console.warn('Error getting search suggestions:', error);
+    return [];
   }
 };
 
@@ -84,11 +119,11 @@ export const getSearchSuggestions = async (partialQuery, limit = 10) => {
  */
 const getSearchSuggestionsFallback = async (partialQuery, limit = 10) => {
   try {
-    // Search in title, channel_name, and keywords
+    // Search in title and channel_name only (keywords require different handling)
     const { data: videos, error: videoError } = await supabase
       .from('videos')
       .select('title, channel_name, keywords, views')
-      .or(`title.ilike.%${partialQuery}%,channel_name.ilike.%${partialQuery}%,keywords.cs.{${partialQuery}}`)
+      .or(`title.ilike.%${partialQuery}%,channel_name.ilike.%${partialQuery}%`)
       .order('views', { ascending: false })
       .limit(limit * 2); // Get more to filter
 
@@ -182,10 +217,13 @@ export const getRelatedSearches = async (query, limit = 5) => {
       p_limit: limit
     });
 
-    if (error) throw error;
+    if (error) {
+      console.warn('RPC get_related_searches not available:', error.message);
+      return [];
+    }
     return data || [];
   } catch (error) {
-    console.error('Error getting related searches:', error);
+    console.warn('Error getting related searches:', error);
     return [];
   }
 };
@@ -204,10 +242,13 @@ export const logSearch = async (query, resultsCount, userId = null, filters = {}
       p_filters: filters
     });
 
-    if (error) throw error;
+    if (error) {
+      console.warn('RPC log_search not available:', error.message);
+      return null;
+    }
     return data;
   } catch (error) {
-    console.error('Error logging search:', error);
+    console.warn('Error logging search:', error);
     return null;
   }
 };

@@ -69,14 +69,8 @@ function HomePage() {
   return (
     <div>
       <Sidebar />
-      <LoginPage />
-      <RegisterPage />
-      <ForgotPassword/>
-      <Channel />
-      <VideoSearchBar />
-      <VideoUpload />
+      <HomeFeed />
       <VideoGrid />
-      <UserProfilePage />
     </div>
   );
 }

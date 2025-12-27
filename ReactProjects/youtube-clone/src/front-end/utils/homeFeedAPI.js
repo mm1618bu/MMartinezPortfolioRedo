@@ -98,8 +98,7 @@ const getPersonalizedFeed = async (userId, limit, offset) => {
         channel_name,
         created_at,
         quality,
-        is_public,
-        video_categories (category)
+        is_public
       `)
       .eq('is_public', true)
       .order('created_at', { ascending: false });
@@ -240,8 +239,8 @@ export const getRelatedVideos = async (videoId, limit = 10) => {
       .select(`
         id,
         channel_name,
-        video_categories (category),
-        video_tags (tag)
+        keywords,
+        meta_tags
       `)
       .eq('id', videoId)
       .single();
@@ -263,8 +262,8 @@ export const getRelatedVideos = async (videoId, limit = 10) => {
         channel_name,
         created_at,
         quality,
-        video_categories (category),
-        video_tags (tag)
+        keywords,
+        meta_tags
       `)
       .eq('is_public', true)
       .neq('id', videoId)

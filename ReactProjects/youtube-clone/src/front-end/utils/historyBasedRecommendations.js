@@ -78,8 +78,8 @@ const getUserWatchHistory = async (userId, limit = 100) => {
           dislikes,
           duration,
           created_at,
-          video_categories (category),
-          video_tags (tag)
+          keywords,
+          meta_tags
         )
       `)
       .eq('user_id', userId)
@@ -127,20 +127,26 @@ const analyzeWatchHistory = (watchHistory) => {
     }
 
     // Track category preferences
+    // Note: video_categories table doesn't exist, commented out
+    /*
     if (video.video_categories) {
       video.video_categories.forEach(cat => {
         const category = cat.category;
         categoryScores[category] = (categoryScores[category] || 0) + finalWeight;
       });
     }
+    */
 
     // Track tag preferences
+    // Note: video_tags table doesn't exist, commented out
+    /*
     if (video.video_tags) {
       video.video_tags.forEach(tagObj => {
         const tag = tagObj.tag;
         tagScores[tag] = (tagScores[tag] || 0) + finalWeight;
       });
     }
+    */
 
     totalWatchTime += watchTimeSeconds;
     if (entry.completed) completedVideos++;
@@ -200,8 +206,8 @@ const getCandidateVideos = async (userId, excludeVideoIds = []) => {
         created_at,
         quality,
         is_public,
-        video_categories (category),
-        video_tags (tag)
+        keywords,
+        meta_tags
       `)
       .eq('is_public', true);
 
@@ -235,6 +241,8 @@ const calculatePersonalizedScore = (video, userPreferences, watchHistory) => {
   }
 
   // 2. Category match (30% weight)
+  // Note: video_categories table doesn't exist, commented out
+  /*
   if (video.video_categories && video.video_categories.length > 0) {
     let categoryScore = 0;
     video.video_categories.forEach(catObj => {
@@ -245,8 +253,11 @@ const calculatePersonalizedScore = (video, userPreferences, watchHistory) => {
     });
     score += (categoryScore / Math.max(video.video_categories.length, 1)) * 30;
   }
+  */
 
   // 3. Tag similarity (20% weight)
+  // Note: video_tags table doesn't exist, commented out
+  /*
   if (video.video_tags && video.video_tags.length > 0) {
     let tagScore = 0;
     video.video_tags.forEach(tagObj => {
@@ -257,6 +268,7 @@ const calculatePersonalizedScore = (video, userPreferences, watchHistory) => {
     });
     score += (tagScore / Math.max(video.video_tags.length, 1)) * 20;
   }
+  */
 
   // 4. Video quality/popularity (10% weight)
   const engagementRate = video.likes / Math.max(video.views, 1);
@@ -295,22 +307,32 @@ const injectDiversity = (sortedVideos, userPreferences) => {
       // Add top personalized videos
       result.push(video);
       seenChannels.add(video.channel_name);
+      // video_categories table doesn't exist
+      /*
       if (video.video_categories) {
         video.video_categories.forEach(c => seenCategories.add(c.category));
       }
+      */
     } else {
       // For remaining slots, prefer diverse content
       const isNewChannel = !seenChannels.has(video.channel_name);
+      // video_categories table doesn't exist
+      /*
       const hasNewCategory = video.video_categories?.some(c => 
         !seenCategories.has(c.category)
       );
+      */
+      const hasNewCategory = false;
       
       if (isNewChannel || hasNewCategory) {
         result.push(video);
         seenChannels.add(video.channel_name);
+        // video_categories table doesn't exist
+        /*
         if (video.video_categories) {
           video.video_categories.forEach(c => seenCategories.add(c.category));
         }
+        */
       } else if (result.length < sortedVideos.length) {
         // Fill remaining with best remaining videos
         result.push(video);
@@ -418,8 +440,8 @@ export const getHistoryBasedSimilarVideos = async (userId, currentVideoId, limit
       .from('videos')
       .select(`
         *,
-        video_categories (category),
-        video_tags (tag)
+        keywords,
+        meta_tags
       `)
       .eq('id', currentVideoId)
       .single();
@@ -460,14 +482,14 @@ export const getHistoryBasedSimilarVideos = async (userId, currentVideoId, limit
  */
 const getSimilarVideoCandidates = async (currentVideo, excludeId) => {
   try {
-    const categories = currentVideo.video_categories?.map(c => c.category) || [];
+    const categories = [];
     
     let query = supabase
       .from('videos')
       .select(`
         *,
-        video_categories (category),
-        video_tags (tag)
+        keywords,
+        meta_tags
       `)
       .eq('is_public', true)
       .neq('id', excludeId);
@@ -523,7 +545,8 @@ const calculateSimilarityScore = (video, referenceVideo, userPreferences) => {
     }
   }
 
-  // Shared categories
+  // Shared categories - video_categories table doesn't exist
+  /*
   const videoCats = video.video_categories?.map(c => c.category) || [];
   const refCats = referenceVideo.video_categories?.map(c => c.category) || [];
   const sharedCats = videoCats.filter(c => refCats.includes(c));
@@ -536,13 +559,16 @@ const calculateSimilarityScore = (video, referenceVideo, userPreferences) => {
       score += userPreferences.categoryScores[cat] * 10;
     }
   });
+  */
 
-  // Shared tags
+  // Shared tags - video_tags table doesn't exist
+  /*
   const videoTags = video.video_tags?.map(t => t.tag) || [];
   const refTags = referenceVideo.video_tags?.map(t => t.tag) || [];
   const sharedTags = videoTags.filter(t => refTags.includes(t));
   
   score += sharedTags.length * 10;
+  */
 
   // Video quality
   const engagementRate = video.likes / Math.max(video.views, 1);
@@ -566,6 +592,8 @@ export const getRecommendationReason = (video, userPreferences) => {
     }
   }
 
+  // video_categories table doesn't exist
+  /*
   if (userPreferences && userPreferences.topCategories && video.video_categories) {
     const videoCategories = video.video_categories.map(c => c.category);
     const matchedCat = userPreferences.topCategories.find(
@@ -575,6 +603,7 @@ export const getRecommendationReason = (video, userPreferences) => {
       reasons.push(`Based on ${matchedCat.item} videos you watched`);
     }
   }
+  */
 
   const daysOld = (Date.now() - new Date(video.created_at)) / (1000 * 60 * 60 * 24);
   if (daysOld < 3) {

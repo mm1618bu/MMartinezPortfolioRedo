@@ -1,0 +1,127 @@
+┌─────────────────────────────────────────────────────────────┐
+│           BACKUP & RECOVERY QUICK REFERENCE CARD            │
+└─────────────────────────────────────────────────────────────┘
+
+📥 BACKUP COMMANDS
+─────────────────────────────────────────────────────────────
+Full System:         ./scripts/backup-all.sh
+Database Only:       ./scripts/backup-database.sh  
+Storage Only:        ./scripts/backup-storage.sh
+Verify Backups:      ./scripts/verify-backup.sh
+Check Freshness:     ./scripts/check-backup-freshness.sh
+
+📤 RESTORE COMMANDS
+─────────────────────────────────────────────────────────────
+Interactive Restore: ./scripts/restore-database.sh
+   • Type "latest" for most recent backup
+   • Creates safety backup automatically
+   • Requires confirmation
+
+📁 BACKUP LOCATIONS
+─────────────────────────────────────────────────────────────
+Database:   backups/database/youtube_clone_db_*.sql.gz
+Storage:    backups/storage/BUCKET_NAME/*.tar.gz
+Config:     backups/config/config_*.tar.gz
+Logs:       backups/*.log
+Manifests:  backups/manifest_*.json
+
+⏰ AUTOMATION
+─────────────────────────────────────────────────────────────
+Cron:           See crontab.example
+GitHub Actions: Runs daily at 2 AM UTC (manual trigger available)
+Systemd:        See BACKUP_RECOVERY_PLAN.md
+
+🔍 MONITORING
+─────────────────────────────────────────────────────────────
+List Backups:    ls -lh backups/database/
+View Logs:       tail -f backups/*.log
+Check Size:      du -sh backups/
+Latest Manifest: cat backups/manifest_*.json | jq '.'
+
+🚨 EMERGENCY RECOVERY
+─────────────────────────────────────────────────────────────
+1. Assess:       What's broken? (DB, storage, or both?)
+2. Restore:      ./scripts/restore-database.sh
+3. Select:       Choose "latest" or specific backup
+4. Confirm:      Type "yes" to proceed
+5. Verify:       Test app functionality
+6. Document:     Record what happened
+
+📊 RETENTION POLICY
+─────────────────────────────────────────────────────────────
+Database:    30 days (daily backups)
+Storage:     30 days (weekly backups)
+Full Backup: 90 days (weekly backups)
+Safety:      Keep indefinitely until manually deleted
+
+⚙️ CONFIGURATION
+─────────────────────────────────────────────────────────────
+Environment File:     .env
+Required Variables:   SUPABASE_DB_PASSWORD
+                     REACT_APP_SUPABASE_URL
+                     REACT_APP_SUPABASE_ANON_KEY (storage)
+                     SUPABASE_ACCESS_TOKEN (storage)
+
+🔐 SECURITY CHECKLIST
+─────────────────────────────────────────────────────────────
+☐ .env file has proper permissions (chmod 600)
+☐ Backups directory excluded from git
+☐ Database password is secure
+☐ Backups stored in multiple locations
+☐ Test restore procedure monthly
+☐ Encryption enabled for off-site storage (optional)
+
+📈 SUCCESS METRICS
+─────────────────────────────────────────────────────────────
+Backup Success Rate:     Target 99.9%
+Avg Backup Duration:     < 30 minutes
+Restore Success Rate:    100%
+Avg Restore Duration:    < 60 minutes
+RTO (Database):          30 minutes
+RPO (Database):          24 hours
+
+🛠️ TROUBLESHOOTING
+─────────────────────────────────────────────────────────────
+Permission Denied:       chmod +x scripts/*.sh
+Command Not Found:       sudo apt-get install postgresql-client
+Connection Refused:      Check .env credentials
+Disk Space Full:         Clean old backups or increase storage
+Backup Failed:          Check backups/*.log for errors
+
+📚 DOCUMENTATION
+─────────────────────────────────────────────────────────────
+Quick Start:        BACKUP_QUICK_START.md
+Complete Guide:     BACKUP_RECOVERY_PLAN.md
+Scripts Help:       scripts/README.md
+Automation:         crontab.example
+CI/CD:             .github/workflows/backup.yml
+
+🆘 EMERGENCY CONTACTS
+─────────────────────────────────────────────────────────────
+Lead Developer:     [Name] - [Email/Phone]
+DevOps Engineer:    [Name] - [Email/Phone]
+Supabase Support:   support@supabase.io
+
+💡 BEST PRACTICES
+─────────────────────────────────────────────────────────────
+✓ Test restore monthly
+✓ Monitor backup success/failures
+✓ Keep backups in 3 locations (3-2-1 rule)
+✓ Verify backups before disasters
+✓ Document all recovery procedures
+✓ Train team on restore process
+✓ Update this card as system evolves
+
+⚡ QUICK SCENARIOS
+─────────────────────────────────────────────────────────────
+Accidental Delete:      Restore latest backup
+Database Corruption:    Restore + verify data
+Complete Outage:        Follow full DR plan (4 hours)
+Single Video Missing:   Restore storage bucket
+Need Older Version:     Select specific timestamp backup
+
+┌─────────────────────────────────────────────────────────────┐
+│         ⚠️  REMEMBER: Best backup = Tested backup!          │
+└─────────────────────────────────────────────────────────────┘
+
+Last Updated: December 27, 2025
