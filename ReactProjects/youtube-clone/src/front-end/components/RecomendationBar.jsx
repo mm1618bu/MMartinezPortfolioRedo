@@ -1,7 +1,10 @@
 // src/front-end/components/RecomendationBar.jsx
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getAllVideosFromSupabase, getVideoFromSupabase } from "../utils/supabase";
 import { getSimilarVideos } from '../utils/recommendationModel';
+import { getHistoryBasedSimilarVideos } from '../utils/historyBasedRecommendations';
+import { supabase } from '../utils/supabase';
 import "../../styles/main.css";
 
 /**
@@ -10,7 +13,18 @@ import "../../styles/main.css";
  *  - limit? (number, optional): how many recommendations to fetch (default 8)
  */
 export default function RecomendationBar({ videoId, limit = 8 }) {
-  // Fetch all videos with shared cache
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // Get current user for personalized recommendations
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+    };
+    fetchUser();
+  }, []);
+
+  // Fetch all videos with shared cache (fallback)
   const { data: allVideos = [] } = useQuery({
     queryKey: ['allVideos'], // Use shared cache
     queryFn: async () => {
@@ -30,16 +44,28 @@ export default function RecomendationBar({ videoId, limit = 8 }) {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Compute recommendations using recommendation model
+  // Compute recommendations using history-based personalization
   const { data: recommendations = [], isLoading: loading, error: errorMsg } = useQuery({
-    queryKey: ['recommendations', videoId, limit],
+    queryKey: ['recommendations', videoId, currentUser?.id, limit],
     queryFn: async () => {
-      // Use recommendation model for personalized suggestions
-      const recommended = getSimilarVideos(allVideos, currentVideo, limit);
+      // Use history-based recommendations for logged-in users
+      if (currentUser?.id) {
+        const historyBased = await getHistoryBasedSimilarVideos(
+          currentUser.id, 
+          videoId, 
+          limit
+        );
+        
+        if (historyBased && historyBased.length > 0) {
+          return historyBased;
+        }
+      }
       
+      // Fallback to basic recommendation model
+      const recommended = getSimilarVideos(allVideos, currentVideo, limit);
       return recommended;
     },
-    enabled: !!videoId && allVideos.length > 0 && !!currentVideo,
+    enabled: !!videoId && (allVideos.length > 0 || currentUser) && !!currentVideo,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 

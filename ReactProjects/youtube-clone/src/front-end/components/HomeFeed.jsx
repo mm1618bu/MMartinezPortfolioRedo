@@ -1,6 +1,7 @@
 /**
  * HomeFeed Component
  * Displays personalized video feed with infinite scroll
+ * Enhanced with history-based recommendations
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -12,6 +13,10 @@ import {
   VIDEO_CATEGORIES,
   refreshTrendingVideos
 } from '../utils/homeFeedAPI';
+import { 
+  getHistoryBasedRecommendations,
+  getRecommendationReason
+} from '../utils/historyBasedRecommendations';
 import { supabase } from '../utils/supabase';
 
 const HomeFeed = () => {
@@ -45,7 +50,7 @@ const HomeFeed = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Infinite scroll for videos
+  // Infinite scroll for videos with history-based personalization
   const {
     data,
     fetchNextPage,
@@ -57,10 +62,31 @@ const HomeFeed = () => {
   } = useInfiniteQuery({
     queryKey: ['homeFeed', user?.id, selectedCategory, feedType],
     queryFn: async ({ pageParam = 0 }) => {
+      // Use history-based recommendations for personalized feed
+      if (feedType === 'for-you' && user?.id) {
+        const watchedVideoIds = data?.pages?.flatMap(page => 
+          page.videos.map(v => v.id)
+        ) || [];
+        
+        const videos = await getHistoryBasedRecommendations(
+          user.id, 
+          20, 
+          watchedVideoIds
+        );
+        
+        return {
+          videos,
+          nextOffset: pageParam + 20,
+          isPersonalized: true,
+        };
+      }
+      
+      // Fallback to original feed for trending/other types
       const videos = await getHomeFeed(user?.id, 20, pageParam);
       return {
         videos,
         nextOffset: pageParam + 20,
+        isPersonalized: false,
       };
     },
     getNextPageParam: (lastPage, pages) => {
@@ -303,7 +329,17 @@ const HomeFeed = () => {
                     <span>{formatTimeAgo(video.created_at)}</span>
                   </div>
 
-                  {video.recommendation_score && (
+                  {/* Show personalized score or recommendation reason */}
+                  {video.personalizedScore && user && (
+                    <div className="personalized-badge" title={getRecommendationReason(video, preferences)}>
+                      <span className="badge-icon">✨</span>
+                      <span className="badge-text">
+                        {getRecommendationReason(video, preferences)}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {video.recommendation_score && !video.personalizedScore && (
                     <div className="recommendation-badge" title="Recommended for you">
                       ⭐ {Math.round(video.recommendation_score)}
                     </div>

@@ -1,0 +1,359 @@
+/**
+ * Personalized Recommendations Styles
+ * Visual indicators for history-based recommendations
+ */
+
+/* Personalized Badge */
+.personalized-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 6px;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.personalized-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.personalized-badge .badge-icon {
+  font-size: 0.9rem;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.personalized-badge .badge-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+}
+
+/* Legacy recommendation badge (less prominent) */
+.recommendation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: #f0f0f0;
+  color: #666;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+/* Video card enhancements for personalized content */
+.video-card.personalized {
+  border: 2px solid transparent;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #667eea, #764ba2) border-box;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.video-card.personalized:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+}
+
+/* Personalized indicator on thumbnail */
+.video-thumbnail .personalized-indicator {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.personalized-indicator .sparkle-icon {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Feed type indicators */
+.feed-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: white;
+  border: 2px solid #667eea;
+  color: #667eea;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 8px 4px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.feed-type-badge:hover {
+  background: #667eea;
+  color: white;
+  transform: scale(1.05);
+}
+
+.feed-type-badge.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* History-based score indicator */
+.history-score {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.history-score.high {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.history-score.medium {
+  background: rgba(102, 126, 234, 0.8);
+}
+
+/* Recommendation reason tooltip */
+.recommendation-reason {
+  position: relative;
+}
+
+.recommendation-reason:hover::after {
+  content: attr(data-reason);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.recommendation-reason:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+  margin-bottom: 2px;
+  z-index: 1001;
+}
+
+/* Channel affinity indicator */
+.channel-affinity {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.channel-affinity::before {
+  content: '❤️';
+  font-size: 0.8rem;
+}
+
+/* Category match indicator */
+.category-match {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(118, 75, 162, 0.1);
+  color: #764ba2;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.category-match::before {
+  content: '🎯';
+  font-size: 0.8rem;
+}
+
+/* Diversity badge (for filter bubble prevention) */
+.diversity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.diversity-badge::before {
+  content: '✨';
+  font-size: 0.8rem;
+}
+
+/* New content badge */
+.new-content-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.new-content-badge::before {
+  content: '🆕';
+  font-size: 0.8rem;
+}
+
+/* Personalization status in feed header */
+.personalization-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.personalization-status-icon {
+  font-size: 1.5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.personalization-status-text {
+  flex: 1;
+}
+
+.personalization-status-text h4 {
+  margin: 0 0 4px 0;
+  color: #667eea;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.personalization-status-text p {
+  margin: 0;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+/* Recommendation score visualization */
+.recommendation-score-bar {
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.recommendation-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.5s ease;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .personalized-badge .badge-text {
+    max-width: 120px;
+  }
+  
+  .personalization-status {
+    padding: 10px 12px;
+  }
+  
+  .personalization-status-icon {
+    font-size: 1.2rem;
+  }
+  
+  .personalization-status-text h4 {
+    font-size: 0.85rem;
+  }
+  
+  .personalization-status-text p {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .personalized-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+  
+  .personalized-badge .badge-text {
+    max-width: 100px;
+  }
+  
+  .channel-affinity,
+  .category-match,
+  .new-content-badge {
+    display: none; /* Hide on very small screens */
+  }
+}

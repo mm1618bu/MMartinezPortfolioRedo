@@ -15,8 +15,9 @@ A full-featured YouTube clone built with React, featuring video upload, playback
 - 🎯 **Category Filtering**: Browse videos by 25+ categories
 - ♾️ **Infinite Scroll**: Seamless automatic loading of more videos as you scroll
 - 📊 **Analytics**: Track views, engagement, and ad performance
-- � **Live Creator Dashboard**: Real-time stats and content management for creators
-- �💰 **Ad Simulation**: Complete advertising system with multiple ad types
+- 📊 **Live Creator Dashboard**: Real-time stats and content management for creators
+- ✨ **Personalized Recommendations**: AI-powered suggestions based on watch history
+- 💰 **Ad Simulation**: Complete advertising system with multiple ad types
 - 🔍 **Search**: Find videos, channels, and content
 - 👤 **User Profiles**: Manage subscriptions and viewing history
 - 🎨 **Responsive UI**: Mobile-friendly design with modern aesthetics
@@ -55,8 +56,10 @@ The app will open at [http://localhost:3000](http://localhost:3000)
 - **[CI/CD Setup Guide](CICD_SETUP_GUIDE.md)** - Complete guide for GitHub Actions setup
 - **[Ad System Guide](AD_SYSTEM_GUIDE.md)** - Comprehensive ad simulation documentation
 - **[Infinite Scroll Guide](INFINITE_SCROLL_GUIDE.md)** - Infinite scroll implementation details
-- **[Live Creator Dashboard Guide](LIVE_CREATOR_DASHBOARD_GUIDE.md)** - Real-time dashboard for content creators
+- **[Personalized Recommendations Guide](PERSONALIZED_RECOMMENDATIONS_GUIDE.md)** - Watch history-based recommendation system
 
+### Quick References
+- **[Personalized Recommendations Quick Reference](PERSONALIZED_RECOMMENDATIONS_QUICK_REFERENCE.md)** - Fast lookup for recommendation featur
 ### Quick References
 - **[Dashboard Quick Reference](DASHBOARD_QUICK_REFERENCE.md)** - Fast lookup for dashboard features
 - **[Dashboard Visual Guide](DASHBOARD_VISUAL_GUIDE.md)** - Visual walkthrough with layouts

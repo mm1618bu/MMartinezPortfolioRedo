@@ -1,6 +1,7 @@
 import './styles/main.css';
 import './styles/accessibility.css';
 import './styles/live-dashboard.css';
+import './styles/personalized-recommendations.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
