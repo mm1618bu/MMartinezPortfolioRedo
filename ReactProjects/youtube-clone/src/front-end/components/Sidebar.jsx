@@ -68,7 +68,14 @@ export default function Sidebar() {
       show: !!user
     },
     {
-      icon: "📤",
+      icon: "�",
+      label: "Creator Studio",
+      path: "/dashboard",
+      requiresAuth: true,
+      show: !!user && !!channel
+    },
+    {
+      icon: "�📤",
       label: "Upload Video",
       path: "/home", // VideoUpload is in home page
       requiresAuth: true,

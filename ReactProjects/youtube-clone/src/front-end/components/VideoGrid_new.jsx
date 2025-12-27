@@ -155,14 +155,21 @@ export default function VideoGrid() {
     <div className="video-grid-container">
       <div className="video-grid-header">
         <h2 className="video-grid-title">Video Gallery</h2>
-        <div className="video-grid-controls">
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <label htmlFor="video-sort" className="visually-hidden">Sort videos by</label>
           <select 
             id="video-sort"
             value={sortBy} 
             onChange={(e) => setSortBy(e.target.value)}
             aria-label="Sort videos by"
-            className="video-sort-select"
+            style={{
+              padding: '6px 12px',
+              borderRadius: '4px',
+              border: '1px solid #ddd',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
           >
             <option value="score">🎯 Smart Ranking</option>
             <option value="newest">🆕 Newest First</option>

@@ -1,0 +1,220 @@
+name: Deploy Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  NODE_VERSION: '18.x'
+
+jobs:
+  # Job 1: Build for Production
+  build-production:
+    name: Production Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ReactProjects/youtube-clone/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: ReactProjects/youtube-clone
+        run: npm ci --production=false
+        
+      - name: Create production environment file
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "REACT_APP_SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env.production
+          echo "REACT_APP_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env.production
+          echo "REACT_APP_SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env.production
+          echo "GENERATE_SOURCEMAP=false" >> .env.production
+          
+      - name: Build for production
+        working-directory: ReactProjects/youtube-clone
+        run: npm run build
+        env:
+          CI: false
+          NODE_ENV: production
+          
+      - name: Optimize build
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "Build optimization..."
+          # Remove source maps if present
+          find build -name "*.map" -delete
+          # Compress build
+          tar -czf build.tar.gz build/
+          
+      - name: Generate build metadata
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "{" > build/metadata.json
+          echo "  \"version\": \"${{ github.sha }}\"," >> build/metadata.json
+          echo "  \"branch\": \"${{ github.ref_name }}\"," >> build/metadata.json
+          echo "  \"buildTime\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"," >> build/metadata.json
+          echo "  \"environment\": \"production\"" >> build/metadata.json
+          echo "}" >> build/metadata.json
+          cat build/metadata.json
+          
+      - name: Upload production build
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: ReactProjects/youtube-clone/build.tar.gz
+          retention-days: 30
+
+  # Job 2: Deploy to Vercel (example)
+  deploy-vercel:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: build-production
+    if: github.event_name == 'push' || github.event.inputs.environment == 'production'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download production build
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: ./
+          
+      - name: Extract build
+        run: tar -xzf build.tar.gz
+        
+      - name: Deploy to Vercel (Placeholder)
+        run: |
+          echo "🚀 Deploying to Vercel..."
+          echo "Build artifacts ready for deployment"
+          echo "To complete setup:"
+          echo "1. Install Vercel CLI: npm i -g vercel"
+          echo "2. Link project: vercel link"
+          echo "3. Add secrets to GitHub: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID"
+          echo "4. Uncomment deployment commands below"
+          
+      # Uncomment when ready to deploy:
+      # - name: Deploy to Vercel
+      #   working-directory: ReactProjects/youtube-clone
+      #   run: |
+      #     npm install -g vercel
+      #     vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+      #   env:
+      #     VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      #     VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  # Job 3: Deploy to Netlify (alternative)
+  deploy-netlify:
+    name: Deploy to Netlify
+    runs-on: ubuntu-latest
+    needs: build-production
+    if: github.event.inputs.environment == 'staging'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download production build
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: ./
+          
+      - name: Extract build
+        run: tar -xzf build.tar.gz
+        
+      - name: Deploy to Netlify (Placeholder)
+        run: |
+          echo "🚀 Deploying to Netlify..."
+          echo "Build artifacts ready for deployment"
+          echo "To complete setup:"
+          echo "1. Install Netlify CLI: npm i -g netlify-cli"
+          echo "2. Add secrets to GitHub: NETLIFY_AUTH_TOKEN, NETLIFY_SITE_ID"
+          echo "3. Uncomment deployment commands below"
+          
+      # Uncomment when ready to deploy:
+      # - name: Deploy to Netlify
+      #   working-directory: ReactProjects/youtube-clone
+      #   run: |
+      #     npm install -g netlify-cli
+      #     netlify deploy --prod --dir=build --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} --site=${{ secrets.NETLIFY_SITE_ID }}
+
+  # Job 4: Deployment Health Check
+  health-check:
+    name: Post-Deployment Health Check
+    runs-on: ubuntu-latest
+    needs: [deploy-vercel]
+    if: always()
+    
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+        
+      - name: Health check (Placeholder)
+        run: |
+          echo "🏥 Running health checks..."
+          echo "Checking deployment status..."
+          echo "To implement:"
+          echo "1. Add your deployment URL"
+          echo "2. Uncomment curl commands below"
+          
+      # Uncomment and add your URL:
+      # - name: Check homepage
+      #   run: |
+      #     curl -f https://your-domain.com || exit 1
+      #     
+      # - name: Check API endpoints
+      #   run: |
+      #     curl -f https://your-domain.com/api/health || exit 1
+
+  # Job 5: Rollback (manual trigger)
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'rollback'
+    
+    steps:
+      - name: Rollback (Placeholder)
+        run: |
+          echo "⏮️ Initiating rollback..."
+          echo "This would revert to the previous deployment"
+          echo "Implement rollback strategy based on your hosting platform"
+
+  # Job 6: Deployment Summary
+  deployment-summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [build-production, deploy-vercel, health-check]
+    if: always()
+    
+    steps:
+      - name: Generate deployment summary
+        run: |
+          echo "## 🚀 Deployment Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment**: ${{ github.event.inputs.environment || 'production' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Job Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Build: ${{ needs.build-production.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Deploy: ${{ needs.deploy-vercel.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Health Check: ${{ needs.health-check.result }}" >> $GITHUB_STEP_SUMMARY

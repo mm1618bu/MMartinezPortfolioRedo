@@ -1,5 +1,6 @@
 import './styles/main.css';
 import './styles/accessibility.css';
+import './styles/live-dashboard.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -36,6 +37,7 @@ import SubscriptionsFeed from './front-end/components/SubscriptionsFeed.jsx';
 import MentionsDemo from './front-end/components/MentionsDemo.jsx';
 import AudienceDemographics from './front-end/components/AudienceDemographics.jsx';
 import CreatorDashboard from './front-end/components/CreatorDashboard.jsx';
+import LiveCreatorDashboard from './front-end/components/LiveCreatorDashboard.jsx';
 import AdminDashboard from './front-end/components/AdminDashboard.jsx';
 import AdAnalyticsDashboard from './front-end/components/AdAnalyticsDashboard.jsx';
 import SkipLink from './front-end/components/SkipLink.jsx';
@@ -98,7 +100,8 @@ function App() {
             <Route path="/channel" element={<><TopNavBar /><Channel /></>} />
             <Route path="/channel/:channelTag" element={<><TopNavBar /><Channel /></>} />
             <Route path="/channel/settings" element={<><TopNavBar /><ChannelSettings /></>} />
-            <Route path="/dashboard" element={<><TopNavBar /><CreatorDashboard /></>} />
+            <Route path="/dashboard" element={<><TopNavBar /><LiveCreatorDashboard /></>} />
+            <Route path="/dashboard/legacy" element={<><TopNavBar /><CreatorDashboard /></>} />
             <Route path="/admin" element={<><TopNavBar /><AdminDashboard /></>} />
             <Route path="/playlists" element={<><TopNavBar /><PlaylistGrid /></>} />
             <Route path="/playlists/:channelName" element={<><TopNavBar /><PlaylistGrid /></>} />

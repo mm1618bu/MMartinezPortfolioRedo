@@ -1,0 +1,133 @@
+name: Scheduled Jobs
+
+on:
+  schedule:
+    # Run security audit daily at 2 AM UTC
+    - cron: '0 2 * * *'
+    # Run dependency check weekly on Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18.x'
+
+jobs:
+  # Daily Security Audit
+  daily-security-audit:
+    name: Daily Security Audit
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 2 * * *' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Run security audit
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "=== Daily Security Audit ===" > security-report.txt
+          echo "Date: $(date)" >> security-report.txt
+          echo "" >> security-report.txt
+          npm audit --json > audit.json || true
+          npm audit >> security-report.txt || true
+          
+      - name: Check for critical vulnerabilities
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' audit.json)
+          HIGH=$(jq '.metadata.vulnerabilities.high // 0' audit.json)
+          
+          echo "Critical: $CRITICAL, High: $HIGH"
+          
+          if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+            echo "⚠️ Critical or High vulnerabilities found!"
+            echo "::warning::Found $CRITICAL critical and $HIGH high vulnerabilities"
+          fi
+          
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-security-report-${{ github.run_number }}
+          path: ReactProjects/youtube-clone/security-report.txt
+          retention-days: 90
+
+  # Weekly Dependency Check
+  weekly-dependency-check:
+    name: Weekly Dependency Check
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 9 * * 1' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Check for updates
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "=== Weekly Dependency Check ===" > dependency-report.txt
+          echo "Date: $(date)" >> dependency-report.txt
+          echo "" >> dependency-report.txt
+          echo "Outdated packages:" >> dependency-report.txt
+          npm outdated >> dependency-report.txt || true
+          echo "" >> dependency-report.txt
+          echo "Package audit:" >> dependency-report.txt
+          npm audit >> dependency-report.txt || true
+          
+      - name: Generate update suggestions
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "" >> dependency-report.txt
+          echo "=== Update Recommendations ===" >> dependency-report.txt
+          echo "Run these commands to update:" >> dependency-report.txt
+          echo "npm update # Update to latest minor/patch versions" >> dependency-report.txt
+          echo "npm outdated # Check for major version updates" >> dependency-report.txt
+          cat dependency-report.txt
+          
+      - name: Upload dependency report
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-dependency-report-${{ github.run_number }}
+          path: ReactProjects/youtube-clone/dependency-report.txt
+          retention-days: 90
+
+  # Cleanup old workflow runs
+  cleanup-workflow-runs:
+    name: Cleanup Old Runs
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Delete old workflow runs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const days = 30;
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - days);
+            
+            const workflows = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            
+            for (const run of workflows.data.workflow_runs) {
+              if (new Date(run.created_at) < cutoff) {
+                console.log(`Deleting run ${run.id} from ${run.created_at}`);
+                await github.rest.actions.deleteWorkflowRun({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id
+                });
+              }
+            }

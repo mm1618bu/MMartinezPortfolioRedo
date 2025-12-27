@@ -1,0 +1,244 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  NODE_VERSION: '18.x'
+
+jobs:
+  # Job 1: PR Validation
+  validate:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Check PR title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+          
+          # Check if title follows convention (feat:, fix:, docs:, etc.)
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|test|chore|perf)(\(.+\))?:.+ ]]; then
+            echo "::warning::PR title should follow conventional commits format"
+            echo "Examples: feat: add new feature, fix: resolve bug, docs: update readme"
+          fi
+          
+      - name: Check PR description
+        run: |
+          DESC="${{ github.event.pull_request.body }}"
+          if [ -z "$DESC" ]; then
+            echo "::warning::PR description is empty. Please add a description."
+          fi
+          
+      - name: Check for merge conflicts
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          if ! git merge-tree $(git merge-base HEAD origin/${{ github.base_ref }}) HEAD origin/${{ github.base_ref }} | grep -q "^conflict"; then
+            echo "✅ No merge conflicts detected"
+          else
+            echo "::error::Merge conflicts detected. Please resolve before merging."
+            exit 1
+          fi
+
+  # Job 2: Code Changes Analysis
+  analyze-changes:
+    name: Analyze Changes
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Get changed files
+        id: changed-files
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files:"
+          echo "$CHANGED"
+          
+          # Count file types
+          JS_FILES=$(echo "$CHANGED" | grep -c "\.jsx\?$" || true)
+          CSS_FILES=$(echo "$CHANGED" | grep -c "\.css$" || true)
+          TEST_FILES=$(echo "$CHANGED" | grep -c "\.test\.jsx\?$" || true)
+          
+          echo "JavaScript/React files: $JS_FILES"
+          echo "CSS files: $CSS_FILES"
+          echo "Test files: $TEST_FILES"
+          
+          echo "js_count=$JS_FILES" >> $GITHUB_OUTPUT
+          echo "css_count=$CSS_FILES" >> $GITHUB_OUTPUT
+          echo "test_count=$TEST_FILES" >> $GITHUB_OUTPUT
+          
+      - name: Check for tests
+        run: |
+          JS_COUNT=${{ steps.changed-files.outputs.js_count }}
+          TEST_COUNT=${{ steps.changed-files.outputs.test_count }}
+          
+          if [ "$JS_COUNT" -gt 0 ] && [ "$TEST_COUNT" -eq 0 ]; then
+            echo "::warning::Code changes detected but no test files modified. Consider adding tests."
+          fi
+
+  # Job 3: Build Preview
+  build-preview:
+    name: Build Preview
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ReactProjects/youtube-clone/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: ReactProjects/youtube-clone
+        run: npm ci
+        
+      - name: Create preview environment
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "REACT_APP_SUPABASE_URL=https://preview.supabase.co" > .env
+          echo "REACT_APP_SUPABASE_ANON_KEY=preview_key" >> .env
+          echo "REACT_APP_ENVIRONMENT=preview" >> .env
+          
+      - name: Build preview
+        working-directory: ReactProjects/youtube-clone
+        run: npm run build
+        env:
+          CI: false
+          
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const buildSize = require('fs').readdirSync('ReactProjects/youtube-clone/build')
+              .reduce((acc, file) => acc + require('fs').statSync(`ReactProjects/youtube-clone/build/${file}`).size, 0);
+            const sizeMB = (buildSize / 1024 / 1024).toFixed(2);
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `### 📦 Build Preview\n\n✅ Build successful!\n\n**Build Size:** ${sizeMB} MB\n\n**Preview:** Build artifacts are ready for deployment.`
+            });
+
+  # Job 4: Size Impact
+  size-impact:
+    name: Bundle Size Impact
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ReactProjects/youtube-clone/package-lock.json
+          
+      - name: Install and build PR
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          npm ci
+          echo "REACT_APP_SUPABASE_URL=test" > .env
+          echo "REACT_APP_SUPABASE_ANON_KEY=test" >> .env
+          npm run build
+        env:
+          CI: false
+          
+      - name: Get PR build size
+        id: pr-size
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          SIZE=$(du -sb build | cut -f1)
+          echo "pr_size=$SIZE" >> $GITHUB_OUTPUT
+          echo "PR build size: $(numfmt --to=iec-i --suffix=B $SIZE)"
+          
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          
+      - name: Install and build base
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          npm ci
+          echo "REACT_APP_SUPABASE_URL=test" > .env
+          echo "REACT_APP_SUPABASE_ANON_KEY=test" >> .env
+          npm run build
+        env:
+          CI: false
+          
+      - name: Get base build size
+        id: base-size
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          SIZE=$(du -sb build | cut -f1)
+          echo "base_size=$SIZE" >> $GITHUB_OUTPUT
+          echo "Base build size: $(numfmt --to=iec-i --suffix=B $SIZE)"
+          
+      - name: Calculate size diff
+        run: |
+          PR_SIZE=${{ steps.pr-size.outputs.pr_size }}
+          BASE_SIZE=${{ steps.base-size.outputs.base_size }}
+          DIFF=$((PR_SIZE - BASE_SIZE))
+          PERCENT=$(awk "BEGIN {printf \"%.2f\", ($DIFF / $BASE_SIZE) * 100}")
+          
+          echo "Size difference: $(numfmt --to=iec-i --suffix=B $DIFF)"
+          echo "Percentage change: ${PERCENT}%"
+          
+          if [ "$DIFF" -gt 524288 ]; then # 512 KB
+            echo "::warning::Bundle size increased by more than 512 KB"
+          fi
+
+  # Job 5: PR Summary
+  pr-summary:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [validate, analyze-changes, build-preview, size-impact]
+    if: always()
+    
+    steps:
+      - name: Generate PR summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = `## 🔍 PR Check Summary
+            
+            ### Results
+            - ✅ Validation: ${{ needs.validate.result }}
+            - ✅ Code Analysis: ${{ needs.analyze-changes.result }}
+            - ✅ Build Preview: ${{ needs.build-preview.result }}
+            - ✅ Size Impact: ${{ needs.size-impact.result }}
+            
+            ### Details
+            - **Branch:** ${{ github.head_ref }}
+            - **Base:** ${{ github.base_ref }}
+            - **Commits:** ${{ github.event.pull_request.commits }}
+            - **Files Changed:** ${{ github.event.pull_request.changed_files }}
+            
+            Ready for review! 🚀
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });

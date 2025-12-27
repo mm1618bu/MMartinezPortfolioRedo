@@ -185,32 +185,67 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .video-grid-title {
     margin: 0;
+    font-size: 1.5rem;
+}
+
+.video-grid-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.video-sort-select {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 14px;
+    min-height: 44px;
+    min-width: 160px;
 }
 
 .video-grid-refresh-button {
-    padding: 8px 16px;
+    padding: 10px 16px;
     background-color: var(--secondary-color);
     color: var(--primary-color);
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    min-height: 44px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.video-grid-refresh-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.video-grid-refresh-button:active {
+    transform: translateY(0);
 }
 
 .video-grid-empty {
     text-align: center;
-    padding: 40px;
+    padding: 40px 20px;
     color: var(--text-secondary);
+    font-size: 1rem;
 }
 
 .video-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
 }
 
 /* Video Card Styles */
@@ -5865,7 +5900,7 @@ body {
 }
 
 .category-chips .chip {
-  padding: 8px 16px;
+  padding: 10px 18px;
   border: 1px solid var(--border-color, #e5e5e5);
   background-color: var(--bg-secondary, #ffffff);
   color: var(--text-primary, #030303);
@@ -5875,6 +5910,9 @@ body {
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .category-chips .chip:hover {
@@ -5938,10 +5976,88 @@ body {
   margin-bottom: 48px;
 }
 
+@media (max-width: 1024px) {
+  .video-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+}
+
 @media (max-width: 768px) {
+  .video-grid-container {
+    padding: 16px 12px;
+  }
+
+  .video-grid-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .video-grid-title {
+    font-size: 1.25rem;
+  }
+
+  .video-grid-controls {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .video-sort-select,
+  .video-grid-refresh-button {
+    width: 100%;
+    min-height: 48px;
+    font-size: 16px;
+  }
+
   .video-grid {
     grid-template-columns: 1fr;
     gap: 16px;
+  }
+
+  .category-chips {
+    padding: 12px 0;
+    gap: 10px;
+  }
+
+  .category-chips .chip {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-grid-container {
+    padding: 12px 8px;
+  }
+
+  .video-grid-header {
+    margin-bottom: 16px;
+  }
+
+  .video-grid-title {
+    font-size: 1.1rem;
+  }
+
+  .video-grid {
+    gap: 12px;
+  }
+
+  .category-chips {
+    padding: 10px 0;
+    gap: 8px;
+  }
+
+  .category-chips .chip {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  .video-grid-empty {
+    padding: 30px 16px;
+    font-size: 0.95rem;
   }
 }
 

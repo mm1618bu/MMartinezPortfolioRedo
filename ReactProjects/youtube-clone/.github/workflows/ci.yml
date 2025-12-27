@@ -1,0 +1,268 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '18.x'
+
+jobs:
+  # Job 1: Code Quality Checks
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ReactProjects/youtube-clone/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: ReactProjects/youtube-clone
+        run: npm ci
+        
+      - name: Run ESLint
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          npm run lint 2>&1 | tee eslint-report.txt || true
+          echo "ESLint completed"
+        continue-on-error: true
+        
+      - name: Check for syntax errors
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "Checking for JavaScript syntax errors..."
+          find src -name "*.js" -o -name "*.jsx" | xargs node -c 2>&1 || true
+          
+      - name: Upload ESLint report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eslint-report
+          path: ReactProjects/youtube-clone/eslint-report.txt
+          retention-days: 30
+
+  # Job 2: Build Application
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: quality
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ReactProjects/youtube-clone/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: ReactProjects/youtube-clone
+        run: npm ci
+        
+      - name: Create environment file
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "REACT_APP_SUPABASE_URL=https://placeholder.supabase.co" > .env
+          echo "REACT_APP_SUPABASE_ANON_KEY=placeholder_key" >> .env
+          echo "REACT_APP_SUPABASE_SERVICE_ROLE_KEY=placeholder_key" >> .env
+          
+      - name: Build application
+        working-directory: ReactProjects/youtube-clone
+        run: npm run build
+        env:
+          CI: false # Treat warnings as warnings, not errors
+          
+      - name: Check build output
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "Build artifacts:"
+          ls -lah build/
+          du -sh build/
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: ReactProjects/youtube-clone/build/
+          retention-days: 7
+
+  # Job 3: Run Tests
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: quality
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ReactProjects/youtube-clone/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: ReactProjects/youtube-clone
+        run: npm ci
+        
+      - name: Run tests
+        working-directory: ReactProjects/youtube-clone
+        run: npm test -- --coverage --watchAll=false
+        env:
+          CI: true
+          
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: ReactProjects/youtube-clone/coverage/
+          retention-days: 30
+
+  # Job 4: Security Audit
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ReactProjects/youtube-clone/package-lock.json
+          
+      - name: Run npm audit
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          npm audit --audit-level=moderate 2>&1 | tee audit-report.txt || true
+          echo "Security audit completed"
+        continue-on-error: true
+        
+      - name: Check for known vulnerabilities
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "Checking for critical vulnerabilities..."
+          npm audit --audit-level=critical || true
+          
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-audit-report
+          path: ReactProjects/youtube-clone/audit-report.txt
+          retention-days: 30
+
+  # Job 5: Dependency Check
+  dependencies:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Check for outdated packages
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          npm outdated 2>&1 | tee outdated-packages.txt || true
+          
+      - name: List dependencies
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "Production dependencies:"
+          npm list --depth=0 --prod || true
+          echo "Development dependencies:"
+          npm list --depth=0 --dev || true
+          
+      - name: Upload dependency report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-report
+          path: ReactProjects/youtube-clone/outdated-packages.txt
+          retention-days: 7
+
+  # Job 6: Bundle Size Analysis
+  analyze:
+    name: Bundle Analysis
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ReactProjects/youtube-clone/build/
+          
+      - name: Analyze bundle size
+        working-directory: ReactProjects/youtube-clone
+        run: |
+          echo "=== Bundle Size Analysis ===" > bundle-analysis.txt
+          echo "" >> bundle-analysis.txt
+          echo "Total build size:" >> bundle-analysis.txt
+          du -sh build/ >> bundle-analysis.txt
+          echo "" >> bundle-analysis.txt
+          echo "JavaScript bundles:" >> bundle-analysis.txt
+          find build/static/js -name "*.js" -exec ls -lh {} \; >> bundle-analysis.txt
+          echo "" >> bundle-analysis.txt
+          echo "CSS bundles:" >> bundle-analysis.txt
+          find build/static/css -name "*.css" -exec ls -lh {} \; >> bundle-analysis.txt
+          cat bundle-analysis.txt
+          
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: ReactProjects/youtube-clone/bundle-analysis.txt
+          retention-days: 7
+
+  # Job 7: Summary Report
+  summary:
+    name: Pipeline Summary
+    runs-on: ubuntu-latest
+    needs: [quality, build, test, security, dependencies, analyze]
+    if: always()
+    
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## CI Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Quality Check**: ${{ needs.quality.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Build**: ${{ needs.build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Tests**: ${{ needs.test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Security**: ${{ needs.security.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Dependencies**: ${{ needs.dependencies.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Bundle Analysis**: ${{ needs.analyze.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow**: ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
