@@ -58,3 +58,89 @@ function generateTestVideos(count) {
   for (let i = 0; i < count; i++) {
     videos.push(`test-video-${i}`);
   }
+  return videos;
+}
+
+export default function () {
+  // Pick a random user
+  const user = TEST_USERS[Math.floor(Math.random() * TEST_USERS.length)];
+
+  group(`User ${user.id} Recommendation Load Test`, () => {
+    const params = {
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+      },
+    };    
+    const url = `${SUPABASE_URL}/recommendations?userId=${user.id}`;
+
+    const startTime = new Date().getTime();
+    const res = http.get(url, params);
+    const duration = new Date().getTime() - startTime;
+
+    recommendationDuration.add(duration);
+
+    const success = check(res, {
+      'status is 200': (r) => r.status === 200,
+      'has recommendations': (r) => {
+        const data = r.json();
+        return data && data.recommendations && data.recommendations.length > 0;
+      },
+    });
+
+    if (success) {
+      recommendationSuccess.add(1);
+    } else {
+      recommendationErrors.add(1);
+    }
+
+    // Simulate DB query time metric (mocked)
+    const dbQueryTime = Math.random() * 500; // Mock DB query time between 0-500ms
+    dbQueryDuration.add(dbQueryTime);
+
+    sleep(1 + Math.random() * 2); // Sleep between 1-3 seconds
+  });
+}
+  scoreAndRankVideos,
+  getTopRatedVideoScores,
+  getRecommendedVideoScores,
+  calculateVideoHealth,
+  batchScoreVideos,
+};
+
+
+
+import { 
+  calculateVideoScore, 
+  scoreAndRankVideos,
+  getTrendingVideoScores,
+  getTopRatedVideoScores,
+  getRecommendedVideoScores,
+  calculateVideoHealth,
+  batchScoreVideos
+} from './videoScoringSystem';
+
+// ============================================
+// EXAMPLE 1: Score a single video
+// ============================================
+export const exampleSingleVideoScore = (video) => {
+  const score = calculateVideoScore(video, {
+    engagementWeight: 0.4,
+    recencyWeight: 0.3,
+    qualityWeight: 0.2,
+    keywordWeight: 0.1,
+  });
+  
+  console.log('Video Score:', score.total);
+  console.log('Breakdown:', score.breakdown);
+  /*
+   * Output:
+   * Video Score: 72.5
+   * Breakdown: {
+   *   engagement: 80.2,
+   *   recency: 65.5,
+   *   quality: 80,
+   *   keyword: 70
+   * }
+   */
+}
