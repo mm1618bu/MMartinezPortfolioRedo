@@ -243,11 +243,15 @@ const WarehouseTable = () => {
   }, {});
 
   return (
-    <div>
+    <div style={mainContainerStyle}>
       {/* Day Filter Dropdown */}
-      <div style={{ marginBottom: '20px' }}>
-        <label>Select Day: </label>
-        <select onChange={(e) => setSelectedDay(e.target.value)} value={selectedDay}>
+      <div style={filterContainerStyle}>
+        <label style={labelStyle}>Select Day: </label>
+        <select 
+          onChange={(e) => setSelectedDay(e.target.value)} 
+          value={selectedDay}
+          style={selectStyle}
+        >
           <option value="">All Days</option>
           <option value="Mon">Monday</option>
           <option value="Tue">Tuesday</option>
@@ -260,27 +264,30 @@ const WarehouseTable = () => {
       </div>
 
       {/* Name Tags Section */}
-      <div className="draggable-stacks" style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+      <div style={draggableStacksStyle}>
         {Object.keys(groupedNameTags).map((SHIFT) => (
-          <div key={SHIFT} style={{ border: '1px solid black', padding: '10px', borderRadius: '5px', backgroundColor: SHIFTColors[SHIFT] }}>
-            <h4>{SHIFT}</h4>
-            {groupedNameTags[SHIFT].map((tag) => (
-              <p
-                key={tag.id}
-                draggable
-                onDragStart={(e) => handleDragStart(e, tag.name)}
-                style={{
-                  padding: '6px',
-                  border: '1px solid black',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                  backgroundColor: SHIFTColors[SHIFT],
-                  marginBottom: '-25px',
-                }}
-              >
-                {tag.name}
-              </p>
-            ))}
+          <div key={SHIFT} style={{...shiftGroupStyle, backgroundColor: SHIFTColors[SHIFT]}}>
+            <h4 style={shiftHeaderStyle}>{SHIFT}</h4>
+            <div style={nameTagsContainerStyle}>
+              {groupedNameTags[SHIFT].map((tag) => (
+                <div
+                  key={tag.id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, tag.name)}
+                  style={nameTagStyle}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                  }}
+                >
+                  {tag.name}
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
@@ -368,37 +375,145 @@ const WarehouseTable = () => {
   );
 };
 
+const mainContainerStyle = {
+  padding: '30px',
+  backgroundColor: '#f8f9fa',
+  minHeight: '100vh',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+};
+
+const filterContainerStyle = {
+  marginBottom: '30px',
+  padding: '20px',
+  backgroundColor: '#ffffff',
+  borderRadius: '12px',
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '15px',
+};
+
+const labelStyle = {
+  fontSize: '16px',
+  fontWeight: '600',
+  color: '#2c3e50',
+  letterSpacing: '0.3px',
+};
+
+const selectStyle = {
+  padding: '10px 16px',
+  fontSize: '15px',
+  borderRadius: '8px',
+  border: '2px solid #e0e0e0',
+  backgroundColor: '#ffffff',
+  color: '#2c3e50',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  outline: 'none',
+  minWidth: '180px',
+  fontWeight: '500',
+};
+
+const draggableStacksStyle = {
+  display: 'flex',
+  gap: '12px',
+  marginBottom: '30px',
+  flexWrap: 'wrap',
+  overflowX: 'auto',
+  paddingBottom: '10px',
+};
+
+const shiftGroupStyle = {
+  padding: '12px',
+  borderRadius: '8px',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+  minWidth: '160px',
+  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+  border: 'none',
+};
+
+const shiftHeaderStyle = {
+  margin: '0 0 8px 0',
+  fontSize: '13px',
+  fontWeight: '700',
+  color: '#2c3e50',
+  textTransform: 'uppercase',
+  letterSpacing: '0.3px',
+  borderBottom: '2px solid rgba(0, 0, 0, 0.1)',
+  paddingBottom: '6px',
+};
+
+const nameTagsContainerStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '4px',
+};
+
+const nameTagStyle = {
+  padding: '6px 10px',
+  border: 'none',
+  cursor: 'grab',
+  borderRadius: '6px',
+  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+  fontSize: '12px',
+  fontWeight: '500',
+  color: '#2c3e50',
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  transition: 'all 0.2s ease',
+  userSelect: 'none',
+  backdropFilter: 'blur(10px)',
+};
+
 const containerStyle = {
   display: 'flex',
   flexWrap: 'wrap',
-  gap: '20px',
-  alignItems: 'flex-start', // Align items to the start
+  gap: '24px',
+  alignItems: 'flex-start',
+  marginBottom: '30px',
 };
 
 const tableStyle = {
-  borderCollapse: 'collapse',
+  borderCollapse: 'separate',
+  borderSpacing: '0',
   width: '100%',
   marginTop: '20px',
+  backgroundColor: '#ffffff',
+  borderRadius: '12px',
+  overflow: 'hidden',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
 };
 
 const headerCellStyle = {
-  backgroundColor: 'gray',
-  color: 'white',
-  padding: '10px',
-  border: '1px solid black',
+  backgroundColor: '#2c3e50',
+  color: '#ffffff',
+  padding: '16px',
+  border: 'none',
   textAlign: 'center',
+  fontWeight: '600',
+  fontSize: '14px',
+  textTransform: 'uppercase',
+  letterSpacing: '0.5px',
+  borderBottom: '3px solid #34495e',
 };
 
 const tableCellStyle = {
-  padding: '10px',
-  border: '1px solid black',
+  padding: '14px',
+  border: '1px solid #e8e8e8',
   textAlign: 'center',
+  fontSize: '14px',
+  color: '#2c3e50',
+  fontWeight: '500',
+  backgroundColor: '#ffffff',
+  transition: 'background-color 0.2s ease',
 };
 
 const dropCellStyle = {
   ...tableCellStyle,
-  minHeight: '20px',
-  backgroundColor: '#f2f2f2',
+  minHeight: '50px',
+  backgroundColor: '#f8f9fa',
+  cursor: 'pointer',
+  position: 'relative',
+  transition: 'all 0.2s ease',
 };
 
 

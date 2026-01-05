@@ -196,13 +196,13 @@ export const getTrendingSearches = async (hours = 24, limit = 10) => {
     });
 
     if (error) {
-      console.warn('RPC get_trending_searches error, returning empty:', error);
+      // Return empty array instead of logging error
       return [];
     }
     
     return data || [];
   } catch (error) {
-    console.error('Error getting trending searches:', error);
+    // Silently return empty array in demo mode
     return [];
   }
 };

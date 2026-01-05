@@ -32,6 +32,7 @@
  */
 
 import { getAllVideosFromSupabase } from './supabase';
+import { getMockVideos } from './mockData';
 import { getTrendingVideoScores, getTopRatedVideoScores, batchScoreVideos } from './videoScoringSystem';
 
 /**
@@ -44,9 +45,15 @@ export const prefetchVideos = async (queryClient) => {
     await queryClient.prefetchQuery({
       queryKey: ['allVideos'],
       queryFn: async () => {
-        const videos = await getAllVideosFromSupabase();
-        console.log(`✅ Prefetched ${videos.length} videos`);
-        return videos;
+        try {
+          const videos = await getAllVideosFromSupabase();
+          console.log(`✅ Prefetched ${videos.length} videos`);
+          return videos;
+        } catch (error) {
+          console.log('📦 Using mock videos for cache');
+          const mockResult = await getMockVideos();
+          return mockResult.data;
+        }
       },
       staleTime: 1000 * 60 * 10, // 10 minutes
       cacheTime: 1000 * 60 * 30, // 30 minutes
@@ -69,12 +76,18 @@ export const getTopVideos = async (queryClient, limit = 10) => {
   }
   
   // If not in cache, fetch all videos
-  const videos = await getAllVideosFromSupabase();
-  
-  // Update cache
-  queryClient.setQueryData(['allVideos'], videos);
-  
-  return getTopRatedVideoScores(videos).slice(0, limit);
+  try {
+    const videos = await getAllVideosFromSupabase();
+    
+    // Update cache
+    queryClient.setQueryData(['allVideos'], videos);
+    
+    return getTopRatedVideoScores(videos).slice(0, limit);
+  } catch (error) {
+    console.log('📦 Using mock videos');
+    const mockResult = await getMockVideos({ limit });
+    return mockResult.data;
+  }
 };
 
 /**

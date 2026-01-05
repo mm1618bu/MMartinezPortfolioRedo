@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase, getCurrentUserChannel } from "../utils/supabase";
+import { mockAuth } from "../utils/mockAuth";
 import { useTheme } from "../../contexts/ThemeContext";
 import SearchBar from "./SearchBar";
 import NotificationBell from "./NotificationBell";
@@ -34,25 +35,56 @@ export default function TopNavBar() {
 
   const loadUserData = async () => {
     try {
-      const { data: { user }, error } = await supabase.auth.getUser();
+      // Try Supabase first, fallback to mock auth
+      let user, error;
+      try {
+        const result = await supabase.auth.getUser();
+        user = result.data?.user;
+        error = result.error;
+      } catch (supabaseError) {
+        // Use mock auth
+        const mockResult = await mockAuth.getUser();
+        user = mockResult.data?.user;
+        error = mockResult.error;
+      }
       
-      if (error) throw error;
+      if (error && !user) {
+        // Not logged in, which is fine
+        setUser(null);
+        setChannel(null);
+        setLoading(false);
+        return;
+      }
       
       setUser(user);
 
       if (user) {
-        const userChannel = await getCurrentUserChannel();
-        setChannel(userChannel);
+        try {
+          const userChannel = await getCurrentUserChannel();
+          setChannel(userChannel);
+        } catch (channelError) {
+          // Channel loading failed, not critical
+          console.log("No channel found for user");
+        }
       }
     } catch (err) {
-      console.error("Error loading user:", err);
+      // Silent fail - user just won't be logged in
+      setUser(null);
+      setChannel(null);
     } finally {
       setLoading(false);
     }
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // Use mock auth signout
+      await mockAuth.signOut();
+    }
+    setUser(null);
+    setChannel(null);
     setShowDropdown(false);
     navigate('/');
   };

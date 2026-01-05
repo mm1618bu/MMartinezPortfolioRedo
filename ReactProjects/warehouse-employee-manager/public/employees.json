@@ -1,0 +1,14 @@
+{
+  "employees": [
+    { "id": 1, "name": "John Doe", "department": "Receiving", "shift": "Day", "status": "Active" },
+    { "id": 2, "name": "Jane Smith", "department": "Packing", "shift": "Night", "status": "Active" },
+    { "id": 3, "name": "Mike Johnson", "department": "Shipping", "shift": "Day", "status": "Active" },
+    { "id": 4, "name": "Sarah Williams", "department": "Receiving", "shift": "Night", "status": "Active" },
+    { "id": 5, "name": "Tom Brown", "department": "Packing", "shift": "Day", "status": "Active" },
+    { "id": 6, "name": "Emily Davis", "department": "Shipping", "shift": "Night", "status": "Active" },
+    { "id": 7, "name": "David Wilson", "department": "Receiving", "shift": "Day", "status": "Active" },
+    { "id": 8, "name": "Lisa Martinez", "department": "Packing", "shift": "Night", "status": "Active" },
+    { "id": 9, "name": "James Anderson", "department": "Shipping", "shift": "Day", "status": "Active" },
+    { "id": 10, "name": "Maria Garcia", "department": "Quality Control", "shift": "Day", "status": "Active" }
+  ]
+}

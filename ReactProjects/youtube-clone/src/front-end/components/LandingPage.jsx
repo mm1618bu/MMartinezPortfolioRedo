@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
+import { getMockVideos } from '../utils/mockData';
 import { getTrendingSearches } from '../utils/searchAPI';
 import '../../styles/main.css';
 
@@ -51,7 +52,10 @@ export default function LandingPage() {
       if (error) throw error;
       setVideos(data || []);
     } catch (error) {
-      console.error('Error fetching videos:', error);
+      // Fallback to mock data if Supabase fails
+      console.log('Using mock data for demo');
+      const mockResult = await getMockVideos({ limit: 24 });
+      setVideos(mockResult.data || []);
     } finally {
       setLoading(false);
     }

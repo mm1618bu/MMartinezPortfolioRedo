@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { getAllVideosFromSupabase, supabase } from '../utils/supabase';
+import { getMockVideos } from '../utils/mockData';
 import { scoreAndRankVideos } from '../utils/videoScoringSystem';
 import { VIDEO_CATEGORIES } from '../utils/homeFeedAPI';
 import { getBannerAd } from '../utils/adSimulationEngine';
@@ -34,7 +35,8 @@ export default function VideoGrid() {
   } = useInfiniteQuery({
     queryKey: ['allVideos', selectedCategory], // Include category in cache key
     queryFn: async ({ pageParam = 0 }) => {
-      console.log(`📥 Loading videos from Supabase (page: ${pageParam})`);
+      console.log(`📥 Loading videos (page: ${pageParam})`);
+      console.log('🔍 Supabase client:', !!supabase);
       
       let query = supabase
         .from('videos')
@@ -48,10 +50,16 @@ export default function VideoGrid() {
         query = query.order('created_at', { ascending: false });
       }
 
+      console.log('🚀 Executing Supabase query...');
       const { data, error, count } = await query
         .range(pageParam, pageParam + VIDEOS_PER_PAGE - 1);
       
-      if (error) throw error;
+      console.log('📊 Query result:', { dataCount: data?.length, error: error?.message, totalCount: count });
+      
+      if (error) {
+        console.error('❌ Supabase error:', error);
+        throw error;
+      }
 
       // Filter by category on client side if needed
       // Note: video_categories table doesn't exist, using meta_tags or keywords instead

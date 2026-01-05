@@ -41,9 +41,7 @@ export default function SearchBar({ onSearch, autoFocus = false }) {
   // Load trending searches on mount
   useEffect(() => {
     const loadTrending = async () => {
-      console.log('SearchBar: Loading trending searches...');
       const data = await getTrendingSearches(24, 5);
-      console.log('SearchBar: Trending searches:', data);
       setTrending(data);
     };
     loadTrending();
@@ -53,9 +51,7 @@ export default function SearchBar({ onSearch, autoFocus = false }) {
   useEffect(() => {
     const loadHistory = async () => {
       if (currentUser) {
-        console.log('SearchBar: Loading search history...');
         const data = await getUserSearchHistory(currentUser.id, 5);
-        console.log('SearchBar: Search history:', data);
         setHistory(data);
       }
     };

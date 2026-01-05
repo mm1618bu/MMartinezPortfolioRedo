@@ -1,28 +1,41 @@
 import React from 'react';
 import './ProjectCard.scss';
 
-const ProjectCard = () => {
+const ProjectCard = ({ title, technologies, description, liveLink, githubLink, imageSrc }) => {
   return (
     <div className="project-card">
       <div className="project-image">
         <img
-          src="path-to-image.png" // Replace with the correct image path
-          alt="Shawerr Project"
+          src={imageSrc || "path-to-image.png"} // Replace with the correct image path
+          alt={`${title} Project`}
         />
       </div>
       <div className="project-info">
-        <h2 className="project-title">Shawerr</h2>
+        <h2 className="project-title">
+          <a href={githubLink || liveLink} target="_blank" rel="noopener noreferrer">
+            {title}
+          </a>
+        </h2>
         <p className="project-tech">
-          Made with: <span>TypeScript</span> <span>SvelteKit</span> <span>Svelte</span>{' '}
-          <span>TailwindCss</span> <span>Firebase</span>
+          Made with: {technologies.map((tech, index) => (
+            <span key={index}>{tech}</span>
+          ))}
         </p>
         <p className="project-description">
-          Comprehensive consultant for rebuilding and establishing new products, safety
-          inspection, and product evaluation.
+          {description}
         </p>
-        <a href="your-live-link.com" className="project-link" target="_blank" rel="noopener noreferrer">
-          <span>🔗 Live</span>
-        </a>
+        <div className="project-links">
+          {liveLink && (
+            <a href={liveLink} className="project-link" target="_blank" rel="noopener noreferrer">
+              <span>🔗 Live</span>
+            </a>
+          )}
+          {githubLink && (
+            <a href={githubLink} className="project-link" target="_blank" rel="noopener noreferrer">
+              <span>💻 GitHub</span>
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );

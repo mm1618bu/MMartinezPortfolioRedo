@@ -9,6 +9,29 @@ body{
   background-color: rgba(42, 49, 42, 0.877);
 }
 
+.projects-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 32px;
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media screen and (max-width: 768px) {
+  .projects-section {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 20px;
+  }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .projects-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 nav{
   display: flex;
   justify-content: center;
