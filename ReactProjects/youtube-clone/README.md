@@ -1,4 +1,4 @@
-# 🎬 YouTube Clone - Full-Stack Video Platform
+# YouTube Clone - Full-Stack Video Platform
 
 A production-ready YouTube clone built with React and Supabase, featuring advanced video management, intelligent search, personalized recommendations, creator tools, and polished UI animations.
 
@@ -7,48 +7,48 @@ A production-ready YouTube clone built with React and Supabase, featuring advanc
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Full--Text%20Search-336791?logo=postgresql)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## ✨ Key Features
+## Key Features
 
-### 🎥 Video Platform
-- **📹 Video Upload & Management** - Multi-format support with automatic compression
-- **▶️ Advanced Video Player** - Custom controls, quality selection, playback speed
-- **🎬 Channel System** - Create and customize your own video channel
-- **📋 Playlists** - Organize videos into collections with full CRUD operations
-- **🔒 Privacy Controls** - Public, unlisted, and private video settings
+### Video Platform
+- ** Video Upload & Management** - Multi-format support with automatic compression
+- ** Advanced Video Player** - Custom controls, quality selection, playback speed
+- ** Channel System** - Create and customize your own video channel
+- ** Playlists** - Organize videos into collections with full CRUD operations
+- ** Privacy Controls** - Public, unlisted, and private video settings
 
-### 🔍 Intelligent Search & Discovery
-- **⚡ Advanced Search** - Pattern matching across titles, descriptions, channels, and tags
-- **🎯 Search Highlighting** - Visual highlighting of matching terms in results
-- **📊 Smart Suggestions** - Auto-complete with trending and related searches
-- **🏷️ Category Filtering** - Browse by 25+ video categories
-- **🤖 Personalized Recommendations** - AI-powered suggestions based on watch history
+###  Intelligent Search & Discovery
+- ** Advanced Search** - Pattern matching across titles, descriptions, channels, and tags
+- ** Search Highlighting** - Visual highlighting of matching terms in results
+- ** Smart Suggestions** - Auto-complete with trending and related searches
+- ** Category Filtering** - Browse by 25+ video categories
+- ** Personalized Recommendations** - AI-powered suggestions based on watch history
 
-### 💬 Social Features
-- **💭 Threaded Comments** - Nested replies with real-time updates
-- **👍 Engagement System** - Like/dislike for videos and comments
-- **🔔 Activity Tracking** - Watch history and view analytics
-- **👤 User Profiles** - Customizable profiles with avatars and bios
+###  Social Features
+- ** Threaded Comments** - Nested replies with real-time updates
+- ** Engagement System** - Like/dislike for videos and comments
+- ** Activity Tracking** - Watch history and view analytics
+- ** User Profiles** - Customizable profiles with avatars and bios
 
-### 📊 Creator Tools
-- **📈 Live Dashboard** - Real-time analytics for creators
-- **💰 Revenue Tracking** - Simulated ad revenue and engagement metrics
-- **📉 Performance Insights** - Views, watch time, engagement rates
-- **🎨 Channel Customization** - Banners, avatars, descriptions
+###  Creator Tools
+- ** Live Dashboard** - Real-time analytics for creators
+- ** Revenue Tracking** - Simulated ad revenue and engagement metrics
+- ** Performance Insights** - Views, watch time, engagement rates
+- ** Channel Customization** - Banners, avatars, descriptions
 
-### 🎨 UI/UX Excellence
-- **✨ Smooth Animations** - 60fps animations with GPU acceleration
-- **🌓 Dark Mode** - Full dark theme support with smooth transitions
-- **📱 Responsive Design** - Mobile-first, works on all screen sizes
-- **♾️ Infinite Scroll** - Seamless content loading as you browse
-- **🎭 Polished Interactions** - Hover effects, transitions, loading states
+###  UI/UX Excellence
+- ** Smooth Animations** - 60fps animations with GPU acceleration
+- ** Dark Mode** - Full dark theme support with smooth transitions
+- ** Responsive Design** - Mobile-first, works on all screen sizes
+- ** Infinite Scroll** - Seamless content loading as you browse
+- ** Polished Interactions** - Hover effects, transitions, loading states
 
-### 💰 Monetization Simulation
-- **📺 Ad System** - Pre-roll, banner, overlay, and companion ads
-- **🎯 Ad Targeting** - Category-based ad placement
-- **📊 Ad Analytics** - Impressions, clicks, CTR, and RPM tracking
-- **⏭️ Skip Controls** - User-friendly ad skip functionality
+###  Monetization Simulation
+- ** Ad System** - Pre-roll, banner, overlay, and companion ads
+- ** Ad Targeting** - Category-based ad placement
+- ** Ad Analytics** - Impressions, clicks, CTR, and RPM tracking
+- ** Skip Controls** - User-friendly ad skip functionality
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 
@@ -155,7 +155,7 @@ REACT_APP_ENABLE_ADS=true
 - **[SQL Migrations](sql/)** - Database schema and migrations
 - **[Next Steps](NEXT_STEPS.md)** - Roadmap and future features
 
-## 📜 Available Scripts
+##  Available Scripts
 
 ### Development Commands
 
@@ -182,7 +182,7 @@ REACT_APP_ENABLE_ADS=true
 | `./scripts/ci-local.sh` | Test CI pipeline locally |
 | `./scripts/deploy.sh` | Deploy to production/staging |
 
-## 🗂️ Project Structure
+##  Project Structure
 
 ```
 youtube-clone/
@@ -225,41 +225,41 @@ youtube-clone/
     └── ... (30+ documentation files)
 ```
 
-## 🎨 Recent Improvements
+## Recent Improvements
 
 ### Search System Enhancements
-- ✅ **Advanced Pattern Matching** - Search across title, description, channel name, and meta tags
-- ✅ **Search Highlighting** - Visual emphasis on matching terms in results
-- ✅ **Auto-complete Suggestions** - Real-time search suggestions as you type
-- ✅ **Graceful Fallbacks** - Robust error handling with fallback search methods
-- ✅ **Performance Optimization** - Debounced input and efficient query patterns
+- **Advanced Pattern Matching** - Search across title, description, channel name, and meta tags
+- **Search Highlighting** - Visual emphasis on matching terms in results
+- **Auto-complete Suggestions** - Real-time search suggestions as you type
+- **Graceful Fallbacks** - Robust error handling with fallback search methods
+- **Performance Optimization** - Debounced input and efficient query patterns
 
 ### UI/UX Polish
-- ✅ **Smooth Animations** - 60fps animations throughout the app
+- **Smooth Animations** - 60fps animations throughout the app
   - Fade-in effects for content loading
   - Slide-in animations for modals and dropdowns
   - Scale and transform effects for interactive elements
   - Shimmer loading states for skeleton screens
-- ✅ **Enhanced Video Cards** - 3D hover effects with lift and shadow
-- ✅ **Navbar Improvements** - Gradient accents and smooth transitions
-- ✅ **Button Polish** - Ripple effects and gradient backgrounds
-- ✅ **Loading States** - Skeleton screens and spinners
-- ✅ **Dark Mode** - Complete dark theme with smooth transitions
+- **Enhanced Video Cards** - 3D hover effects with lift and shadow
+- **Navbar Improvements** - Gradient accents and smooth transitions
+- **Button Polish** - Ripple effects and gradient backgrounds
+- **Loading States** - Skeleton screens and spinners
+- **Dark Mode** - Complete dark theme with smooth transitions
 
 ### Sidebar Redesign
-- ✅ **Section Organization** - Logical grouping of navigation items
-- ✅ **Visual Hierarchy** - Clear sections with titles and dividers
-- ✅ **Hover Animations** - Smooth transitions and active state indicators
-- ✅ **User Info Card** - Enhanced profile display with avatar
-- ✅ **Responsive Design** - Mobile-friendly collapsible sidebar
+- **Section Organization** - Logical grouping of navigation items
+- **Visual Hierarchy** - Clear sections with titles and dividers
+- **Hover Animations** - Smooth transitions and active state indicators
+- **User Info Card** - Enhanced profile display with avatar
+- **Responsive Design** - Mobile-friendly collapsible sidebar
 
 ### Database Optimization
-- ✅ **Removed Legacy Tables** - Cleaned up video_categories and video_tags dependencies
-- ✅ **Streamlined Queries** - Optimized to use actual table schema (keywords, meta_tags)
-- ✅ **Error Handling** - Graceful degradation when RPC functions unavailable
-- ✅ **Performance** - Reduced query complexity and improved response times
+- **Removed Legacy Tables** - Cleaned up video_categories and video_tags dependencies
+- **Streamlined Queries** - Optimized to use actual table schema (keywords, meta_tags)
+- **Error Handling** - Graceful degradation when RPC functions unavailable
+- **Performance** - Reduced query complexity and improved response times
 
-## 🔧 Configuration
+## Configuration
 
 ### Database Setup
 
@@ -301,7 +301,7 @@ REACT_APP_ENABLE_ADS=true            # Enable ad simulation
 REACT_APP_ENABLE_RECOMMENDATIONS=true # Enable personalized recommendations
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Running Tests
 
@@ -326,7 +326,7 @@ npm run test:ci
 - **React Testing Library** - Component testing
 - **Coverage Reports** - Istanbul/nyc
 
-## 🚀 Deployment
+## Deployment
 
 ### Automated Deployment (Recommended)
 
@@ -367,7 +367,7 @@ docker build -t youtube-clone .
 docker run -p 3000:3000 youtube-clone
 ```
 
-## 📊 Feature Deep Dive
+## Feature Deep Dive
 
 ### Advanced Search System
 
@@ -406,12 +406,12 @@ AI-powered video suggestions based on:
 
 Real-time analytics dashboard featuring:
 
-- **📈 Live Metrics**: Views, watch time, engagement (updates every 30s)
-- **💰 Revenue Tracking**: Simulated ad revenue with RPM calculations
-- **📊 Performance Charts**: Visual graphs for trends over time
-- **👥 Audience Insights**: Demographics and viewing patterns
-- **🎯 Content Performance**: Individual video analytics
-- **🔔 Real-time Alerts**: Notifications for milestones and achievements
+- ** Live Metrics**: Views, watch time, engagement (updates every 30s)
+- ** Revenue Tracking**: Simulated ad revenue with RPM calculations
+- ** Performance Charts**: Visual graphs for trends over time
+- ** Audience Insights**: Demographics and viewing patterns
+- ** Content Performance**: Individual video analytics
+- ** Real-time Alerts**: Notifications for milestones and achievements
 
 **Implementation**: See [LIVE_CREATOR_DASHBOARD_GUIDE.md](LIVE_CREATOR_DASHBOARD_GUIDE.md)
 
@@ -420,10 +420,10 @@ Real-time analytics dashboard featuring:
 Complete advertising ecosystem:
 
 **Ad Types**:
-- 🎬 **Pre-roll Video Ads**: Before video playback (skippable after 5s)
-- 📰 **Banner Ads**: Top/bottom page banners
-- 🎨 **Overlay Ads**: Semi-transparent video overlays
-- 📱 **Companion Ads**: Sidebar display ads
+- **Pre-roll Video Ads**: Before video playback (skippable after 5s)
+- **Banner Ads**: Top/bottom page banners
+- **Overlay Ads**: Semi-transparent video overlays
+- **Companion Ads**: Sidebar display ads
 
 **Features**:
 - Category-based targeting
@@ -447,7 +447,7 @@ Seamless content loading:
 
 **Implementation**: See [INFINITE_SCROLL_GUIDE.md](INFINITE_SCROLL_GUIDE.md)
 
-## 🎨 UI Animation System
+## UI Animation System
 
 ### Keyframe Animations
 
@@ -479,7 +479,7 @@ spin        - Loading spinner rotation
 - Optimized repaints and reflows
 - Debounced scroll events
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Here's how to get started:
 
@@ -542,7 +542,7 @@ chore:    Maintenance tasks
 - **React**: Hooks, React Query, context when needed
 - **Testing**: React Testing Library, meaningful test names
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -563,24 +563,24 @@ chore:    Maintenance tasks
 
 ### Getting Help
 
-- 📖 Check documentation in `/docs` directory
-- 🐛 Search [existing issues](https://github.com/mm1618bu/MMartinezPortfolioRedo/issues)
-- 💬 Open a new issue with detailed description
-- 📧 Contact: [Create issue on GitHub](https://github.com/mm1618bu/MMartinezPortfolioRedo/issues/new)
+- Check documentation in `/docs` directory
+- Search [existing issues](https://github.com/mm1618bu/MMartinezPortfolioRedo/issues)
+- Open a new issue with detailed description
+- Contact: [Create issue on GitHub](https://github.com/mm1618bu/MMartinezPortfolioRedo/issues/new)
 
-## 📝 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ### What this means:
-- ✅ Commercial use allowed
-- ✅ Modification allowed
-- ✅ Distribution allowed
-- ✅ Private use allowed
-- ⚠️ License and copyright notice required
-- ❌ No liability or warranty
+- Commercial use allowed
+- Modification allowed
+- Distribution allowed
+- Private use allowed
+- License and copyright notice required
+- No liability or warranty
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 ### Built With
 - [React](https://reactjs.org/) - UI framework
@@ -600,13 +600,13 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - Supabase team for amazing backend services
 - Open source community for invaluable libraries
 
-## 📞 Support & Contact
+## Support & Contact
 
 ### Get Help
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/mm1618bu/MMartinezPortfolioRedo/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/mm1618bu/MMartinezPortfolioRedo/discussions)
-- 📖 **Documentation**: See `/docs` directory
-- ⭐ **Star this repo** if you find it helpful!
+- **Bug Reports**: [GitHub Issues](https://github.com/mm1618bu/MMartinezPortfolioRedo/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/mm1618bu/MMartinezPortfolioRedo/discussions)
+- **Documentation**: See `/docs` directory
+- **Star this repo** if you find it helpful!
 
 ### Stay Updated
 - Watch this repository for updates
@@ -617,7 +617,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 <div align="center">
 
-**Made with ❤️ using React and Supabase**
 
 [⬆ Back to Top](#-youtube-clone---full-stack-video-platform)
 
