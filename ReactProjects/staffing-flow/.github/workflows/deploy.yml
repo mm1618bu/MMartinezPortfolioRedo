@@ -1,0 +1,68 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build frontend
+        run: npm run build:web
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_PYTHON_API_URL: ${{ secrets.VITE_PYTHON_API_URL }}
+          VITE_ENABLE_DEBUG: false
+          VITE_ENABLE_ANALYTICS: true
+          VITE_APP_NAME: Staffing Flow
+          VITE_APP_VERSION: ${{ github.ref_name }}
+
+      - name: Build Node API
+        run: npm run build:api
+
+      - name: Create deployment package
+        run: |
+          mkdir -p deployment
+          cp -r dist deployment/
+          cp -r python deployment/
+          cp requirements.txt deployment/
+          cp package.json deployment/
+          echo "Deployment package created"
+
+      - name: Upload deployment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deployment
+          path: deployment
+          retention-days: 30
+
+      # Add your deployment steps here (e.g., deploy to AWS, Vercel, etc.)
+      # - name: Deploy to hosting service
+      #   run: echo "Add your deployment commands here"

@@ -1,0 +1,79 @@
+{
+  "name": "staffing-flow",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\" \"npm run dev:python\"",
+    "dev:web": "vite",
+    "dev:api": "tsx watch api/server.ts",
+    "dev:python": "cd python && uvicorn main:app --reload --port 8000",
+    "build": "npm run build:web && npm run build:api",
+    "build:web": "tsc -b tsconfig.web.json && vite build",
+    "build:api": "tsc -b tsconfig.api.json",
+    "lint": "eslint . && make lint",
+    "lint:js": "eslint .",
+    "lint:fix": "eslint . --fix && prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "lint:python": "make lint",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:python": "make format",
+    "test": "make test",
+    "test:python": "make test",
+    "test:cov": "make test-cov",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "type-check:web": "tsc -b tsconfig.web.json --noEmit",
+    "type-check:api": "tsc -b tsconfig.api.json --noEmit",
+    "ci": "./scripts/ci-local.sh",
+    "ci:quick": "./scripts/ci-quick.sh",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.9",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.53.0",
+    "@typescript-eslint/parser": "^8.53.0",
+    "@vitejs/plugin-react": "^5.1.1",
+    "concurrently": "^9.2.1",
+    "envalid": "^8.1.1",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.4"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ],
+    "*.py": [
+      "black",
+      "ruff check --fix"
+    ]
+  }
+}

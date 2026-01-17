@@ -1,0 +1,9 @@
+#!/bin/sh
+# Husky post-checkout hook
+# This hook is invoked when a git checkout or git switch is run
+
+# Restore node_modules if needed
+if [ -f package.json ] && [ ! -d node_modules ]; then
+  echo "node_modules not found, running npm install..."
+  npm install
+fi

@@ -1,0 +1,23 @@
+# Ignore artifacts:
+dist
+build
+coverage
+node_modules
+
+# Ignore all compiled files
+*.min.js
+*.min.css
+
+# Ignore lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Python
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+
+# Logs
+*.log

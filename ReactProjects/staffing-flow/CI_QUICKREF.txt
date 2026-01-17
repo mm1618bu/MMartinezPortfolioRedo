@@ -1,0 +1,166 @@
+╔════════════════════════════════════════════════════════════╗
+║                  CI/CD QUICK REFERENCE                      ║
+╚════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────┐
+│  LOCAL CI COMMANDS                                          │
+└─────────────────────────────────────────────────────────────┘
+
+  npm run ci              Full CI simulation (all checks)
+  npm run ci:quick        Quick checks (lint + type check)
+  
+  npm run lint            Lint all (JS/TS + Python)
+  npm run lint:js         Lint JavaScript/TypeScript only
+  npm run lint:fix        Auto-fix JS/TS issues
+  
+  npm run type-check      Type check all TypeScript
+  npm run test            Run Python tests
+  npm run test:cov        Run tests with coverage
+  
+  npm run build           Build all components
+  npm run build:web       Build frontend only
+  npm run build:api       Build Node API only
+
+┌─────────────────────────────────────────────────────────────┐
+│  GITHUB WORKFLOWS                                           │
+└─────────────────────────────────────────────────────────────┘
+
+  ci.yml          Main CI Pipeline
+                  • Lint, type check, test, build
+                  • Runs on: push, PR
+                  • Duration: ~10-15 min
+  
+  deploy.yml      Production Deploy
+                  • Build & package for production
+                  • Runs on: push to main, tags
+                  • Duration: ~5-8 min
+  
+  nightly.yml     Extended Tests
+                  • Matrix: Node 18/20/22, Python 3.10/3.11/3.12
+                  • Runs on: daily 2 AM UTC, manual
+                  • Duration: ~20-30 min
+  
+  pr-checks.yml   PR Quality Checks
+                  • Conflict check, file size, complexity
+                  • Runs on: PR events
+                  • Duration: ~3-5 min
+
+┌─────────────────────────────────────────────────────────────┐
+│  CI JOBS BREAKDOWN                                          │
+└─────────────────────────────────────────────────────────────┘
+
+  ✓ Lint & Format Check
+    - Prettier format validation
+    - ESLint (JavaScript/TypeScript)
+    - Ruff (Python linting)
+    - Black (Python formatting)
+  
+  ✓ TypeScript Type Check
+    - Frontend (src/)
+    - Node API (api/)
+  
+  ✓ Python Tests
+    - pytest with coverage
+    - Upload to Codecov
+  
+  ✓ Build Frontend
+    - React/Vite production build
+    - Upload artifacts
+  
+  ✓ Build Node API
+    - TypeScript compilation
+    - Upload artifacts
+  
+  ✓ Build Python API
+    - Syntax validation
+    - Import verification
+  
+  ✓ Security Scan
+    - npm audit (Node)
+    - bandit (Python)
+
+┌─────────────────────────────────────────────────────────────┐
+│  STATUS BADGES                                              │
+└─────────────────────────────────────────────────────────────┘
+
+  CI Pipeline:
+  ![CI](https://github.com/mm1618bu/MMartinezPortfolioRedo/
+       actions/workflows/ci.yml/badge.svg)
+  
+  Deploy:
+  ![Deploy](https://github.com/mm1618bu/MMartinezPortfolioRedo/
+            actions/workflows/deploy.yml/badge.svg)
+
+┌─────────────────────────────────────────────────────────────┐
+│  TROUBLESHOOTING                                            │
+└─────────────────────────────────────────────────────────────┘
+
+  ❌ CI fails but works locally
+     → Check Node/Python versions match
+     → Use npm ci (not npm install)
+     → Set environment variables
+  
+  ❌ Slow CI runs
+     → Already optimized with caching
+     → Use [skip ci] for docs-only commits
+  
+  ❌ Security scan fails
+     → Run: npm audit fix
+     → Review and accept known issues
+  
+  ❌ Python tests fail
+     → Ensure requirements-dev.txt installed
+     → Check Python version (3.10+)
+
+┌─────────────────────────────────────────────────────────────┐
+│  BRANCH PROTECTION (Recommended)                            │
+└─────────────────────────────────────────────────────────────┘
+
+  main branch:
+  ☑ Require PR reviews (1 reviewer)
+  ☑ Require status checks:
+    - Lint & Format Check
+    - TypeScript Type Check
+    - Python Tests
+    - Build Frontend
+    - Build Node API
+    - Build Python API
+  ☑ Require branches up to date
+  ☑ Require linear history
+
+┌─────────────────────────────────────────────────────────────┐
+│  SKIP CI                                                    │
+└─────────────────────────────────────────────────────────────┘
+
+  Docs-only changes:
+  git commit -m "docs: update README [skip ci]"
+  
+  Or use:
+  [skip actions]
+  [actions skip]
+  [no ci]
+
+┌─────────────────────────────────────────────────────────────┐
+│  VIEW RESULTS                                               │
+└─────────────────────────────────────────────────────────────┘
+
+  All workflows:
+  https://github.com/mm1618bu/MMartinezPortfolioRedo/actions
+  
+  Specific workflow:
+  Click on any commit in GitHub
+  
+  PR checks:
+  Visible in PR page under "Checks"
+
+┌─────────────────────────────────────────────────────────────┐
+│  DOCUMENTATION                                              │
+└─────────────────────────────────────────────────────────────┘
+
+  CI_GUIDE.md          Complete CI/CD documentation
+  CI_SUMMARY.md        Setup summary
+  .github/ACTIONS_STATUS.md    Workflow status
+  
+═══════════════════════════════════════════════════════════════
+
+Need help? Check CI_GUIDE.md or file an issue!

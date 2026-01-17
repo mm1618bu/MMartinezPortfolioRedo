@@ -1,0 +1,70 @@
+name: Nightly Tests
+
+on:
+  schedule:
+    # Run every day at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  extended-tests:
+    name: Extended Test Suite
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Python dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run all linters
+        run: |
+          npm run lint:js
+          make lint
+          npm run type-check
+
+      - name: Run Python tests
+        run: make test-cov
+
+      - name: Build all components
+        run: |
+          npm run build:web
+          npm run build:api
+        env:
+          VITE_API_URL: http://localhost:3001
+          VITE_PYTHON_API_URL: http://localhost:8000
+          VITE_ENABLE_DEBUG: false
+          VITE_ENABLE_ANALYTICS: false
+          VITE_APP_NAME: Staffing Flow
+          VITE_APP_VERSION: nightly
+
+  notify-on-failure:
+    name: Notify on Failure
+    needs: extended-tests
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - name: Send notification
+        run: echo "Nightly tests failed. Configure notifications here."

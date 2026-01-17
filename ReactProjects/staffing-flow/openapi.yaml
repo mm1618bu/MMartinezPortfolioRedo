@@ -1,0 +1,1793 @@
+openapi: 3.0.3
+info:
+  title: Staffing Flow API
+  description: |
+    REST API for the Staffing Flow application - a comprehensive staff management and scheduling system.
+    
+    ## Features
+    - User authentication and authorization
+    - Staff management with RBAC
+    - Schedule creation and management
+    - Time off request handling
+    - Department and team organization
+    - Reporting and analytics
+    
+    ## Authentication
+    All endpoints (except public ones) require JWT authentication via the `Authorization` header:
+    ```
+    Authorization: Bearer <jwt_token>
+    ```
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@staffingflow.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local Python API
+  - url: http://localhost:3001/api/v1
+    description: Local Node API
+  - url: https://api.staffingflow.com/v1
+    description: Production API
+
+tags:
+  - name: Authentication
+    description: User authentication and session management
+  - name: Users
+    description: User management operations
+  - name: Staff
+    description: Staff member management
+  - name: Schedules
+    description: Schedule creation and management
+  - name: Time Off
+    description: Time off request handling
+  - name: Departments
+    description: Department and team management
+  - name: Reports
+    description: Reporting and analytics
+  - name: Settings
+    description: System and organization settings
+
+paths:
+  # Authentication Endpoints
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new user
+      description: Create a new user account
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and receive JWT token
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Get new access token using refresh token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+              required:
+                - refresh_token
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Invalidate current session
+      operationId: logoutUser
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Logout successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user
+      description: Retrieve authenticated user's information
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # User Management Endpoints
+  /users:
+    get:
+      tags:
+        - Users
+      summary: List users
+      description: Get paginated list of users (requires user.read permission)
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: role
+          in: query
+          description: Filter by role
+          schema:
+            $ref: '#/components/schemas/UserRole'
+        - name: organization_id
+          in: query
+          description: Filter by organization
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Users
+      summary: Create user
+      description: Create a new user (requires user.create permission)
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Retrieve user details (requires user.read permission)
+      operationId: getUserById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: Update user information (requires user.update permission)
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: Delete a user (requires user.delete permission)
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '204':
+          description: User deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Staff Management Endpoints
+  /staff:
+    get:
+      tags:
+        - Staff
+      summary: List staff members
+      description: Get paginated list of staff (respects RBAC scope)
+      operationId: listStaff
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: department_id
+          in: query
+          description: Filter by department
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            $ref: '#/components/schemas/StaffStatus'
+        - name: search
+          in: query
+          description: Search by name or email
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Staff retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Staff
+      summary: Create staff member
+      description: Create a new staff member (requires staff.create permission)
+      operationId: createStaff
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStaffRequest'
+      responses:
+        '201':
+          description: Staff created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /staff/{staffId}:
+    get:
+      tags:
+        - Staff
+      summary: Get staff by ID
+      description: Retrieve staff details (respects RBAC scope)
+      operationId: getStaffById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StaffIdParam'
+      responses:
+        '200':
+          description: Staff retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Staff
+      summary: Update staff
+      description: Update staff information (requires staff.update permission)
+      operationId: updateStaff
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StaffIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStaffRequest'
+      responses:
+        '200':
+          description: Staff updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Staff
+      summary: Delete staff
+      description: Delete a staff member (requires staff.delete permission)
+      operationId: deleteStaff
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StaffIdParam'
+      responses:
+        '204':
+          description: Staff deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Schedule Endpoints
+  /schedules:
+    get:
+      tags:
+        - Schedules
+      summary: List schedules
+      description: Get paginated list of schedules (respects RBAC scope)
+      operationId: listSchedules
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: start_date
+          in: query
+          description: Filter by start date (ISO 8601)
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: Filter by end date (ISO 8601)
+          schema:
+            type: string
+            format: date
+        - name: staff_id
+          in: query
+          description: Filter by staff member
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            $ref: '#/components/schemas/ScheduleStatus'
+      responses:
+        '200':
+          description: Schedules retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Schedules
+      summary: Create schedule
+      description: Create a new schedule (requires schedule.create permission)
+      operationId: createSchedule
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScheduleRequest'
+      responses:
+        '201':
+          description: Schedule created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /schedules/{scheduleId}:
+    get:
+      tags:
+        - Schedules
+      summary: Get schedule by ID
+      description: Retrieve schedule details (respects RBAC scope)
+      operationId: getScheduleById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdParam'
+      responses:
+        '200':
+          description: Schedule retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Schedules
+      summary: Update schedule
+      description: Update schedule information (requires schedule.update permission)
+      operationId: updateSchedule
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScheduleRequest'
+      responses:
+        '200':
+          description: Schedule updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Schedules
+      summary: Delete schedule
+      description: Delete a schedule (requires schedule.delete permission)
+      operationId: deleteSchedule
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdParam'
+      responses:
+        '204':
+          description: Schedule deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /schedules/{scheduleId}/publish:
+    post:
+      tags:
+        - Schedules
+      summary: Publish schedule
+      description: Publish a schedule to staff (requires schedule.publish permission)
+      operationId: publishSchedule
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdParam'
+      responses:
+        '200':
+          description: Schedule published successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Time Off Endpoints
+  /timeoff:
+    get:
+      tags:
+        - Time Off
+      summary: List time off requests
+      description: Get paginated list of time off requests (respects RBAC scope)
+      operationId: listTimeOff
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: staff_id
+          in: query
+          description: Filter by staff member
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            $ref: '#/components/schemas/TimeOffStatus'
+        - name: start_date
+          in: query
+          description: Filter by start date
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Time off requests retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeOffList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Time Off
+      summary: Create time off request
+      description: Submit a new time off request
+      operationId: createTimeOff
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTimeOffRequest'
+      responses:
+        '201':
+          description: Time off request created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeOff'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /timeoff/{timeOffId}:
+    get:
+      tags:
+        - Time Off
+      summary: Get time off by ID
+      description: Retrieve time off request details
+      operationId: getTimeOffById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TimeOffIdParam'
+      responses:
+        '200':
+          description: Time off request retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeOff'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Time Off
+      summary: Cancel time off request
+      description: Cancel a time off request (requires timeoff.cancel permission)
+      operationId: cancelTimeOff
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TimeOffIdParam'
+      responses:
+        '204':
+          description: Time off request cancelled successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /timeoff/{timeOffId}/approve:
+    post:
+      tags:
+        - Time Off
+      summary: Approve time off request
+      description: Approve a time off request (requires timeoff.approve permission)
+      operationId: approveTimeOff
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TimeOffIdParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+                  description: Approval notes
+      responses:
+        '200':
+          description: Time off request approved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeOff'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /timeoff/{timeOffId}/deny:
+    post:
+      tags:
+        - Time Off
+      summary: Deny time off request
+      description: Deny a time off request (requires timeoff.approve permission)
+      operationId: denyTimeOff
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TimeOffIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: Denial reason
+              required:
+                - reason
+      responses:
+        '200':
+          description: Time off request denied successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeOff'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Department Endpoints
+  /departments:
+    get:
+      tags:
+        - Departments
+      summary: List departments
+      description: Get paginated list of departments
+      operationId: listDepartments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Departments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Departments
+      summary: Create department
+      description: Create a new department (requires department.create permission)
+      operationId: createDepartment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDepartmentRequest'
+      responses:
+        '201':
+          description: Department created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /departments/{departmentId}:
+    get:
+      tags:
+        - Departments
+      summary: Get department by ID
+      description: Retrieve department details
+      operationId: getDepartmentById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DepartmentIdParam'
+      responses:
+        '200':
+          description: Department retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Departments
+      summary: Update department
+      description: Update department information (requires department.update permission)
+      operationId: updateDepartment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DepartmentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDepartmentRequest'
+      responses:
+        '200':
+          description: Department updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Departments
+      summary: Delete department
+      description: Delete a department (requires department.delete permission)
+      operationId: deleteDepartment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DepartmentIdParam'
+      responses:
+        '204':
+          description: Department deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Report Endpoints
+  /reports/staff-summary:
+    get:
+      tags:
+        - Reports
+      summary: Staff summary report
+      description: Generate staff summary report (requires report.generate permission)
+      operationId: getStaffSummaryReport
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: department_id
+          in: query
+          description: Filter by department
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Report generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffSummaryReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /reports/schedule-coverage:
+    get:
+      tags:
+        - Reports
+      summary: Schedule coverage report
+      description: Generate schedule coverage report
+      operationId: getScheduleCoverageReport
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          description: Report start date
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: true
+          description: Report end date
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Report generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleCoverageReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /reports/timeoff-summary:
+    get:
+      tags:
+        - Reports
+      summary: Time off summary report
+      description: Generate time off summary report
+      operationId: getTimeOffSummaryReport
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: year
+          in: query
+          required: true
+          description: Report year
+          schema:
+            type: integer
+            minimum: 2020
+      responses:
+        '200':
+          description: Report generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeOffSummaryReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login endpoint
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: Page number (1-indexed)
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    SortParam:
+      name: sort
+      in: query
+      description: Sort field and direction (e.g., "name:asc", "created_at:desc")
+      schema:
+        type: string
+
+    UserIdParam:
+      name: userId
+      in: path
+      required: true
+      description: User ID
+      schema:
+        type: string
+        format: uuid
+
+    StaffIdParam:
+      name: staffId
+      in: path
+      required: true
+      description: Staff ID
+      schema:
+        type: string
+        format: uuid
+
+    ScheduleIdParam:
+      name: scheduleId
+      in: path
+      required: true
+      description: Schedule ID
+      schema:
+        type: string
+        format: uuid
+
+    TimeOffIdParam:
+      name: timeOffId
+      in: path
+      required: true
+      description: Time off request ID
+      schema:
+        type: string
+        format: uuid
+
+    DepartmentIdParam:
+      name: departmentId
+      in: path
+      required: true
+      description: Department ID
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    # Enums
+    UserRole:
+      type: string
+      enum:
+        - super_admin
+        - admin
+        - manager
+        - staff
+        - viewer
+      description: User role in the system
+
+    StaffStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - on_leave
+        - terminated
+      description: Staff employment status
+
+    ScheduleStatus:
+      type: string
+      enum:
+        - draft
+        - published
+        - archived
+      description: Schedule status
+
+    TimeOffStatus:
+      type: string
+      enum:
+        - pending
+        - approved
+        - denied
+        - cancelled
+      description: Time off request status
+
+    TimeOffType:
+      type: string
+      enum:
+        - vacation
+        - sick
+        - personal
+        - unpaid
+        - bereavement
+        - jury_duty
+      description: Type of time off
+
+    # Authentication Schemas
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - name
+        - organization_id
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+        name:
+          type: string
+          minLength: 1
+        organization_id:
+          type: string
+          format: uuid
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT access token
+        refresh_token:
+          type: string
+          description: JWT refresh token
+        token_type:
+          type: string
+          default: Bearer
+        expires_in:
+          type: integer
+          description: Token expiration time in seconds
+        user:
+          $ref: '#/components/schemas/User'
+
+    # User Schemas
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+        organization_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateUserRequest:
+      type: object
+      required:
+        - email
+        - name
+        - role
+        - organization_id
+      properties:
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+        organization_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+        password:
+          type: string
+          format: password
+          minLength: 8
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+        team_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+
+    UserList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Staff Schemas
+    Staff:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+          nullable: true
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        department_id:
+          type: string
+          format: uuid
+        position:
+          type: string
+        hire_date:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/StaffStatus'
+        hourly_rate:
+          type: number
+          format: float
+          nullable: true
+        weekly_hours:
+          type: number
+          format: float
+        organization_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateStaffRequest:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+        - department_id
+        - position
+        - hire_date
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        department_id:
+          type: string
+          format: uuid
+        position:
+          type: string
+        hire_date:
+          type: string
+          format: date
+        hourly_rate:
+          type: number
+          format: float
+        weekly_hours:
+          type: number
+          format: float
+          default: 40
+
+    UpdateStaffRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        department_id:
+          type: string
+          format: uuid
+        position:
+          type: string
+        status:
+          $ref: '#/components/schemas/StaffStatus'
+        hourly_rate:
+          type: number
+          format: float
+        weekly_hours:
+          type: number
+          format: float
+
+    StaffList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Staff'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Schedule Schemas
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        staff_id:
+          type: string
+          format: uuid
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        position:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/ScheduleStatus'
+        created_by:
+          type: string
+          format: uuid
+        organization_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateScheduleRequest:
+      type: object
+      required:
+        - staff_id
+        - start_time
+        - end_time
+        - position
+      properties:
+        staff_id:
+          type: string
+          format: uuid
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        position:
+          type: string
+        notes:
+          type: string
+
+    UpdateScheduleRequest:
+      type: object
+      properties:
+        staff_id:
+          type: string
+          format: uuid
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        position:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: '#/components/schemas/ScheduleStatus'
+
+    ScheduleList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Schedule'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Time Off Schemas
+    TimeOff:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        staff_id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/TimeOffType'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        total_days:
+          type: number
+          format: float
+        reason:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/TimeOffStatus'
+        reviewed_by:
+          type: string
+          format: uuid
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        review_notes:
+          type: string
+          nullable: true
+        organization_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateTimeOffRequest:
+      type: object
+      required:
+        - staff_id
+        - type
+        - start_date
+        - end_date
+      properties:
+        staff_id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/TimeOffType'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+
+    TimeOffList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeOff'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Department Schemas
+    Department:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        manager_id:
+          type: string
+          format: uuid
+          nullable: true
+        organization_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateDepartmentRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        manager_id:
+          type: string
+          format: uuid
+
+    UpdateDepartmentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        manager_id:
+          type: string
+          format: uuid
+
+    DepartmentList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Department'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Report Schemas
+    StaffSummaryReport:
+      type: object
+      properties:
+        total_staff:
+          type: integer
+        active_staff:
+          type: integer
+        inactive_staff:
+          type: integer
+        on_leave:
+          type: integer
+        by_department:
+          type: array
+          items:
+            type: object
+            properties:
+              department_name:
+                type: string
+              staff_count:
+                type: integer
+        generated_at:
+          type: string
+          format: date-time
+
+    ScheduleCoverageReport:
+      type: object
+      properties:
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        total_shifts:
+          type: integer
+        covered_shifts:
+          type: integer
+        coverage_percentage:
+          type: number
+          format: float
+        by_day:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              shifts:
+                type: integer
+              covered:
+                type: integer
+        generated_at:
+          type: string
+          format: date-time
+
+    TimeOffSummaryReport:
+      type: object
+      properties:
+        year:
+          type: integer
+        total_requests:
+          type: integer
+        approved_requests:
+          type: integer
+        denied_requests:
+          type: integer
+        pending_requests:
+          type: integer
+        total_days_off:
+          type: number
+          format: float
+        by_type:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                $ref: '#/components/schemas/TimeOffType'
+              count:
+                type: integer
+              days:
+                type: number
+                format: float
+        generated_at:
+          type: string
+          format: date-time
+
+    # Common Schemas
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: Current page number
+        limit:
+          type: integer
+          description: Items per page
+        total:
+          type: integer
+          description: Total number of items
+        total_pages:
+          type: integer
+          description: Total number of pages
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: object
+          description: Additional error details
+          nullable: true
+
+  responses:
+    BadRequest:
+      description: Bad request - Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized - Invalid or missing authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
