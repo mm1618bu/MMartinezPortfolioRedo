@@ -1,0 +1,6 @@
+email,name,role,team_id,password,send_invite
+john.manager@example.com,John Manager,manager,550e8400-e29b-41d4-a716-446655440000,,true
+sarah.admin@example.com,Sarah Admin,admin,,,true
+mike.staff@example.com,Mike Staff,staff,550e8400-e29b-41d4-a716-446655440001,TempPass123!,false
+emily.viewer@example.com,Emily Viewer,viewer,,,true
+robert.manager@example.com,Robert Manager,manager,550e8400-e29b-41d4-a716-446655440002,,true

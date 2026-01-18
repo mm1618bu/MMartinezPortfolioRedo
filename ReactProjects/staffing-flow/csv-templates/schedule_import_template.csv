@@ -1,0 +1,6 @@
+staff_id,start_time,end_time,position,notes,status
+550e8400-e29b-41d4-a716-446655440000,2024-03-20T08:00:00,2024-03-20T16:00:00,Registered Nurse,ICU assignment,published
+550e8400-e29b-41d4-a716-446655440001,2024-03-20T16:00:00,2024-03-21T00:00:00,Registered Nurse,ER night shift,published
+550e8400-e29b-41d4-a716-446655440002,2024-03-21T08:00:00,2024-03-21T16:00:00,Nurse Practitioner,Clinic duty,published
+550e8400-e29b-41d4-a716-446655440000,2024-03-21T08:00:00,2024-03-21T16:00:00,Registered Nurse,,draft
+550e8400-e29b-41d4-a716-446655440003,2024-03-21T16:00:00,2024-03-22T00:00:00,Respiratory Therapist,ICU night shift,published

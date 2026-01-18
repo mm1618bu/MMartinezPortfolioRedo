@@ -1,0 +1,7 @@
+name,description,manager_id
+Emergency Department,24/7 emergency care services,550e8400-e29b-41d4-a716-446655440000
+Intensive Care Unit,Critical care for severely ill patients,550e8400-e29b-41d4-a716-446655440001
+Outpatient Clinic,General outpatient medical services,
+Surgery,Surgical procedures and post-op care,550e8400-e29b-41d4-a716-446655440002
+Radiology,Medical imaging and diagnostics,
+Pediatrics,Care for children and adolescents,550e8400-e29b-41d4-a716-446655440003

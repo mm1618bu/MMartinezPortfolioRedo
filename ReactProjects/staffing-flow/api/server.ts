@@ -1,6 +1,12 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import cors from 'cors';
 import config from './config';
+import routes from './routes';
+import { globalErrorHandler, notFoundHandler, handleUncaughtErrors } from './errors';
+import { requestLogger } from './middleware/logging.middleware';
+
+// Handle uncaught errors
+handleUncaughtErrors();
 
 const app = express();
 
@@ -12,26 +18,34 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Routes
-app.get('/api/health', (req: Request, res: Response) => {
-  res.json({
-    status: 'ok',
-    message: 'Staffing Flow API is running',
-    environment: config.env,
+// Logging (in development)
+if (config.isDevelopment) {
+  app.use(requestLogger);
+}
+
+// API Routes
+app.use('/api', routes);
+
+// Error handling (must be last)
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
+
+// Start server
+const server = app.listen(config.server.port, () => {
+  console.log(`API server running on http://${config.server.host}:${config.server.port}`);
+  console.log(`Environment: ${config.env}`);
+  console.log(`CORS enabled for: ${config.cors.origins.join(', ')}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
   });
 });
 
-app.get('/api/staff', (req: Request, res: Response) => {
-  // Sample data - replace with actual database queries
-  res.json([
-    { id: 1, name: 'John Doe', role: 'Developer', status: 'active' },
-    { id: 2, name: 'Jane Smith', role: 'Designer', status: 'active' },
-  ]);
-});
-
-// Start server
-app.listen(config.server.port, () => {
-  console.log(`API server running on http://${config.server.host}:${config.server.port}`);
-  console.log(`Environment: ${config.env}`);
-});
+export default app;

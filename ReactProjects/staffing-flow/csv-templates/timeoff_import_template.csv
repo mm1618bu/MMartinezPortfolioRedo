@@ -1,0 +1,6 @@
+staff_id,type,start_date,end_date,reason,status
+550e8400-e29b-41d4-a716-446655440000,vacation,2024-04-15,2024-04-19,Family vacation,approved
+550e8400-e29b-41d4-a716-446655440001,sick,2024-03-25,2024-03-25,Medical appointment,approved
+550e8400-e29b-41d4-a716-446655440002,personal,2024-05-01,2024-05-02,Personal matters,pending
+550e8400-e29b-41d4-a716-446655440003,vacation,2024-06-10,2024-06-21,Summer vacation,pending
+550e8400-e29b-41d4-a716-446655440004,bereavement,2024-03-28,2024-03-30,Family emergency,approved

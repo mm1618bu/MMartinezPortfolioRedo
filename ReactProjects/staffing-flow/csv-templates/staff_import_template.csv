@@ -1,0 +1,6 @@
+first_name,last_name,email,phone,department_id,position,hire_date,status,hourly_rate,weekly_hours
+John,Smith,john.smith@example.com,(555) 123-4567,550e8400-e29b-41d4-a716-446655440000,Registered Nurse,2024-01-15,active,32.50,40
+Sarah,Johnson,sarah.j@example.com,(555) 234-5678,550e8400-e29b-41d4-a716-446655440000,Nurse Practitioner,2024-02-01,active,45.00,36
+Michael,Williams,mike.w@example.com,,550e8400-e29b-41d4-a716-446655440001,Physician Assistant,2023-11-20,active,55.00,40
+Emily,Davis,emily.d@example.com,(555) 456-7890,550e8400-e29b-41d4-a716-446655440001,Medical Assistant,2024-03-10,active,22.50,32
+Robert,Brown,robert.b@example.com,(555) 567-8901,550e8400-e29b-41d4-a716-446655440002,Respiratory Therapist,2023-08-15,active,35.00,40
