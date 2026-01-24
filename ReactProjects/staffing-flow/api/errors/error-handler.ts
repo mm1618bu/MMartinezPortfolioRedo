@@ -3,6 +3,8 @@ import { ZodError } from 'zod';
 import { AppError } from './custom-errors';
 import { ErrorCode, ErrorResponse } from './error-codes';
 import config from '../config';
+import { logger } from '../utils/logger';
+import { getRequestContext } from '../middleware/tracing.middleware';
 
 /**
  * Determines if an error is operational (expected) or a programmer error
@@ -55,10 +57,9 @@ const formatDatabaseError = (error: any) => {
  */
 const logError = (error: Error, req: Request) => {
   const isOperational = isOperationalError(error);
-  const logLevel = isOperational ? 'warn' : 'error';
+  const context = getRequestContext();
 
   const errorLog = {
-    level: logLevel,
     message: error.message,
     stack: error.stack,
     name: error.name,
@@ -66,16 +67,15 @@ const logError = (error: Error, req: Request) => {
     path: req.path,
     ip: req.ip,
     userId: req.user?.id,
-    timestamp: new Date().toISOString(),
+    correlationId: req.correlationId,
+    ...context,
   };
 
-  // In production, you would send this to a logging service
-  // (e.g., Winston, Sentry, CloudWatch)
-  if (config.isDevelopment) {
-    console.error('Error occurred:', errorLog);
+  // Log with appropriate level
+  if (isOperational) {
+    logger.warn('Operational error occurred', errorLog);
   } else {
-    // Production: Send to logging service
-    console.error(JSON.stringify(errorLog));
+    logger.error('Unexpected error occurred', errorLog);
   }
 };
 
@@ -216,15 +216,19 @@ export const asyncHandler = (fn: Function) => {
  */
 export const handleUncaughtErrors = (): void => {
   process.on('uncaughtException', (error: Error) => {
-    console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
-    console.error(error.name, error.message);
-    console.error(error.stack);
+    logger.error('UNCAUGHT EXCEPTION! 💥 Shutting down...', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    });
     process.exit(1);
   });
 
   process.on('unhandledRejection', (reason: any) => {
-    console.error('UNHANDLED REJECTION! 💥 Shutting down...');
-    console.error(reason);
+    logger.error('UNHANDLED REJECTION! 💥 Shutting down...', {
+      reason: reason instanceof Error ? reason.message : String(reason),
+      stack: reason instanceof Error ? reason.stack : undefined,
+    });
     process.exit(1);
   });
 };

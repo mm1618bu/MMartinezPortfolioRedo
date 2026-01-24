@@ -6,6 +6,7 @@ import {
   TokenPayload,
 } from '../utils/token.utils';
 import { UnauthorizedError, NotFoundError } from '../errors';
+import { logAuthEvent } from '../utils/logger';
 
 interface SignupData {
   email: string;
@@ -97,8 +98,14 @@ export const authService = {
       password,
     });
 
-    if (error) throw new UnauthorizedError('Invalid email or password');
-    if (!authData.user) throw new UnauthorizedError('Invalid email or password');
+    if (error) {
+      logAuthEvent('login_failed', undefined, false, { email, reason: 'invalid_credentials', ipAddress });
+      throw new UnauthorizedError('Invalid email or password');
+    }
+    if (!authData.user) {
+      logAuthEvent('login_failed', undefined, false, { email, reason: 'no_user_data', ipAddress });
+      throw new UnauthorizedError('Invalid email or password');
+    }
 
     // Fetch user details from database
     const { data: user, error: userError } = await supabase
@@ -109,6 +116,9 @@ export const authService = {
 
     if (userError) throw userError;
     if (!user) throw new NotFoundError('User', authData.user.id);
+
+    // Log successful login
+    logAuthEvent('login_success', user.id, true, { email, ipAddress, userAgent });
 
     // Generate token pair
     const tokenPayload: TokenPayload = {

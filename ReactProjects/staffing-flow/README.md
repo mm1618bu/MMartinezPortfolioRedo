@@ -97,6 +97,80 @@ npm run dev:api      # Node API only
 npm run dev:python   # Python API only
 ```
 
+## Security Features
+
+### API Rate Limiting
+
+The API includes comprehensive rate limiting to prevent abuse:
+
+**General API Limiter:**
+- 100 requests per 15 minutes per IP
+- Applies to all endpoints
+
+**Authentication Endpoints:**
+- Login: 5 attempts per 15 minutes
+- Signup: 3 attempts per 15 minutes
+- Refresh token: 5 attempts per 15 minutes
+
+**Specialized Limiters:**
+- File uploads: 20 per hour
+- Search queries: 30 per minute
+- Password reset: 3 per hour
+
+**Speed Limiter:**
+- Gradually slows down responses after 50% of rate limit
+- Adds 100ms delay per request over threshold
+- Maximum 5-second delay
+
+**Configuration:**
+Rate limits can be customized via environment variables:
+```bash
+RATE_LIMIT_WINDOW_MS=900000        # 15 minutes
+RATE_LIMIT_MAX_REQUESTS=100        # Max general requests
+AUTH_RATE_LIMIT_MAX_REQUESTS=5     # Max auth attempts
+TRUSTED_IPS=                        # IPs to skip rate limiting
+```
+
+### Security Headers
+
+Implemented using Helmet.js with comprehensive protection:
+
+**Included Headers:**
+- `Content-Security-Policy` - Prevents XSS attacks
+- `Strict-Transport-Security` - Enforces HTTPS (1 year)
+- `X-Content-Type-Options` - Prevents MIME sniffing
+- `X-Frame-Options` - Prevents clickjacking
+- `X-XSS-Protection` - Legacy XSS protection
+- `Referrer-Policy` - Controls referrer information
+- `Permissions-Policy` - Disables unnecessary browser features
+- `Cross-Origin-*-Policy` - Controls cross-origin resource access
+
+**Additional Security:**
+- Hides `X-Powered-By` header
+- Removes server information
+- Sets secure cache headers for API responses
+- CORS configured for specific origins only
+
+### Authentication Security
+
+**JWT + Refresh Token Flow:**
+- Short-lived access tokens (15 minutes)
+- Long-lived refresh tokens (7 days)
+- Token rotation on each use
+- Individual and bulk token revocation
+- IP address and user agent tracking
+
+See [docs/REFRESH_TOKEN_FLOW.md](docs/REFRESH_TOKEN_FLOW.md) for details.
+
+### Centralized Error Handling
+
+- Custom error classes for all HTTP status codes
+- Production-safe error message sanitization
+- Structured error logging with context
+- No sensitive information in error responses
+
+See [api/errors/](api/errors/) for implementation.
+
 ## CI/CD Pipeline
 
 The project uses GitHub Actions for continuous integration and deployment.

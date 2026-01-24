@@ -37,6 +37,29 @@ CREATE TABLE departments (
   UNIQUE(organization_id, name)
 );
 
+-- Create sites table (physical locations/facilities)
+CREATE TABLE sites (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  code TEXT,
+  description TEXT,
+  address TEXT,
+  city TEXT,
+  state TEXT,
+  country TEXT,
+  postal_code TEXT,
+  timezone TEXT,
+  phone TEXT,
+  email TEXT,
+  manager_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  is_active BOOLEAN DEFAULT true,
+  organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(organization_id, name),
+  UNIQUE(organization_id, code)
+);
+
 -- =============================================
 -- EMPLOYEE MANAGEMENT
 -- =============================================
@@ -74,6 +97,7 @@ CREATE TABLE skills (
   name TEXT NOT NULL,
   description TEXT,
   category TEXT,
+  is_active BOOLEAN DEFAULT true,
   organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -202,6 +226,7 @@ CREATE TABLE labor_standards (
   quality_threshold_percentage NUMERIC(5, 2),
   effective_date DATE NOT NULL,
   end_date DATE,
+  is_active BOOLEAN DEFAULT true,
   organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

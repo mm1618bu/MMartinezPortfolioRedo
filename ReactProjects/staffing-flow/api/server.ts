@@ -3,24 +3,75 @@ import cors from 'cors';
 import config from './config';
 import routes from './routes';
 import { globalErrorHandler, notFoundHandler, handleUncaughtErrors } from './errors';
-import { requestLogger } from './middleware/logging.middleware';
+import { httpLogger, requestLogger, slowRequestLogger, errorLogger } from './middleware/logging.middleware';
+import { requestTracing, userContext } from './middleware/tracing.middleware';
+import { apiRateLimiter, speedLimiter } from './middleware/rate-limit.middleware';
+import { getSecurityMiddleware } from './middleware/security.middleware';
+import { logger } from './utils/logger';
+import {
+  livenessProbe,
+  readinessProbe,
+  detailedHealthCheck,
+  startupProbe,
+} from './middleware/health.middleware';
 
 // Handle uncaught errors
 handleUncaughtErrors();
 
 const app = express();
 
-// Middleware
+// Trust proxy (important for rate limiting and IP logging behind reverse proxy)
+app.set('trust proxy', 1);
+
+// Request tracing (must be first to track all requests)
+app.use(requestTracing);
+
+// Security headers (must be early in middleware chain)
+const securityMiddleware = getSecurityMiddleware();
+securityMiddleware.forEach((middleware) => app.use(middleware));
+
+// CORS
 app.use(
   cors({
     origin: config.cors.origins,
     credentials: true,
   })
 );
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Logging (in development)
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Health check endpoints (before rate limiting to ensure they always work)
+// Liveness probe - checks if app is running (Kubernetes liveness probe)
+app.get('/api/health', livenessProbe);
+app.get('/api/live', livenessProbe);
+app.get('/api/liveness', livenessProbe);
+
+// Readiness probe - checks if app is ready to accept traffic (Kubernetes readiness probe)
+app.get('/api/ready', readinessProbe);
+app.get('/api/readiness', readinessProbe);
+
+// Startup probe - checks if app has finished starting (Kubernetes startup probe)
+app.get('/api/startup', startupProbe);
+
+// Detailed health check - internal use only, includes all diagnostics
+app.get('/api/health/detailed', detailedHealthCheck);
+
+// Rate limiting (after parsing, before routes)
+app.use(apiRateLimiter);
+app.use(speedLimiter);
+
+// HTTP request logging with Morgan + Winston
+app.use(httpLogger);
+
+// Slow request monitoring (warn if request takes > 1s)
+app.use(slowRequestLogger(1000));
+
+// User context tracking (after auth middleware would set req.user)
+app.use(userContext);
+
+// Enhanced request logging (development only)
 if (config.isDevelopment) {
   app.use(requestLogger);
 }
@@ -28,22 +79,28 @@ if (config.isDevelopment) {
 // API Routes
 app.use('/api', routes);
 
+// Error logging middleware (before error handler)
+app.use(errorLogger);
+
 // Error handling (must be last)
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
 // Start server
 const server = app.listen(config.server.port, () => {
-  console.log(`API server running on http://${config.server.host}:${config.server.port}`);
-  console.log(`Environment: ${config.env}`);
-  console.log(`CORS enabled for: ${config.cors.origins.join(', ')}`);
+  logger.info(`API server started`, {
+    host: config.server.host,
+    port: config.server.port,
+    environment: config.env,
+    cors: config.cors.origins,
+  });
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
+  logger.info('SIGTERM received. Shutting down gracefully...');
   server.close(() => {
-    console.log('Server closed');
+    logger.info('Server closed');
     process.exit(0);
   });
 });
