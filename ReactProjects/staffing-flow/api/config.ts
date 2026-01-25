@@ -12,8 +12,8 @@ export const env = cleanEnv(process.env, {
   PORT: port({ default: 3001 }),
   API_HOST: str({ default: 'localhost' }),
   CORS_ORIGINS: str({ default: 'http://localhost:5173,http://localhost:3000' }),
-  VITE_SUPABASE_URL: str({ desc: 'Supabase project URL' }),
-  VITE_SUPABASE_ANON_KEY: str({ desc: 'Supabase anonymous key' }),
+  SUPABASE_URL: str({ desc: 'Supabase project URL', default: '' }),
+  SUPABASE_SERVICE_ROLE_KEY: str({ desc: 'Supabase service role key (admin)', default: '' }),
 });
 
 export const config = {
@@ -26,8 +26,8 @@ export const config = {
     origins: env.CORS_ORIGINS.split(',').map((origin) => origin.trim()),
   },
   supabase: {
-    url: env.VITE_SUPABASE_URL,
-    anonKey: env.VITE_SUPABASE_ANON_KEY,
+    url: env.SUPABASE_URL,
+    serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY,
   },
   isDevelopment: env.isDevelopment,
   isProduction: env.isProduction,

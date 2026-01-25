@@ -21,9 +21,6 @@ export const DepartmentManagement: React.FC = () => {
   const [viewingStats, setViewingStats] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Demo organization ID - replace with actual auth context
-  const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001';
-
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -41,12 +38,7 @@ export const DepartmentManagement: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await departmentService.getAll({
-        organizationId: DEMO_ORG_ID,
-        search: searchTerm || undefined,
-        page: currentPage,
-        limit: itemsPerPage,
-      });
+      const data = await departmentService.getAll();
       setDepartments(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch departments');

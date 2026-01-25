@@ -7,7 +7,7 @@ export const siteService = {
    * Get all sites with optional filtering
    */
   getAll: async (query: SiteQueryInput = {}) => {
-    let dbQuery = supabase.from('sites').select('*, manager:manager_id(id, name, email)');
+    let dbQuery = supabase.from('sites').select('*');
 
     if (query.organizationId) {
       dbQuery = dbQuery.eq('organization_id', query.organizationId);
@@ -52,7 +52,7 @@ export const siteService = {
   getById: async (id: string) => {
     const { data, error } = await supabase
       .from('sites')
-      .select('*, manager:manager_id(id, name, email), departments(id, name)')
+      .select('*')
       .eq('id', id)
       .single();
 
@@ -74,7 +74,7 @@ export const siteService = {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .select('*, manager:manager_id(id, name, email)')
+      .select('*')
       .single();
 
     if (error) {
@@ -95,7 +95,7 @@ export const siteService = {
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .select('*, manager:manager_id(id, name, email)')
+      .select('*')
       .single();
 
     if (error) {

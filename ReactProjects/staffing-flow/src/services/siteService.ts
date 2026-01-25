@@ -76,7 +76,7 @@ class SiteService {
   private token: string | null = null;
 
   constructor() {
-    this.baseUrl = `${config.api.baseUrl}/api/sites`;
+    this.baseUrl = `${config.api.baseUrl}/sites`;
   }
 
   setToken(token: string) {
@@ -108,8 +108,12 @@ class SiteService {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to fetch sites');
+      try {
+        const error = await response.json();
+        throw new Error(error.message || error.error || `HTTP ${response.status}: Failed to fetch sites`);
+      } catch (parseError) {
+        throw new Error(`HTTP ${response.status}: Failed to fetch sites`);
+      }
     }
 
     return response.json();

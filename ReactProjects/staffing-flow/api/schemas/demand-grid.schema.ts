@@ -62,8 +62,8 @@ export const demandGridResponseSchema = z.object({
     hasPrevious: z.boolean(),
   }),
   filters: z.object({
-    applied: z.record(z.any()),
-    available: z.record(z.array(z.any())),
+    applied: z.record(z.string(), z.any()),
+    available: z.record(z.string(), z.array(z.any())),
   }),
   sort: z.object({
     field: z.string().optional(),

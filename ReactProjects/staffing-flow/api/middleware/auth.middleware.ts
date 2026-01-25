@@ -31,6 +31,21 @@ export const authenticate = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    // Development bypass: skip auth check entirely in development
+    if (process.env.NODE_ENV === 'development') {
+      // Create a mock user for local development
+      req.user = {
+        id: '00000000-0000-0000-0000-000000000001',
+        email: 'dev@localhost',
+        name: 'Dev User',
+        role: 'admin',
+        organization_id: '00000000-0000-0000-0000-000000000001',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      return next();
+    }
+
     // Get token from Authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

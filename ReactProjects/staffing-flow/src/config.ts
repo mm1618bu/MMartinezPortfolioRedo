@@ -4,8 +4,8 @@
 
 export const config = {
   api: {
-    baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:3001',
-    pythonUrl: import.meta.env.VITE_PYTHON_API_URL || 'http://localhost:8000',
+    baseUrl: import.meta.env.VITE_API_URL || '/api',
+    pythonUrl: import.meta.env.VITE_PYTHON_API_URL || '/python',
   },
   app: {
     name: import.meta.env.VITE_APP_NAME || 'Staffing Flow',

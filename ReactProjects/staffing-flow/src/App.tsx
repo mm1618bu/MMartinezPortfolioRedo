@@ -5,12 +5,17 @@ import { DepartmentManagement } from './components/departments/DepartmentManagem
 import { EmployeeManagement } from './components/employees/EmployeeManagement';
 import { LaborStandardManagement } from './components/labor-standards/LaborStandardManagement';
 import { ShiftTemplateManagement } from './components/shift-templates/ShiftTemplateManagement';
+import { DemandEditor } from './components/demands/DemandEditor.tsx';
+import { DemandCharts } from './components/visualizations/DemandCharts.tsx';
+import { DatabaseHealthCheck } from './components/admin/DatabaseHealthCheck';
 import './components/departments/DepartmentManagement.css';
 import './components/employees/EmployeeManagement.css';
 import './components/labor-standards/LaborStandardManagement.css';
 import './components/shift-templates/ShiftTemplateManagement.css';
+import './components/demands/DemandEditor.css';
+import './components/visualizations/DemandCharts.css';
 
-type Page = 'home' | 'sites' | 'departments' | 'employees' | 'labor-standards' | 'shift-templates';
+type Page = 'home' | 'sites' | 'departments' | 'employees' | 'labor-standards' | 'shift-templates' | 'demands' | 'demand-charts' | 'health-check';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -40,6 +45,15 @@ function App() {
           <button className={currentPage === 'shift-templates' ? 'active' : ''} onClick={() => setCurrentPage('shift-templates')}>
             Shift Templates
           </button>
+          <button className={currentPage === 'demands' ? 'active' : ''} onClick={() => setCurrentPage('demands')}>
+            Demand Planning
+          </button>
+          <button className={currentPage === 'demand-charts' ? 'active' : ''} onClick={() => setCurrentPage('demand-charts')}>
+            Demand Analytics
+          </button>
+          <button className={currentPage === 'health-check' ? 'active' : ''} onClick={() => setCurrentPage('health-check')}>
+            Database Health
+          </button>
         </div>
       </nav>
 
@@ -63,6 +77,12 @@ function App() {
               </button>
               <button className="btn btn-primary btn-lg" onClick={() => setCurrentPage('shift-templates')}>
                 Manage Shift Templates →
+              </button>
+              <button className="btn btn-primary btn-lg" onClick={() => setCurrentPage('demands')}>
+                Plan Demands →
+              </button>
+              <button className="btn btn-primary btn-lg" onClick={() => setCurrentPage('demand-charts')}>
+                View Analytics →
               </button>
             </div>
             <div className="feature-grid">
@@ -90,6 +110,14 @@ function App() {
                 <h3>🎯 Skills Tracking</h3>
                 <p>Monitor employee competencies and proficiency</p>
               </div>
+              <div className="feature-card">
+                <h3>📈 Demand Planning</h3>
+                <p>Create and manage workforce demand forecasts</p>
+              </div>
+              <div className="feature-card">
+                <h3>📉 Analytics & Charts</h3>
+                <p>Visualize demand trends and requirements</p>
+              </div>
             </div>
           </div>
         )}
@@ -99,6 +127,9 @@ function App() {
         {currentPage === 'employees' && <EmployeeManagement />}
         {currentPage === 'labor-standards' && <LaborStandardManagement />}
         {currentPage === 'shift-templates' && <ShiftTemplateManagement />}
+        {currentPage === 'demands' && <DemandEditor />}
+        {currentPage === 'demand-charts' && <DemandCharts />}
+        {currentPage === 'health-check' && <DatabaseHealthCheck />}
       </main>
     </div>
   );

@@ -1,0 +1,327 @@
+/* CSV Export Modal Styles */
+.csv-export-modal {
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.csv-export-modal .modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+}
+
+.csv-export-modal .modal-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.csv-export-modal .modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.csv-export-modal .modal-close:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.csv-export-modal .modal-body {
+  padding: 20px;
+  min-height: 200px;
+}
+
+.csv-export-modal .modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #f9f9f9;
+}
+
+/* Form Elements */
+.csv-export-modal .form-group {
+  margin-bottom: 20px;
+}
+
+.csv-export-modal .form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.csv-export-modal .form-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  background: white;
+  color: #333;
+  transition: border-color 0.2s;
+}
+
+.csv-export-modal .form-input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+}
+
+/* Radio Group */
+.csv-export-modal .radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.csv-export-modal .radio-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #555;
+  user-select: none;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.csv-export-modal .radio-label:hover {
+  background: #f5f5f5;
+}
+
+.csv-export-modal .radio-label input[type='radio'] {
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Checkbox */
+.csv-export-modal .form-group.checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 0;
+}
+
+.csv-export-modal .form-group.checkbox input[type='checkbox'] {
+  cursor: pointer;
+  margin: 0;
+  width: 18px;
+  height: 18px;
+}
+
+/* Info Box */
+.csv-export-modal .info-box {
+  background: #f0f8ff;
+  border-left: 4px solid #1976d2;
+  padding: 12px 15px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.csv-export-modal .info-box strong {
+  display: block;
+  color: #1976d2;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.csv-export-modal .info-box ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.csv-export-modal .info-box li {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+/* Empty Message */
+.csv-export-modal .empty-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.csv-export-modal .empty-message p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* Buttons */
+.csv-export-modal .btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.csv-export-modal .btn-primary {
+  background: #1976d2;
+  color: white;
+}
+
+.csv-export-modal .btn-primary:hover:not(:disabled) {
+  background: #1565c0;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.csv-export-modal .btn-secondary {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.csv-export-modal .btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.csv-export-modal .btn-outline {
+  background: white;
+  color: #1976d2;
+  border: 1px solid #1976d2;
+}
+
+.csv-export-modal .btn-outline:hover {
+  background: #f0f8ff;
+}
+
+.csv-export-modal .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .csv-export-modal {
+    max-width: 90vw;
+    max-height: 90vh;
+  }
+
+  .csv-export-modal .modal-header {
+    padding: 15px;
+  }
+
+  .csv-export-modal .modal-body {
+    padding: 15px;
+  }
+
+  .csv-export-modal .modal-footer {
+    padding: 12px 15px;
+    flex-direction: column-reverse;
+  }
+
+  .csv-export-modal .btn {
+    width: 100%;
+  }
+
+  .csv-export-modal .radio-group {
+    gap: 10px;
+  }
+
+  .csv-export-modal .radio-label {
+    padding: 6px;
+    font-size: 0.9rem;
+  }
+
+  .csv-export-modal .info-box {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  .csv-export-modal {
+    max-width: 100%;
+    border-radius: 4px;
+  }
+
+  .csv-export-modal .modal-header {
+    padding: 12px;
+  }
+
+  .csv-export-modal .modal-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .csv-export-modal .modal-body {
+    padding: 12px;
+    min-height: 150px;
+  }
+
+  .csv-export-modal .modal-footer {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .csv-export-modal .btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .csv-export-modal .form-input {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+
+  .csv-export-modal .form-group label {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+  }
+}

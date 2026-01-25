@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   DemandValidator,
   DemandErrorFormatter,
@@ -12,7 +12,10 @@ import { demandRecordSchema } from '../schemas/demand.schema';
 describe('DemandValidator', () => {
   describe('validateDateRange', () => {
     const today = new Date();
-    const formatDate = (date: Date) => date.toISOString().split('T')[0];
+    const formatDate = (date: Date): string => {
+      const parts = date.toISOString().split('T');
+      return parts[0] || '';
+    };
 
     it('should accept valid current date', () => {
       const result = DemandValidator.validateDateRange(formatDate(today));
@@ -27,7 +30,7 @@ describe('DemandValidator', () => {
       const result = DemandValidator.validateDateRange(formatDate(oldDate));
       expect(result.isValid).toBe(false);
       expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].message).toContain('older than 1 year');
+      expect(result.errors[0]?.message).toContain('older than 1 year');
     });
 
     it('should reject dates more than 2 years in future', () => {
@@ -37,7 +40,7 @@ describe('DemandValidator', () => {
       const result = DemandValidator.validateDateRange(formatDate(futureDate));
       expect(result.isValid).toBe(false);
       expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].message).toContain('more than 2 years in the future');
+      expect(result.errors[0]?.message).toContain('more than 2 years in the future');
     });
 
     it('should warn for past dates within 1 year', () => {
@@ -47,7 +50,7 @@ describe('DemandValidator', () => {
       const result = DemandValidator.validateDateRange(formatDate(pastDate));
       expect(result.isValid).toBe(true);
       expect(result.warnings).toHaveLength(1);
-      expect(result.warnings[0].message).toContain('in the past');
+      expect(result.warnings[0]?.message).toContain('in the past');
     });
 
     it('should warn for dates more than 6 months in future', () => {
@@ -57,7 +60,7 @@ describe('DemandValidator', () => {
       const result = DemandValidator.validateDateRange(formatDate(futureDate));
       expect(result.isValid).toBe(true);
       expect(result.warnings).toHaveLength(1);
-      expect(result.warnings[0].message).toContain('more than 6 months');
+      expect(result.warnings[0]?.message).toContain('more than 6 months');
     });
   });
 
@@ -72,36 +75,36 @@ describe('DemandValidator', () => {
       const result = DemandValidator.validateTimeRange('16:00', '08:00');
       expect(result.isValid).toBe(false);
       expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].field).toBe('end_time');
-      expect(result.errors[0].message).toContain('must be after');
+      expect(result.errors[0]?.field).toBe('end_time');
+      expect(result.errors[0]?.message).toContain('must be after');
     });
 
     it('should reject start time without end time', () => {
       const result = DemandValidator.validateTimeRange('08:00', undefined);
       expect(result.isValid).toBe(false);
       expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].field).toBe('end_time');
+      expect(result.errors[0]?.field).toBe('end_time');
     });
 
     it('should reject end time without start time', () => {
       const result = DemandValidator.validateTimeRange(undefined, '16:00');
       expect(result.isValid).toBe(false);
       expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].field).toBe('start_time');
+      expect(result.errors[0]?.field).toBe('start_time');
     });
 
     it('should warn for very short shifts (< 2 hours)', () => {
       const result = DemandValidator.validateTimeRange('08:00', '09:30');
       expect(result.isValid).toBe(true);
       expect(result.warnings).toHaveLength(1);
-      expect(result.warnings[0].message).toContain('1h 30m');
+      expect(result.warnings[0]?.message).toContain('1h 30m');
     });
 
     it('should warn for very long shifts (> 12 hours)', () => {
       const result = DemandValidator.validateTimeRange('07:00', '21:00');
       expect(result.isValid).toBe(true);
       expect(result.warnings).toHaveLength(1);
-      expect(result.warnings[0].message).toContain('14h');
+      expect(result.warnings[0]?.message).toContain('14h');
     });
 
     it('should accept empty times', () => {
@@ -122,26 +125,26 @@ describe('DemandValidator', () => {
     it('should reject zero employees', () => {
       const result = DemandValidator.validateRequiredEmployees(0);
       expect(result.isValid).toBe(false);
-      expect(result.errors[0].message).toContain('positive number');
+      expect(result.errors[0]?.message).toContain('positive number');
     });
 
     it('should reject negative employees', () => {
       const result = DemandValidator.validateRequiredEmployees(-5);
       expect(result.isValid).toBe(false);
-      expect(result.errors[0].message).toContain('positive number');
+      expect(result.errors[0]?.message).toContain('positive number');
     });
 
     it('should reject count over 1000', () => {
       const result = DemandValidator.validateRequiredEmployees(1500);
       expect(result.isValid).toBe(false);
-      expect(result.errors[0].message).toContain('exceeds reasonable limit');
+      expect(result.errors[0]?.message).toContain('exceeds reasonable limit');
     });
 
     it('should warn for unusually high count (> 100)', () => {
       const result = DemandValidator.validateRequiredEmployees(250);
       expect(result.isValid).toBe(true);
       expect(result.warnings).toHaveLength(1);
-      expect(result.warnings[0].message).toContain('unusually high');
+      expect(result.warnings[0]?.message).toContain('unusually high');
     });
   });
 
@@ -156,14 +159,14 @@ describe('DemandValidator', () => {
       const result = DemandValidator.validateShiftTypeConsistency('all_day', '08:00', '16:00');
       expect(result.isValid).toBe(true);
       expect(result.warnings).toHaveLength(1);
-      expect(result.warnings[0].message).toContain('Times will be ignored');
+      expect(result.warnings[0]?.message).toContain('Times will be ignored');
     });
 
     it('should warn for specific shift without times', () => {
       const result = DemandValidator.validateShiftTypeConsistency('morning', undefined, undefined);
       expect(result.isValid).toBe(true);
       expect(result.warnings).toHaveLength(1);
-      expect(result.warnings[0].message).toContain('Consider adding start_time and end_time');
+      expect(result.warnings[0]?.message).toContain('Consider adding start_time and end_time');
     });
 
     it('should accept specific shift with times', () => {
@@ -204,9 +207,10 @@ describe('DemandValidator', () => {
     it('should collect warnings alongside validation', () => {
       const futureDate = new Date();
       futureDate.setMonth(futureDate.getMonth() + 9);
+      const dateStr = futureDate.toISOString().split('T')[0] || '';
 
       const result = DemandValidator.validateDemandRecord({
-        date: futureDate.toISOString().split('T')[0],
+        date: dateStr,
         required_employees: 150, // High but valid
         shift_type: 'morning',
         start_time: '08:00',
@@ -229,13 +233,13 @@ describe('DemandErrorFormatter', () => {
 
       try {
         demandRecordSchema.parse(invalidData);
-        fail('Should have thrown validation error');
+        throw new Error('Should have thrown validation error');
       } catch (error) {
         if (error instanceof ZodError) {
           const formatted = DemandErrorFormatter.formatZodError(error, 5);
           expect(formatted.length).toBeGreaterThan(0);
-          expect(formatted[0].type).toBe(DemandErrorType.VALIDATION);
-          expect(formatted[0].row).toBe(5);
+          expect(formatted[0]?.type).toBe(DemandErrorType.VALIDATION);
+          expect(formatted[0]?.row).toBe(5);
         }
       }
     });
@@ -248,7 +252,7 @@ describe('DemandErrorFormatter', () => {
 
       try {
         demandRecordSchema.parse(invalidData);
-        fail('Should have thrown validation error');
+        throw new Error('Should have thrown validation error');
       } catch (error) {
         if (error instanceof ZodError) {
           const formatted = DemandErrorFormatter.formatZodError(error);

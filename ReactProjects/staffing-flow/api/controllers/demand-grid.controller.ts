@@ -7,8 +7,7 @@ import {
   exportSchema,
 } from '../schemas/demand-grid.schema';
 import { demandRecordSchema } from '../schemas/demand.schema';
-import { ValidationError } from '../errors';
-import { DemandValidator, DemandErrorFormatter } from '../utils/demand-validation';
+import { DemandValidator, DemandErrorFormatter, DemandWarning } from '../utils/demand-validation';
 
 export const demandGridController = {
   /**
@@ -134,7 +133,7 @@ export const demandGridController = {
       }
 
       // Business rule validation if date/time/employees are being updated
-      let warnings = [];
+      let warnings: DemandWarning[] = [];
       if (
         updateData.date ||
         updateData.required_employees ||

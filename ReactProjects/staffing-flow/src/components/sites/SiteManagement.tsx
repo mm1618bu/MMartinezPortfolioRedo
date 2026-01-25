@@ -69,9 +69,6 @@ function SiteStatisticsModal({ siteId, onClose }: SiteStatisticsModalProps) {
 }
 
 export function SiteManagement() {
-  // For demo purposes, using a hardcoded org ID. In production, get from auth context
-  const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001';
-
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +87,6 @@ export function SiteManagement() {
       setLoading(true);
       setError(null);
       const response = await siteService.getAll({
-        organizationId: DEMO_ORG_ID,
         search: searchTerm || undefined,
         is_active: filterActive,
         page: currentPage,
@@ -99,7 +95,9 @@ export function SiteManagement() {
       setSites(response.data);
       setTotalPages(response.pagination.totalPages);
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(errorMessage);
+      console.error('Failed to fetch sites:', err);
     } finally {
       setLoading(false);
     }
@@ -207,7 +205,7 @@ export function SiteManagement() {
       {showForm ? (
         <SiteForm
           site={editingSite}
-          organizationId={DEMO_ORG_ID}
+          organizationId={'00000000-0000-0000-0000-000000000001'}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isLoading={isSubmitting}

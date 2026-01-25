@@ -5,7 +5,7 @@ import { z } from 'zod';
  * Shift templates define reusable shift patterns
  */
 
-export const createShiftTemplateSchema = z.object({
+const baseShiftTemplateObject = z.object({
   name: z.string().min(1, 'Shift template name is required').max(200, 'Name too long'),
   description: z.string().max(1000, 'Description too long').optional(),
   start_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Invalid time format (HH:MM:SS)'),
@@ -20,7 +20,9 @@ export const createShiftTemplateSchema = z.object({
   department_id: z.string().uuid('Invalid department ID').optional(),
   is_active: z.boolean().default(true),
   organization_id: z.string().uuid('Invalid organization ID'),
-}).refine(
+});
+
+export const createShiftTemplateSchema = baseShiftTemplateObject.refine(
   (data) => !data.max_employees || data.max_employees >= data.min_employees,
   {
     message: 'Maximum employees must be greater than or equal to minimum employees',
@@ -28,7 +30,8 @@ export const createShiftTemplateSchema = z.object({
   }
 );
 
-export const updateShiftTemplateSchema = createShiftTemplateSchema
+export const updateShiftTemplateSchema = baseShiftTemplateObject
+  .omit({ organization_id: true })
   .partial()
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided for update',

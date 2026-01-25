@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { DatabaseError } from '../errors';
 
 export const departmentService = {
   getAll: async (organizationId?: string) => {
@@ -10,14 +11,14 @@ export const departmentService = {
 
     const { data, error } = await query.order('name', { ascending: true });
 
-    if (error) throw error;
-    return data;
+    if (error) throw new DatabaseError(`Failed to fetch departments: ${error.message}`);
+    return data || [];
   },
 
   getById: async (id: string) => {
     const { data, error } = await supabase.from('departments').select('*').eq('id', id).single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(`Failed to fetch department: ${error.message}`);
     return data;
   },
 
@@ -28,7 +29,7 @@ export const departmentService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(`Failed to create department: ${error.message}`);
     return data;
   },
 
@@ -40,13 +41,13 @@ export const departmentService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(`Failed to update department: ${error.message}`);
     return data;
   },
 
   delete: async (id: string) => {
     const { error } = await supabase.from('departments').delete().eq('id', id);
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(`Failed to delete department: ${error.message}`);
   },
 };

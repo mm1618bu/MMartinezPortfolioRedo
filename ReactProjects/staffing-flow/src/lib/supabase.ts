@@ -144,6 +144,24 @@ export type Database = {
         >;
         Update: Partial<Database['public']['Tables']['organizations']['Insert']>;
       };
+      sites: {
+        Row: {
+          id: string;
+          name: string;
+          code: string;
+          address: string;
+          timezone: string;
+          is_active: boolean;
+          organization_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<
+          Database['public']['Tables']['sites']['Row'],
+          'id' | 'created_at' | 'updated_at'
+        >;
+        Update: Partial<Database['public']['Tables']['sites']['Insert']>;
+      };
     };
   };
 };
