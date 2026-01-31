@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import { createServer } from 'http';
 import config from './config';
 import routes from './routes';
 import { globalErrorHandler, notFoundHandler, handleUncaughtErrors } from './errors';
@@ -8,6 +9,7 @@ import { requestTracing, userContext } from './middleware/tracing.middleware';
 import { apiRateLimiter, speedLimiter } from './middleware/rate-limit.middleware';
 import { getSecurityMiddleware } from './middleware/security.middleware';
 import { logger } from './utils/logger';
+import { webSocketService } from './services/websocket.service';
 import {
   livenessProbe,
   readinessProbe,
@@ -86,13 +88,28 @@ app.use(errorLogger);
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
+// Create HTTP server (needed for WebSocket)
+const httpServer = createServer(app);
+
+// Initialize WebSocket server
+webSocketService.initialize(httpServer);
+logger.info('WebSocket server initialized');
+
 // Start server
-const server = app.listen(config.server.port, () => {
+const server = httpServer.listen(config.server.port, () => {
   logger.info(`API server started`, {
     host: config.server.host,
     port: config.server.port,
     environment: config.env,
-    cors: config.cors.origins,
+  
+  // Shutdown WebSocket server first
+  webSocketService.shutdown();
+  logger.info('WebSocket server shut down');
+  
+  // Then close HTTP server
+  server.close(() => {
+    logger.info('HTTP sabled',
+    websocket_path: '/ws',
   });
 });
 

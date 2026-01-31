@@ -1,0 +1,147 @@
+/**
+ * Connection Status Styles
+ */
+
+.connection-status {
+  padding: 12px 24px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  animation: slideDown 0.3s ease;
+
+  .status-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .status-icon {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .status-message {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .connection-metrics {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: 16px;
+    padding-left: 16px;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+
+    .metric-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+
+      .metric-label {
+        opacity: 0.8;
+      }
+
+      .metric-value {
+        font-weight: 600;
+      }
+
+      &.socket-id {
+        .metric-value {
+          font-family: monospace;
+          font-size: 12px;
+        }
+      }
+    }
+  }
+
+  // Status-based colors
+  &.connected {
+    background: #4caf50;
+    color: white;
+  }
+
+  &.excellent {
+    background: #4caf50;
+    color: white;
+  }
+
+  &.good {
+    background: #8bc34a;
+    color: white;
+  }
+
+  &.fair {
+    background: #ff9800;
+    color: white;
+  }
+
+  &.poor {
+    background: #f44336;
+    color: white;
+  }
+
+  &.connecting {
+    background: #2196f3;
+    color: white;
+
+    .status-icon {
+      animation: pulse 1.5s infinite;
+    }
+  }
+
+  &.disconnected {
+    background: #9e9e9e;
+    color: white;
+  }
+
+  &.error {
+    background: #f44336;
+    color: white;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .connection-status {
+    padding: 10px 16px;
+    flex-direction: column;
+    text-align: center;
+
+    .connection-metrics {
+      margin-left: 0;
+      padding-left: 0;
+      border-left: none;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  }
+}

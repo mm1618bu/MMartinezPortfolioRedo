@@ -1,0 +1,359 @@
+/**
+ * Intraday Dashboard Main Styles
+ */
+
+.intraday-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 24px;
+  position: relative;
+
+  .dashboard-container {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  // Dashboard Grid Layout
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+
+    // KPI Section - 4 columns (full width on top)
+    .kpi-section {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    // Backlog Section - 8 columns (left)
+    .backlog-section {
+      grid-column: span 8;
+    }
+
+    // Attendance Section - 4 columns (right)
+    .attendance-section {
+      grid-column: span 4;
+    }
+
+    // Recommended Actions Section - Full width
+    .recommendations-section {
+      grid-column: span 12;
+    }
+
+    // Alert Section - Full width at bottom
+    .alert-section {
+      grid-column: span 12;
+
+      .alert-latest {
+        background: white;
+        border-radius: 12px;
+        padding: 20px 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+          transform: translateY(-2px);
+        }
+
+        .alert-content {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+
+          .alert-icon {
+            font-size: 32px;
+          }
+
+          .alert-info {
+            flex: 1;
+
+            .alert-title {
+              font-size: 18px;
+              font-weight: 600;
+              color: #333;
+              margin-bottom: 4px;
+            }
+
+            .alert-message {
+              font-size: 14px;
+              color: #666;
+            }
+          }
+
+          .alert-badge {
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+
+            &.severity-critical {
+              background: rgba(244, 67, 54, 0.1);
+              color: #f44336;
+            }
+
+            &.severity-high {
+              background: rgba(255, 152, 0, 0.1);
+              color: #ff9800;
+            }
+
+            &.severity-medium {
+              background: rgba(255, 193, 7, 0.1);
+              color: #ffc107;
+            }
+
+            &.severity-low {
+              background: rgba(76, 175, 80, 0.1);
+              color: #4caf50;
+            }
+          }
+        }
+
+        .view-all-button {
+          padding: 10px 20px;
+          background: #667eea;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+        }
+
+        &.no-alerts {
+          cursor: default;
+
+          &:hover {
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          .alert-content {
+            justify-content: center;
+            color: #999;
+          }
+        }
+      }
+    }
+  }
+
+  // Loading State
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid #f0f0f0;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #666;
+      font-weight: 600;
+    }
+  }
+
+  // Disconnected Overlay
+  .disconnected-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.3s ease;
+
+    .disconnected-content {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+      .disconnected-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+      }
+
+      h2 {
+        margin: 0 0 12px 0;
+        font-size: 24px;
+        color: #333;
+      }
+
+      p {
+        margin: 0 0 24px 0;
+        color: #666;
+        line-height: 1.6;
+      }
+
+      .reconnect-button {
+        padding: 12px 32px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #5568d3;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Responsive Layout Adjustments
+@media (max-width: 1400px) {
+  .intraday-dashboard {
+    .dashboard-grid {
+      .kpi-section {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .backlog-section {
+        grid-column: span 12;
+      }
+
+      .attendance-section {
+        grid-column: span 12;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .intraday-dashboard {
+    padding: 16px;
+
+    .dashboard-grid {
+      gap: 16px;
+
+      .kpi-section {
+        grid-template-columns: 1fr;
+      }
+
+      .alert-section .alert-latest {
+        flex-direction: column;
+        gap: 16px;
+
+        .alert-content {
+          width: 100%;
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .view-all-button {
+          width: 100%;
+        }
+      }
+    }
+
+    .disconnected-overlay .disconnected-content {
+      margin: 20px;
+      padding: 32px 24px;
+
+      .disconnected-icon {
+        font-size: 48px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+// Print Styles
+@media print {
+  .intraday-dashboard {
+    background: white;
+
+    .dashboard-header {
+      .header-right {
+        display: none;
+      }
+    }
+
+    .connection-status,
+    .alert-section .view-all-button,
+    .disconnected-overlay,
+    .alert-panel {
+      display: none !important;
+    }
+
+    .dashboard-grid {
+      .kpi-section,
+      .backlog-section,
+      .attendance-section,
+      .alert-section {
+        page-break-inside: avoid;
+      }
+    }
+  }
+}

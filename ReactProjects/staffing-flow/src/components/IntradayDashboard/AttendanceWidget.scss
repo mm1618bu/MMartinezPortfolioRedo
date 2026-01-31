@@ -1,0 +1,305 @@
+/**
+ * Attendance Widget Styles
+ */
+
+.attendance-widget {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &.loading {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.no-data {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+  }
+
+  .attendance-overview {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .attendance-ring-container {
+      position: relative;
+      flex-shrink: 0;
+
+      .attendance-ring {
+        width: 160px;
+        height: 160px;
+
+        circle {
+          transition: stroke-dasharray 0.5s ease;
+        }
+      }
+
+      .ring-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+
+        .attendance-percentage {
+          font-size: 32px;
+          font-weight: 700;
+          color: #4caf50;
+          line-height: 1;
+        }
+
+        .attendance-label {
+          font-size: 13px;
+          color: #666;
+          margin-top: 4px;
+        }
+      }
+    }
+
+    .attendance-breakdown {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+
+      .status-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          transform: translateX(4px);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-icon {
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          font-size: 18px;
+        }
+
+        .status-label {
+          flex: 1;
+          font-size: 13px;
+          color: #666;
+        }
+
+        .status-value {
+          font-size: 24px;
+          font-weight: 700;
+          color: #333;
+        }
+
+        &.present {
+          .status-icon {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+          }
+        }
+
+        &.absent {
+          .status-icon {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+          }
+        }
+
+        &.late {
+          .status-icon {
+            background: rgba(255, 152, 0, 0.1);
+            color: #ff9800;
+          }
+        }
+
+        &.total {
+          .status-icon {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196f3;
+          }
+        }
+      }
+    }
+  }
+
+  .recent-checkins {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 2px solid #f0f0f0;
+
+    h4 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .checkin-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .checkin-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #e9ecef;
+        }
+
+        .checkin-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+          font-weight: 600;
+        }
+
+        .checkin-info {
+          flex: 1;
+
+          .checkin-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2px;
+          }
+
+          .checkin-time {
+            font-size: 12px;
+            color: #999;
+          }
+        }
+
+        .checkin-status {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+
+          &.status-present {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+          }
+
+          &.status-late {
+            background: rgba(255, 152, 0, 0.1);
+            color: #ff9800;
+          }
+        }
+      }
+    }
+
+    .no-checkins {
+      padding: 32px;
+      text-align: center;
+      color: #999;
+    }
+  }
+
+  .attendance-footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+    text-align: right;
+
+    .last-update {
+      font-size: 12px;
+      color: #999;
+    }
+  }
+
+  .skeleton-loader.large {
+    width: 100%;
+    height: 280px;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e0e0e0 50%,
+      #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .attendance-widget {
+    padding: 16px;
+
+    .attendance-overview {
+      flex-direction: column;
+      gap: 20px;
+
+      .attendance-ring-container {
+        .attendance-ring {
+          width: 140px;
+          height: 140px;
+        }
+
+        .ring-center .attendance-percentage {
+          font-size: 28px;
+        }
+      }
+
+      .attendance-breakdown {
+        width: 100%;
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .recent-checkins .checkin-list .checkin-item {
+      padding: 10px;
+
+      .checkin-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

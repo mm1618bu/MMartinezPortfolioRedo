@@ -17,6 +17,12 @@ import shiftConstraintRoutes from './shift-constraints';
 import scheduleGenerationRoutes from './schedule-generation';
 import coverageScoringRoutes from './coverage-scoring';
 import scheduleAPIRoutes from './schedule-api';
+import backlogSnapshotRoutes from './backlog-snapshot';
+import liveKPIRoutes from './live-kpi';
+import alertRoutes from './alerts';
+import attendanceSnapshotRoutes from './attendance-snapshot';
+import websocketRoutes from './websocket';
+import { router as laborActionsRoutes } from './labor-actions.routes';
 
 const router = Router();
 
@@ -38,6 +44,11 @@ router.use('/staffing-plans', staffingPlanRoutes);
 router.use('/shift-constraints', shiftConstraintRoutes);
 router.use('/schedule-generation', scheduleGenerationRoutes);
 router.use('/coverage-scoring', coverageScoringRoutes);
-router.use('/schedules-api', scheduleAPIRoutes);
+router.use('/schedulesbacklog', backlogSnapshotRoutes); // Backlog snapshot ingestion
+router.use('/intraday/kpi', liveKPIRoutes); // Live KPI computation
+router.use('/alerts', alertRoutes); // Alert rules engine
+router.use('/intraday/attendance', attendanceSnapshotRoutes); // Attendance snapshot ingestion
+router.use('/ws', websocketRoutes); // WebSocket management and stats
+router.use('/labor-actions', laborActionsRoutes); // VET/VTO labor actions
 
 export default router;

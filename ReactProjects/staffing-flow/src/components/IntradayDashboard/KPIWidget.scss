@@ -1,0 +1,246 @@
+/**
+ * KPI Widget Styles
+ */
+
+.kpi-widget {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  &.loading {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.no-data {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+  }
+
+  // Status-based colors
+  &.status-excellent {
+    border-left-color: #4caf50;
+    .kpi-value {
+      color: #4caf50;
+    }
+  }
+
+  &.status-good {
+    border-left-color: #8bc34a;
+    .kpi-value {
+      color: #8bc34a;
+    }
+  }
+
+  &.status-warning {
+    border-left-color: #ff9800;
+    .kpi-value {
+      color: #ff9800;
+    }
+  }
+
+  &.status-critical {
+    border-left-color: #f44336;
+    .kpi-value {
+      color: #f44336;
+    }
+  }
+
+  .kpi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .kpi-icon {
+      font-size: 24px;
+    }
+  }
+
+  .kpi-value {
+    font-size: 48px;
+    font-weight: 700;
+    margin: 16px 0;
+    line-height: 1;
+
+    &.risk-score {
+      font-size: 56px;
+    }
+  }
+
+  .kpi-status-label {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .kpi-details {
+    margin: 16px 0;
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      span {
+        color: #666;
+        font-size: 14px;
+      }
+
+      strong {
+        color: #333;
+        font-size: 16px;
+
+        &.highlight {
+          color: #f44336;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
+  .kpi-change {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+
+    &.positive {
+      background: rgba(76, 175, 80, 0.1);
+      color: #4caf50;
+    }
+
+    &.negative {
+      background: rgba(244, 67, 54, 0.1);
+      color: #f44336;
+    }
+  }
+
+  .kpi-footer {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+
+    .last-update {
+      color: #999;
+      font-size: 12px;
+    }
+  }
+
+  // Health widget specific styles
+  &.health {
+    .health-ring {
+      width: 120px;
+      height: 120px;
+      margin: 16px auto;
+
+      svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+
+      circle {
+        transition: stroke-dasharray 0.5s ease;
+      }
+    }
+
+    &.status-excellent .health-ring circle:last-child {
+      stroke: #4caf50;
+    }
+
+    &.status-good .health-ring circle:last-child {
+      stroke: #8bc34a;
+    }
+
+    &.status-warning .health-ring circle:last-child {
+      stroke: #ff9800;
+    }
+
+    &.status-critical .health-ring circle:last-child {
+      stroke: #f44336;
+    }
+  }
+
+  .skeleton-loader {
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e0e0e0 50%,
+      #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+  }
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .kpi-widget {
+    padding: 16px;
+
+    .kpi-value {
+      font-size: 36px;
+
+      &.risk-score {
+        font-size: 42px;
+      }
+    }
+
+    .kpi-header h3 {
+      font-size: 14px;
+    }
+
+    .kpi-icon {
+      font-size: 20px;
+    }
+  }
+}

@@ -8,6 +8,8 @@ import { ShiftTemplateManagement } from './components/shift-templates/ShiftTempl
 import { DemandEditor } from './components/demands/DemandEditor.tsx';
 import { DemandCharts } from './components/visualizations/DemandCharts.tsx';
 import { DatabaseHealthCheck } from './components/admin/DatabaseHealthCheck';
+import { EmployeePortal } from './components/employee-portal';
+import { LaborActionsManagement } from './components/labor-actions-management/LaborActionsManagement';
 import './components/departments/DepartmentManagement.css';
 import './components/employees/EmployeeManagement.css';
 import './components/labor-standards/LaborStandardManagement.css';
@@ -15,7 +17,7 @@ import './components/shift-templates/ShiftTemplateManagement.css';
 import './components/demands/DemandEditor.css';
 import './components/visualizations/DemandCharts.css';
 
-type Page = 'home' | 'sites' | 'departments' | 'employees' | 'labor-standards' | 'shift-templates' | 'demands' | 'demand-charts' | 'health-check';
+type Page = 'home' | 'sites' | 'departments' | 'employees' | 'labor-standards' | 'shift-templates' | 'demands' | 'demand-charts' | 'health-check' | 'employee-portal' | 'labor-management';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -53,6 +55,12 @@ function App() {
           </button>
           <button className={currentPage === 'health-check' ? 'active' : ''} onClick={() => setCurrentPage('health-check')}>
             Database Health
+          </button>
+          <button className={currentPage === 'employee-portal' ? 'active' : ''} onClick={() => setCurrentPage('employee-portal')}>
+            🧑‍💼 Employee Portal
+          </button>
+          <button className={currentPage === 'labor-management' ? 'active' : ''} onClick={() => setCurrentPage('labor-management')}>
+            👔 Labor Management
           </button>
         </div>
       </nav>
@@ -130,6 +138,8 @@ function App() {
         {currentPage === 'demands' && <DemandEditor />}
         {currentPage === 'demand-charts' && <DemandCharts />}
         {currentPage === 'health-check' && <DatabaseHealthCheck />}
+        {currentPage === 'employee-portal' && <EmployeePortal />}
+        {currentPage === 'labor-management' && <LaborActionsManagement />}
       </main>
     </div>
   );

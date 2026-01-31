@@ -1,0 +1,1071 @@
+/* ============================================================================
+   Employee Portal - Main Container
+   ============================================================================ */
+
+.employee-portal {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding-bottom: 2rem;
+}
+
+/* Header */
+.portal-header {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem 2rem;
+  margin-bottom: 1rem;
+}
+
+.portal-header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.employee-info h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #2d3748;
+}
+
+.employee-details {
+  margin: 0.25rem 0 0;
+  color: #718096;
+  font-size: 0.95rem;
+}
+
+.current-date {
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+/* Tabs */
+.portal-tabs {
+  max-width: 1400px;
+  margin: 0 auto 2rem;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 2rem;
+}
+
+.portal-tabs .tab {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #4a5568;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.portal-tabs .tab:hover {
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.portal-tabs .tab.active {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.tab-icon {
+  font-size: 1.2rem;
+}
+
+/* Content */
+.portal-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 1.5rem;
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ============================================================================
+   Card Styles
+   ============================================================================ */
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+/* ============================================================================
+   Badge Styles
+   ============================================================================ */
+
+.badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-success {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.badge-warning {
+  background: #feebc8;
+  color: #744210;
+}
+
+.badge-danger {
+  background: #fed7d7;
+  color: #742a2a;
+}
+
+.badge-info {
+  background: #bee3f8;
+  color: #2c5282;
+}
+
+.badge-secondary {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.badge-dark {
+  background: #2d3748;
+  color: white;
+}
+
+/* ============================================================================
+   Button Styles
+   ============================================================================ */
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #5568d3;
+}
+
+.btn-success {
+  background: #48bb78;
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #38a169;
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #cbd5e0;
+}
+
+.btn-danger {
+  background: #f56565;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #e53e3e;
+}
+
+.btn-link {
+  background: transparent;
+  color: #667eea;
+  padding: 0.5rem;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.btn.active {
+  background: #667eea;
+  color: white;
+}
+
+/* ============================================================================
+   Labor Actions Card
+   ============================================================================ */
+
+.labor-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.labor-action-item {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: border-color 0.2s;
+}
+
+.labor-action-item:hover {
+  border-color: #cbd5e0;
+}
+
+.labor-action-item.vet {
+  border-left: 4px solid #48bb78;
+}
+
+.labor-action-item.vto {
+  border-left: 4px solid #ed8936;
+}
+
+.action-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.action-details {
+  margin-bottom: 0.75rem;
+}
+
+.action-time {
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin-bottom: 0.25rem;
+}
+
+.action-shift,
+.action-department {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.action-reason {
+  color: #4a5568;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.action-availability {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.positions-badge,
+.deadline-badge {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  background: #edf2f7;
+  border-radius: 4px;
+  color: #4a5568;
+}
+
+.response-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.response-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f7fafc;
+  border-radius: 6px;
+}
+
+.response-icon {
+  font-size: 1.2rem;
+}
+
+/* ============================================================================
+   PTO Request Card
+   ============================================================================ */
+
+.pto-balances {
+  margin-bottom: 2rem;
+}
+
+.pto-balances h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #2d3748;
+}
+
+.balances-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.balance-item {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.balance-type {
+  font-size: 0.85rem;
+  text-transform: capitalize;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.balance-hours {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.balance-hours .total {
+  font-size: 0.9rem;
+  font-weight: normal;
+  opacity: 0.8;
+}
+
+.balance-pending {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  opacity: 0.9;
+}
+
+/* PTO Request Form */
+.pto-request-form {
+  background: #f7fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.pto-request-form h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #2d3748;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.5rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* PTO Requests List */
+.pto-requests-list h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.request-item {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.request-item.status-pending {
+  border-left: 4px solid #ed8936;
+}
+
+.request-item.status-approved {
+  border-left: 4px solid #48bb78;
+}
+
+.request-item.status-denied {
+  border-left: 4px solid #f56565;
+}
+
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.type-badge {
+  background: #edf2f7;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+  color: #4a5568;
+}
+
+.request-dates {
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+}
+
+.request-hours {
+  color: #718096;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+.request-reason,
+.request-denial {
+  font-size: 0.9rem;
+  color: #4a5568;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: #f7fafc;
+  border-radius: 4px;
+}
+
+.request-denial {
+  background: #fff5f5;
+  color: #742a2a;
+}
+
+.request-metadata {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.75rem;
+}
+
+.request-actions {
+  margin-top: 1rem;
+}
+
+/* ============================================================================
+   UPT Balance Card
+   ============================================================================ */
+
+.upt-balance-overview {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Balance Circle */
+.balance-circle-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.balance-circle {
+  width: 100%;
+  height: 100%;
+}
+
+.balance-circle-progress {
+  transition: stroke-dasharray 0.5s ease;
+}
+
+.balance-circle-progress.status-healthy {
+  stroke: #48bb78;
+}
+
+.balance-circle-progress.status-warning {
+  stroke: #ed8936;
+}
+
+.balance-circle-progress.status-critical {
+  stroke: #f56565;
+}
+
+.balance-circle-progress.status-terminated {
+  stroke: #2d3748;
+}
+
+.balance-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.balance-hours {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #2d3748;
+}
+
+.balance-label {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+/* Balance Details */
+.balance-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.balance-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.stat-label {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+/* Thresholds */
+.upt-thresholds {
+  margin-bottom: 2rem;
+}
+
+.upt-thresholds h4 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #2d3748;
+}
+
+.threshold-bar {
+  position: relative;
+  height: 40px;
+  background: linear-gradient(to right, #f56565 0%, #ed8936 50%, #48bb78 100%);
+  border-radius: 4px;
+}
+
+.threshold-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: white;
+}
+
+.threshold-label {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #4a5568;
+  white-space: nowrap;
+}
+
+/* UPT Exceptions */
+.upt-exceptions-list h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.exceptions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.exception-item {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.exception-item.severity-minor {
+  border-left: 4px solid #4299e1;
+}
+
+.exception-item.severity-moderate {
+  border-left: 4px solid #ed8936;
+}
+
+.exception-item.severity-major {
+  border-left: 4px solid #f56565;
+}
+
+.exception-item.severity-critical {
+  border-left: 4px solid #742a2a;
+}
+
+.exception-item.excused {
+  background: #f0fff4;
+  border-color: #9ae6b4;
+}
+
+.exception-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.exception-type {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.exception-icon {
+  font-size: 1.2rem;
+}
+
+.exception-type-text {
+  font-weight: 600;
+  text-transform: capitalize;
+  color: #2d3748;
+}
+
+.exception-details {
+  color: #4a5568;
+}
+
+.exception-date {
+  margin-bottom: 0.5rem;
+}
+
+.exception-time {
+  color: #718096;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+.exception-impact {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.minutes-missed,
+.upt-deducted {
+  font-size: 0.9rem;
+}
+
+.excused-text {
+  color: #22543d;
+  font-weight: 600;
+}
+
+.deducted-text {
+  color: #c53030;
+  font-weight: 600;
+}
+
+.exception-notes,
+.exception-excuse {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #f7fafc;
+  border-radius: 4px;
+}
+
+.exception-excuse {
+  background: #f0fff4;
+}
+
+/* UPT Info */
+.upt-info {
+  background: #f7fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.upt-info h4 {
+  margin-top: 0;
+  color: #2d3748;
+}
+
+.upt-info ul {
+  padding-left: 1.5rem;
+}
+
+.upt-info li {
+  margin-bottom: 0.5rem;
+}
+
+/* ============================================================================
+   Schedule Card
+   ============================================================================ */
+
+.schedule-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.view-mode-toggle {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.schedule-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.schedule-period h3 {
+  margin: 0 0 0.5rem;
+  color: #2d3748;
+}
+
+.schedule-summary {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+}
+
+.summary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summary-stat .stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+}
+
+.summary-stat .stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.schedule-calendar {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.schedule-day {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  min-height: 120px;
+  overflow: hidden;
+}
+
+.schedule-day.today {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.schedule-day.weekend {
+  background: #f7fafc;
+}
+
+.schedule-day.has-shifts {
+  background: #f0fff4;
+}
+
+.day-header {
+  background: #edf2f7;
+  padding: 0.5rem;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.schedule-day.today .day-header {
+  background: #667eea;
+  color: white;
+}
+
+.day-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.day-date {
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.day-shifts {
+  padding: 0.5rem;
+}
+
+.no-shifts {
+  text-align: center;
+  color: #a0aec0;
+  font-size: 0.85rem;
+  padding: 1rem 0;
+}
+
+.shift-item {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.shift-item:last-child {
+  margin-bottom: 0;
+}
+
+.shift-time {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.25rem;
+}
+
+.shift-type {
+  color: #667eea;
+  font-weight: 500;
+}
+
+.shift-department {
+  color: #718096;
+  font-size: 0.75rem;
+}
+
+.shift-duration {
+  color: #4a5568;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.shift-notes {
+  color: #718096;
+  font-size: 0.75rem;
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+/* ============================================================================
+   Utility Styles
+   ============================================================================ */
+
+.loading-spinner {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+}
+
+.error-message {
+  background: #fff5f5;
+  color: #c53030;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+}
+
+.empty-state p:first-child {
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.text-muted {
+  color: #a0aec0;
+  font-size: 0.9rem;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-warning {
+  background: #fffaf0;
+  color: #744210;
+  border-left: 4px solid #ed8936;
+}
+
+.alert-danger {
+  background: #fff5f5;
+  color: #742a2a;
+  border-left: 4px solid #f56565;
+}
+
+.alert-error {
+  background: #fff5f5;
+  color: #c53030;
+  border-left: 4px solid #f56565;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+/* ============================================================================
+   Responsive Design
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .portal-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .portal-tabs {
+    overflow-x: auto;
+    padding: 0 1rem;
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .upt-balance-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-calendar {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

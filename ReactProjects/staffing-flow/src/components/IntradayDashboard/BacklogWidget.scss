@@ -1,0 +1,285 @@
+/**
+ * Backlog Widget Styles
+ */
+
+.backlog-widget {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &.loading {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.no-data {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+  }
+
+  .backlog-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .metric-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      &.primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+
+        .metric-label,
+        .metric-value,
+        .trend-label {
+          color: white;
+        }
+
+        .metric-trend {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      }
+
+      &.warning {
+        background: rgba(255, 152, 0, 0.1);
+        border: 2px solid #ff9800;
+
+        .metric-value {
+          color: #f57c00;
+        }
+      }
+
+      .metric-label {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .metric-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #333;
+        line-height: 1;
+
+        .metric-unit {
+          font-size: 18px;
+          font-weight: 400;
+          margin-left: 4px;
+          color: inherit;
+          opacity: 0.7;
+        }
+      }
+
+      .metric-trend {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        padding: 4px 8px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+        width: fit-content;
+
+        &.trend-up {
+          .trend-label {
+            color: #f44336;
+          }
+        }
+
+        &.trend-down {
+          .trend-label {
+            color: #4caf50;
+          }
+        }
+
+        &.trend-stable {
+          .trend-label {
+            color: #666;
+          }
+        }
+
+        .trend-icon {
+          font-size: 16px;
+        }
+
+        .trend-label {
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: capitalize;
+        }
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+        margin-top: 8px;
+        overflow: hidden;
+
+        .progress-fill {
+          height: 100%;
+          background: #4caf50;
+          border-radius: 3px;
+          transition: width 0.5s ease;
+        }
+      }
+    }
+  }
+
+  .backlog-activity {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 2px solid #f0f0f0;
+
+    h4 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .activity-stats {
+      display: flex;
+      gap: 16px;
+
+      .activity-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+
+        .activity-icon {
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          font-size: 18px;
+          font-weight: 700;
+          margin-bottom: 8px;
+
+          &.added {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+          }
+
+          &.completed {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196f3;
+          }
+
+          &.net {
+            background: rgba(156, 39, 176, 0.1);
+            color: #9c27b0;
+          }
+        }
+
+        .activity-label {
+          font-size: 12px;
+          color: #666;
+          margin-bottom: 4px;
+        }
+
+        .activity-value {
+          font-size: 24px;
+          font-weight: 700;
+          color: #333;
+        }
+      }
+    }
+  }
+
+  .backlog-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+
+    .queue-label {
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .last-update {
+      font-size: 12px;
+      color: #999;
+    }
+  }
+
+  .skeleton-loader.large {
+    width: 100%;
+    height: 280px;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e0e0e0 50%,
+      #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .backlog-widget {
+    padding: 16px;
+
+    .backlog-summary {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+
+      .metric-card {
+        padding: 12px;
+
+        .metric-value {
+          font-size: 24px;
+        }
+      }
+    }
+
+    .backlog-activity .activity-stats {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

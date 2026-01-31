@@ -6,6 +6,10 @@ import DraggableAssignmentCell from './DraggableAssignmentCell';
 import DroppableShiftSlot from './DroppableShiftSlot';
 import { DragDropProvider } from './DragDropContext';
 import DropValidationService from './DropValidationService';
+import { ValidationWarningsPanel } from './ValidationWarningsPanel';
+import { ValidationToastContainer } from './ValidationToast';
+import { CoverageHeatmap } from './CoverageHeatmap';
+import { useRealtimeValidation } from './useRealtimeValidation';
 import './ScheduleGrid.scss';
 import type { Schedule, ScheduleAssignment } from '../../types/scheduleAPI';
 
@@ -40,7 +44,22 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
   ]);
   const [filters, setFilters] = useState<FilterOptions>({});
   const [showFilters, setShowFilters] = useState(false);
+  const [showValidationPanel, setShowValidationPanel] = useState(true);
+  const [showHeatmap, setShowHeatmap] = useState(false);
   const gridContentRef = useRef<HTMLDivElement>(null);
+
+  // Initialize real-time validation
+  const {
+    warnings,
+    totalWarnings,
+    criticalCount,
+    warningCount,
+    dismissWarning,
+    getAssignmentSeverity,
+  } = useRealtimeValidation(schedule, assignments, {
+    autoValidate: true,
+    validationDebounceMs: 300,
+  });
 
   // Generate date range based on view mode
   const displayDates = useMemo(() => {
@@ -132,7 +151,6 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
         await onAssignmentMove?.(assignment.id, targetEmployeeId, targetDate);
         setSelectedAssignment(null);
       } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : 'Failed to move assignment';
         throw error;
       }
     },
@@ -162,6 +180,14 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
   return (
     <DragDropProvider onAssignmentDrop={handleAssignmentMove}>
       <div className="schedule-grid-container">
+        {/* Toast Notifications for Critical Warnings */}
+        <ValidationToastContainer
+          warnings={warnings}
+          onDismiss={dismissWarning}
+          maxToasts={3}
+          position="top-right"
+        />
+
         {/* Header */}
         <div className="schedule-grid-header">
           <div className="header-left">
@@ -174,10 +200,33 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
             </div>
           </div>
           <div className="header-right">
+            <button 
+              onClick={() => setShowHeatmap(!showHeatmap)} 
+              className={`btn-secondary heatmap-toggle ${showHeatmap ? 'active' : ''}`}
+              title="Toggle coverage heatmap visualization"
+            >
+              {showHeatmap ? '📊 Hide' : '📊 Show'} Heatmap
+            </button>
+            <button 
+              onClick={() => setShowValidationPanel(!showValidationPanel)} 
+              className={`btn-secondary validation-toggle ${
+                criticalCount > 0 ? 'critical' : warningCount > 0 ? 'warning' : ''
+              }`}
+            >
+              {showValidationPanel ? 'Hide' : 'Show'} Validation
+              {totalWarnings > 0 && (
+                <span className="warning-badge">{totalWarnings}</span>
+              )}
+            </button>
             <button onClick={() => setShowFilters(!showFilters)} className="btn-secondary">
               {showFilters ? 'Hide' : 'Show'} Filters
             </button>
-            <button onClick={onSchedulePublish} className="btn-primary" disabled={schedule.status !== 'draft'}>
+            <button 
+              onClick={onSchedulePublish} 
+              className="btn-primary" 
+              disabled={schedule.status !== 'draft' || criticalCount > 0}
+              title={criticalCount > 0 ? 'Cannot publish: schedule has critical violations' : ''}
+            >
               Publish Schedule
             </button>
             <button onClick={() => handleExport('csv')} className="btn-secondary">
@@ -225,6 +274,40 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Validation Warnings Panel */}
+        {showValidationPanel && totalWarnings > 0 && (
+          <div style={{ padding: '16px', backgroundColor: '#fff9e6', borderBottom: '2px solid #ffa500' }}>
+            <ValidationWarningsPanel
+              warnings={warnings}
+              onDismiss={dismissWarning}
+              onNavigateToAssignment={(assignmentId) => {
+                const assignment = assignments.find(a => a.id === assignmentId);
+                if (assignment) {
+                  handleAssignmentSelect(assignment);
+                }
+              }}
+              compactMode={false}
+            />
+          </div>
+        )}
+
+        {/* Coverage Heatmap */}
+        {showHeatmap && (
+          <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderBottom: '1px solid #ddd' }}>
+            <CoverageHeatmap
+              schedule={schedule}
+              assignments={assignments}
+              viewMode={viewMode === 'day' ? 'hourly' : viewMode === 'week' ? 'daily' : 'weekly'}
+              showLegend={true}
+              onCellClick={(date) => {
+                // Navigate to specific date/time
+                setDateRange([date, date]);
+                setViewMode('day');
+              }}
+            />
+          </div>
+        )}
 
         {/* Filters Panel */}
         {showFilters && (
@@ -311,18 +394,37 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
                         >
                           {dayAssignments.length > 0 ? (
                             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                              {dayAssignments.map((assignment) => (
-                                <DraggableAssignmentCell
-                                  key={assignment.id}
-                                  assignment={assignment}
-                                  employeeId={employeeId}
-                                  date={date}
-                                  onSelect={handleAssignmentSelect}
-                                  onEdit={onAssignmentEdit}
-                                  onDelete={onAssignmentDelete}
-                                  isSelected={selectedAssignment?.id === assignment.id}
-                                />
-                              ))}
+                              {dayAssignments.map((assignment) => {
+                                const severity = getAssignmentSeverity(assignment.id);
+                                return (
+                                  <div
+                                    key={assignment.id}
+                                    className={`assignment-wrapper ${
+                                      severity ? `has-${severity}-warning` : ''
+                                    }`}
+                                    title={
+                                      severity
+                                        ? `Has ${severity} validation warning(s)`
+                                        : undefined
+                                    }
+                                  >
+                                    <DraggableAssignmentCell
+                                      assignment={assignment}
+                                      employeeId={employeeId}
+                                      date={date}
+                                      onSelect={handleAssignmentSelect}
+                                      onEdit={onAssignmentEdit}
+                                      onDelete={onAssignmentDelete}
+                                      isSelected={selectedAssignment?.id === assignment.id}
+                                    />
+                                    {severity && (
+                                      <span className={`validation-indicator ${severity}`}>
+                                        {severity === 'critical' ? '⚠️' : severity === 'warning' ? '⚡' : 'ℹ️'}
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           ) : (
                             <span className="empty">-</span>
@@ -362,7 +464,7 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
             <div className="stat">
               <span className="label">Quality:</span>
               <span className="value">
-                {schedule.quality_score ? Math.round(schedule.quality_score) : 'N/A'}/100
+                {schedule.quality_score !== undefined ? Math.round(schedule.quality_score) : 'N/A'}/100
               </span>
             </div>
           </div>

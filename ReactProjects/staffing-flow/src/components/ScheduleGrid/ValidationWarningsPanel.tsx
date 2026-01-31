@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import type { ValidationWarning } from './RealtimeValidationService';
 import './ValidationWarningsPanel.scss';
 
@@ -17,6 +17,30 @@ export const ValidationWarningsPanel: React.FC<ValidationWarningsPanelProps> = (
 }) => {
   const [expandedWarnings, setExpandedWarnings] = useState<Set<string>>(new Set());
   const [dismissedWarnings, setDismissedWarnings] = useState<Set<string>>(new Set());
+  const [newWarningIds, setNewWarningIds] = useState<Set<string>>(new Set());
+  const previousWarningsRef = useRef<ValidationWarning[]>([]);
+
+  // Track new warnings for animation
+  useEffect(() => {
+    const prevIds = new Set(previousWarningsRef.current.map(w => w.id));
+    const currentIds = new Set(warnings.map(w => w.id));
+    const newIds = new Set(
+      [...currentIds].filter(id => !prevIds.has(id))
+    );
+    
+    if (newIds.size > 0) {
+      setNewWarningIds(newIds);
+      
+      // Clear the "new" state after animation
+      const timer = setTimeout(() => {
+        setNewWarningIds(new Set());
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+    
+    previousWarningsRef.current = warnings;
+  }, [warnings]);
 
   const visibleWarnings = useMemo(() => {
     return warnings.filter((w) => !dismissedWarnings.has(w.id));
@@ -43,7 +67,8 @@ export const ValidationWarningsPanel: React.FC<ValidationWarningsPanelProps> = (
 
   const handleDismiss = (warningId: string) => {
     setDismissedWarnings((prev) => new Set([...prev, warningId]));
-    
+    onDismiss?.(warningId);
+  };
 
   const handleToggleExpand = (warningId: string) => {
     setExpandedWarnings((prev) => {
@@ -74,6 +99,12 @@ export const ValidationWarningsPanel: React.FC<ValidationWarningsPanelProps> = (
         <div className="summary-title">
           <span className="icon">⚠️</span>
           <span className="text">Validation Warnings ({totalWarnings})</span>
+          {criticalCount > 0 && (
+            <span className="live-indicator critical">
+              <span className="pulse-dot"></span>
+              Live
+            </span>
+          )}
         </div>
         <div className="summary-stats">
           {criticalCount > 0 && (
@@ -112,6 +143,7 @@ export const ValidationWarningsPanel: React.FC<ValidationWarningsPanelProps> = (
                   key={w.id}
                   warning={w}
                   isExpanded={expandedWarnings.has(w.id)}
+                  isNew={newWarningIds.has(w.id)}
                   onToggleExpand={() => handleToggleExpand(w.id)}
                   onDismiss={() => handleDismiss(w.id)}
                   onNavigateToAssignment={onNavigateToAssignment}
@@ -135,6 +167,7 @@ export const ValidationWarningsPanel: React.FC<ValidationWarningsPanelProps> = (
                   key={w.id}
                   warning={w}
                   isExpanded={expandedWarnings.has(w.id)}
+                  isNew={newWarningIds.has(w.id)}
                   onToggleExpand={() => handleToggleExpand(w.id)}
                   onDismiss={() => handleDismiss(w.id)}
                   onNavigateToAssignment={onNavigateToAssignment}
@@ -158,6 +191,7 @@ export const ValidationWarningsPanel: React.FC<ValidationWarningsPanelProps> = (
                   key={w.id}
                   warning={w}
                   isExpanded={expandedWarnings.has(w.id)}
+                  isNew={newWarningIds.has(w.id)}
                   onToggleExpand={() => handleToggleExpand(w.id)}
                   onDismiss={() => handleDismiss(w.id)}
                   onNavigateToAssignment={onNavigateToAssignment}
@@ -175,6 +209,7 @@ export const ValidationWarningsPanel: React.FC<ValidationWarningsPanelProps> = (
 interface WarningItemProps {
   warning: ValidationWarning;
   isExpanded: boolean;
+  isNew?: boolean;
   onToggleExpand: () => void;
   onDismiss: () => void;
   onNavigateToAssignment?: (assignmentId: string) => void;
@@ -184,6 +219,7 @@ interface WarningItemProps {
 const WarningItem: React.FC<WarningItemProps> = ({
   warning,
   isExpanded,
+  isNew = false,
   onToggleExpand,
   onDismiss,
   onNavigateToAssignment,
@@ -205,7 +241,7 @@ const WarningItem: React.FC<WarningItemProps> = ({
   };
 
   return (
-    <div className={`warning-item severity-${warning.severity}`}>
+    <div className={`warning-item severity-${warning.severity} ${isNew ? 'new-warning' : ''}`}>
       <div className="warning-header">
         <button className="expand-btn" onClick={onToggleExpand} aria-label="Toggle details">
           <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>

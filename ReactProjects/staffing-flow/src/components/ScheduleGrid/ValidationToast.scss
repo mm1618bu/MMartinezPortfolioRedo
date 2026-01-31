@@ -1,0 +1,283 @@
+// =============================================
+// VALIDATION TOAST NOTIFICATION STYLES
+// =============================================
+
+.validation-toast-container {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  pointer-events: none;
+
+  &.top-right {
+    top: 0;
+    right: 0;
+  }
+
+  &.top-left {
+    top: 0;
+    left: 0;
+  }
+
+  &.bottom-right {
+    bottom: 0;
+    right: 0;
+  }
+
+  &.bottom-left {
+    bottom: 0;
+    left: 0;
+  }
+}
+
+.validation-toast {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  min-width: 320px;
+  max-width: 480px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  pointer-events: all;
+  animation: slide-in 0.3s ease-out;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+
+  &.exiting {
+    animation: slide-out 0.3s ease-in forwards;
+  }
+
+  &.severity-critical {
+    animation: slide-in-shake 0.5s ease-out;
+
+    .toast-icon {
+      animation: pulse-icon 1.5s ease-in-out infinite;
+    }
+  }
+
+  .toast-icon {
+    font-size: 24px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .toast-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .toast-title {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .toast-message {
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  .toast-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+
+    .action-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .action-text {
+      font-weight: 500;
+    }
+  }
+
+  .toast-dismiss {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+
+    &:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.1);
+      transform: rotate(90deg);
+    }
+
+    &:active {
+      transform: rotate(90deg) scale(0.9);
+    }
+  }
+
+  .toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: currentColor;
+    opacity: 0.3;
+    transform-origin: left;
+    animation: progress-bar linear forwards;
+  }
+}
+
+// =============================================
+// ANIMATIONS
+// =============================================
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-in-shake {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-10px);
+  }
+  80% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-icon {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes progress-bar {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+// =============================================
+// RESPONSIVE DESIGN
+// =============================================
+
+@media (max-width: 768px) {
+  .validation-toast-container {
+    padding: 12px;
+    width: 100%;
+    max-width: 100%;
+
+    &.top-right,
+    &.top-left {
+      left: 0;
+      right: 0;
+    }
+
+    &.bottom-right,
+    &.bottom-left {
+      left: 0;
+      right: 0;
+    }
+  }
+
+  .validation-toast {
+    min-width: auto;
+    max-width: 100%;
+    width: 100%;
+
+    .toast-title {
+      font-size: 13px;
+      padding-right: 24px;
+    }
+
+    .toast-message {
+      font-size: 12px;
+    }
+
+    .toast-action {
+      font-size: 11px;
+    }
+  }
+}
+
+// =============================================
+// ACCESSIBILITY
+// =============================================
+
+@media (prefers-reduced-motion: reduce) {
+  .validation-toast {
+    animation: none;
+    opacity: 1;
+    transform: none;
+
+    &.exiting {
+      animation: none;
+      opacity: 0;
+    }
+
+    .toast-icon,
+    .toast-progress {
+      animation: none;
+    }
+  }
+
+  @keyframes slide-in-shake {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
