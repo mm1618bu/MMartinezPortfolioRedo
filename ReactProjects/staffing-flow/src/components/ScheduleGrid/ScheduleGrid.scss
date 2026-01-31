@@ -1,0 +1,377 @@
+// Schedule Grid Main Styling
+// Comprehensive schedule visualization component with interactive elements
+
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+// Main Container
+.schedule-grid-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: $color-background;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+
+  // Header with Title and Controls
+  .schedule-grid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-lg;
+    border-bottom: 2px solid $color-border;
+    background: $color-surface;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+
+      h2 {
+        margin: 0;
+        color: $color-text-primary;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .schedule-status {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        padding: $spacing-sm $spacing-md;
+        background: $color-info-light;
+        border-radius: $border-radius-md;
+        font-size: 0.875rem;
+        color: $color-info;
+
+        &.draft {
+          background: $color-warning-light;
+          color: $color-warning;
+        }
+
+        &.approved {
+          background: $color-success-light;
+          color: $color-success;
+        }
+
+        &.published {
+          background: $color-primary-light;
+          color: $color-primary;
+        }
+      }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+    }
+  }
+
+  // Toolbar with Controls
+  .schedule-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md $spacing-lg;
+    background: $color-background;
+    border-bottom: 1px solid $color-border;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+
+    .toolbar-left {
+      display: flex;
+      gap: $spacing-md;
+      align-items: center;
+    }
+
+    .toolbar-right {
+      display: flex;
+      gap: $spacing-sm;
+    }
+
+    .view-switcher {
+      display: flex;
+      border: 1px solid $color-border;
+      border-radius: $border-radius-md;
+      overflow: hidden;
+
+      button {
+        padding: $spacing-sm $spacing-md;
+        background: white;
+        border: none;
+        cursor: pointer;
+        font-size: 0.875rem;
+        color: $color-text-secondary;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: $color-background;
+        }
+
+        &.active {
+          background: $color-primary;
+          color: white;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .date-range-picker {
+      display: flex;
+      gap: $spacing-sm;
+      align-items: center;
+
+      input {
+        padding: $spacing-sm $spacing-md;
+        border: 1px solid $color-border;
+        border-radius: $border-radius-md;
+        font-size: 0.875rem;
+        color: $color-text-primary;
+
+        &:focus {
+          outline: none;
+          border-color: $color-primary;
+          box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+        }
+      }
+    }
+  }
+
+  // Main Grid Area
+  .schedule-grid-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+
+    // Frozen Left Column (Employee Names)
+    .grid-frozen {
+      width: 250px;
+      border-right: 2px solid $color-border;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+
+      .frozen-header {
+        padding: $spacing-md;
+        background: $color-surface;
+        border-bottom: 1px solid $color-border;
+        font-weight: 600;
+        color: $color-text-primary;
+        height: 50px;
+        display: flex;
+        align-items: center;
+      }
+
+      .frozen-rows {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: $color-background;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: $color-border;
+          border-radius: 4px;
+
+          &:hover {
+            background: $color-text-secondary;
+          }
+        }
+      }
+    }
+
+    // Scrollable Grid Content
+    .grid-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+
+      .grid-header-row {
+        display: flex;
+        border-bottom: 1px solid $color-border;
+        background: $color-surface;
+        min-height: 50px;
+        flex-shrink: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        &::-webkit-scrollbar {
+          height: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: $color-background;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: $color-border;
+          border-radius: 4px;
+        }
+
+        .time-header {
+          min-width: 120px;
+          padding: $spacing-md;
+          border-right: 1px solid $color-border;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          font-weight: 600;
+          color: $color-text-primary;
+          font-size: 0.875rem;
+          background: $color-surface;
+
+          .date {
+            margin-bottom: 4px;
+          }
+
+          .day-of-week {
+            font-size: 0.75rem;
+            color: $color-text-secondary;
+            font-weight: 400;
+          }
+        }
+      }
+
+      .grid-rows {
+        flex: 1;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+
+        &::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: $color-background;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: $color-border;
+          border-radius: 4px;
+
+          &:hover {
+            background: $color-text-secondary;
+          }
+        }
+      }
+    }
+  }
+
+  // Footer with Statistics
+  .schedule-grid-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md $spacing-lg;
+    background: $color-surface;
+    border-top: 1px solid $color-border;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+
+    .footer-stats {
+      display: flex;
+      gap: $spacing-lg;
+      font-size: 0.875rem;
+      color: $color-text-secondary;
+
+      .stat {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+
+        .label {
+          font-weight: 500;
+        }
+
+        .value {
+          color: $color-text-primary;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: $spacing-sm;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .schedule-grid-container {
+    .schedule-grid-main {
+      .grid-frozen {
+        width: 200px;
+      }
+    }
+
+    .schedule-toolbar {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .toolbar-left,
+      .toolbar-right {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .schedule-grid-container {
+    .schedule-grid-header {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    .schedule-grid-main {
+      .grid-frozen {
+        width: 150px;
+
+        .frozen-header {
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    .schedule-grid-footer {
+      flex-direction: column;
+
+      .footer-stats {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .footer-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+  }
+}

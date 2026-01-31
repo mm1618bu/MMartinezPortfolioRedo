@@ -2,31 +2,29 @@ import { z } from 'zod';
 
 /**
  * Shift Templates schema
- * Shift templates define reusable shift patterns
+ * Shift templates define reusable shift patterns with time and day configurations
  */
 
 const baseShiftTemplateObject = z.object({
   name: z.string().min(1, 'Shift template name is required').max(200, 'Name too long'),
   description: z.string().max(1000, 'Description too long').optional(),
-  start_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Invalid time format (HH:MM:SS)'),
-  end_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Invalid time format (HH:MM:SS)'),
-  duration_hours: z.number().positive('Duration must be positive').max(24, 'Duration cannot exceed 24 hours'),
-  break_duration_minutes: z.number().min(0, 'Break duration cannot be negative').default(0),
-  shift_type: z.enum(['morning', 'afternoon', 'evening', 'night', 'split']).optional(),
-  required_skills: z.array(z.string().uuid('Invalid skill ID')).optional(),
-  required_certifications: z.array(z.string().uuid('Invalid certification ID')).optional(),
-  min_employees: z.number().int().positive('Minimum employees must be positive').default(1),
-  max_employees: z.number().int().positive('Maximum employees must be positive').optional(),
-  department_id: z.string().uuid('Invalid department ID').optional(),
+  start_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM)'),
+  end_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM)'),
+  days_of_week: z.array(z.string()).optional(),
+  is_full_day: z.boolean().default(false),
   is_active: z.boolean().default(true),
   organization_id: z.string().uuid('Invalid organization ID'),
 });
 
 export const createShiftTemplateSchema = baseShiftTemplateObject.refine(
-  (data) => !data.max_employees || data.max_employees >= data.min_employees,
+  (data) => {
+    if (data.is_full_day) return true;
+    // If not a full day shift, end time should be greater than start time
+    return data.end_time > data.start_time;
+  },
   {
-    message: 'Maximum employees must be greater than or equal to minimum employees',
-    path: ['max_employees'],
+    message: 'End time must be after start time',
+    path: ['end_time'],
   }
 );
 
@@ -39,7 +37,6 @@ export const updateShiftTemplateSchema = baseShiftTemplateObject
 
 export const shiftTemplateQuerySchema = z.object({
   organizationId: z.string().uuid().optional(),
-  departmentId: z.string().uuid().optional(),
   shiftType: z.enum(['morning', 'afternoon', 'evening', 'night', 'split']).optional(),
   isActive: z.enum(['true', 'false']).optional(),
   search: z.string().optional(),

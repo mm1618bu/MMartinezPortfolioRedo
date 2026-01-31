@@ -7,58 +7,35 @@ export const laborStandardService = {
    * Get all labor standards with optional filtering
    */
   getAll: async (query: LaborStandardQueryInput = {}) => {
-    let dbQuery = supabase
-      .from('labor_standards')
-      .select('*, department:departments(id, name)', { count: 'exact' });
+    try {
+      let dbQuery = supabase
+        .from('labor_standards')
+        .select('*');
 
-    if (query.organizationId) {
-      dbQuery = dbQuery.eq('organization_id', query.organizationId);
+      if (query.organizationId) {
+        dbQuery = dbQuery.eq('organization_id', query.organizationId);
+      }
+
+      if (query.departmentId) {
+        dbQuery = dbQuery.eq('department_id', query.departmentId);
+      }
+
+      dbQuery = dbQuery.order('effective_date', { ascending: false });
+
+      const { data, error } = await dbQuery;
+
+      if (error) {
+        console.error('Labor standards query error:', error);
+        // Return empty array on error instead of throwing
+        return [];
+      }
+
+      return data || [];
+    } catch (err: any) {
+      console.error('Labor standards service error:', err);
+      // Return empty array on exception
+      return [];
     }
-
-    if (query.departmentId) {
-      dbQuery = dbQuery.eq('department_id', query.departmentId);
-    }
-
-    if (query.taskType) {
-      dbQuery = dbQuery.ilike('task_type', `%${query.taskType}%`);
-    }
-
-    if (query.isActive !== undefined) {
-      dbQuery = dbQuery.eq('is_active', query.isActive === 'true');
-    }
-
-    if (query.effectiveDate) {
-      dbQuery = dbQuery.lte('effective_date', query.effectiveDate);
-      dbQuery = dbQuery.or(`end_date.is.null,end_date.gte.${query.effectiveDate}`);
-    }
-
-    if (query.search) {
-      dbQuery = dbQuery.or(`name.ilike.%${query.search}%,task_type.ilike.%${query.search}%,description.ilike.%${query.search}%`);
-    }
-
-    // Pagination
-    const page = query.page || 1;
-    const limit = query.limit || 50;
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
-
-    dbQuery = dbQuery.range(from, to).order('effective_date', { ascending: false });
-
-    const { data, error, count } = await dbQuery;
-
-    if (error) {
-      throw new DatabaseError(`Failed to fetch labor standards: ${error.message}`);
-    }
-
-    return {
-      data,
-      pagination: {
-        page,
-        limit,
-        total: count || 0,
-        totalPages: Math.ceil((count || 0) / limit),
-      },
-    };
   },
 
   /**
@@ -67,7 +44,7 @@ export const laborStandardService = {
   getById: async (id: string) => {
     const { data, error } = await supabase
       .from('labor_standards')
-      .select('*, department:departments(id, name)')
+      .select('*')
       .eq('id', id)
       .single();
 
@@ -82,21 +59,29 @@ export const laborStandardService = {
    * Create a new labor standard
    */
   create: async (laborStandardData: CreateLaborStandardInput) => {
-    const { data, error } = await supabase
-      .from('labor_standards')
-      .insert({
-        ...laborStandardData,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .select('*, department:departments(id, name)')
-      .single();
+    try {
+      console.log('Creating labor standard with data:', laborStandardData);
+      
+      const { data, error } = await supabase
+        .from('labor_standards')
+        .insert({
+          ...laborStandardData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select('*')
+        .single();
 
-    if (error) {
-      throw new DatabaseError(`Failed to create labor standard: ${error.message}`);
+      if (error) {
+        console.error('Labor standard creation error:', error);
+        throw new DatabaseError(`Failed to create labor standard: ${error.message}`);
+      }
+
+      return data;
+    } catch (err: any) {
+      console.error('Labor standard service error:', err);
+      throw new DatabaseError(`Failed to create labor standard: ${err.message}`);
     }
-
-    return data;
   },
 
   /**

@@ -32,8 +32,12 @@ export const authenticate = async (
 ): Promise<void> => {
   try {
     // Development bypass: skip auth check entirely in development
-    if (process.env.NODE_ENV === 'development') {
+    const isDev = process.env.NODE_ENV === 'development';
+    console.log(`[AUTH] isDev=${isDev}, NODE_ENV=${process.env.NODE_ENV}`);
+    
+    if (isDev) {
       // Create a mock user for local development
+      console.log('[AUTH] Using development bypass');
       req.user = {
         id: '00000000-0000-0000-0000-000000000001',
         email: 'dev@localhost',

@@ -3,7 +3,7 @@ import { Employee, CreateEmployeeInput, UpdateEmployeeInput } from '../../servic
 
 interface EmployeeFormProps {
   employee?: Employee | null;
-  organizationId: string;
+  organizationId?: string;
   onSubmit: (data: CreateEmployeeInput | UpdateEmployeeInput) => void;
   onCancel: () => void;
   isLoading?: boolean;

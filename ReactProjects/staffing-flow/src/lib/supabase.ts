@@ -162,6 +162,129 @@ export type Database = {
         >;
         Update: Partial<Database['public']['Tables']['sites']['Insert']>;
       };
+      shift_templates: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          start_time: string;
+          end_time: string;
+          days_of_week: string[] | null;
+          is_full_day: boolean;
+          is_active: boolean;
+          organization_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<
+          Database['public']['Tables']['shift_templates']['Row'],
+          'id' | 'created_at' | 'updated_at'
+        >;
+        Update: Partial<Database['public']['Tables']['shift_templates']['Insert']>;
+      };
+      staffing_buffers: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          buffer_percentage: number;
+          buffer_minimum_count: number | null;
+          day_of_week: string | null;
+          start_time: string | null;
+          end_time: string | null;
+          effective_date: string;
+          end_date: string | null;
+          is_active: boolean;
+          organization_id: string;
+          department_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["staffing_buffers"]["Row"],
+          "id" | "created_at" | "updated_at"
+        >;
+        Update: Partial<Database["public"]["Tables"]["staffing_buffers"]["Insert"]>;
+      };
+      sla_windows: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          day_of_week: string;
+          start_time: string;
+          end_time: string;
+          required_coverage_percentage: number;
+          minimum_staff_count: number | null;
+          priority: "low" | "medium" | "high" | "critical";
+          effective_date: string;
+          end_date: string | null;
+          is_active: boolean;
+          organization_id: string;
+          department_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["sla_windows"]["Row"],
+          "id" | "created_at" | "updated_at"
+        >;
+        Update: Partial<Database["public"]["Tables"]["sla_windows"]["Insert"]>;
+      };
+      staffing_plans: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          start_date: string;
+          end_date: string;
+          planned_headcount: number | null;
+          current_assignments: number;
+          unassigned_positions: number;
+          demand_ids: string[] | null;
+          staffing_buffer_ids: string[] | null;
+          sla_window_ids: string[] | null;
+          status: "draft" | "pending_approval" | "approved" | "scheduled" | "active" | "completed" | "archived";
+          priority: "low" | "medium" | "high" | "critical";
+          created_by: string | null;
+          approved_by: string | null;
+          approval_date: string | null;
+          notes: string | null;
+          internal_comments: string | null;
+          organization_id: string;
+          department_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["staffing_plans"]["Row"],
+          "id" | "current_assignments" | "unassigned_positions" | "created_at" | "updated_at" | "approval_date"
+        >;
+        Update: Partial<Database["public"]["Tables"]["staffing_plans"]["Insert"]>;
+      };
+      staffing_plan_assignments: {
+        Row: {
+          id: string;
+          staffing_plan_id: string;
+          employee_id: string;
+          organization_id: string;
+          assignment_date: string;
+          assignment_end_date: string | null;
+          assigned_role: string | null;
+          shift_template_id: string | null;
+          status: "proposed" | "assigned" | "confirmed" | "active" | "completed" | "cancelled";
+          confirmed_at: string | null;
+          confirmed_by: string | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["staffing_plan_assignments"]["Row"],
+          "id" | "created_at" | "updated_at" | "confirmed_at"
+        >;
+        Update: Partial<Database["public"]["Tables"]["staffing_plan_assignments"]["Insert"]>;
+      };
     };
   };
 };

@@ -16,7 +16,8 @@ export const validate = (schema: z.ZodSchema) => {
 export const validateQuery = (schema: z.ZodSchema) => {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
-      req.query = (await schema.parseAsync(req.query)) as any;
+      const validatedQuery = await schema.parseAsync(req.query);
+      (req as any).validatedQuery = validatedQuery;
       next();
     } catch (error) {
       // Pass Zod errors to global error handler
@@ -28,7 +29,8 @@ export const validateQuery = (schema: z.ZodSchema) => {
 export const validateParams = (schema: z.ZodSchema) => {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
-      req.params = (await schema.parseAsync(req.params)) as any;
+      const validatedParams = await schema.parseAsync(req.params);
+      (req as any).validatedParams = validatedParams;
       next();
     } catch (error) {
       // Pass Zod errors to global error handler

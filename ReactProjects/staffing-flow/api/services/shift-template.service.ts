@@ -9,7 +9,7 @@ export const shiftTemplateService = {
   getAll: async (query: ShiftTemplateQueryInput = {}) => {
     let dbQuery = supabase
       .from('shift_templates')
-      .select('*, department:departments(id, name)', { count: 'exact' });
+      .select('*', { count: 'exact' });
 
     if (query.organizationId) {
       dbQuery = dbQuery.eq('organization_id', query.organizationId);
@@ -62,7 +62,7 @@ export const shiftTemplateService = {
   getById: async (id: string) => {
     const { data, error } = await supabase
       .from('shift_templates')
-      .select('*, department:departments(id, name)')
+      .select('*')
       .eq('id', id)
       .single();
 
@@ -108,7 +108,7 @@ export const shiftTemplateService = {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .select('*, department:departments(id, name)')
+      .select('*')
       .single();
 
     if (error) {
@@ -129,7 +129,7 @@ export const shiftTemplateService = {
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .select('*, department:departments(id, name)')
+      .select('*')
       .single();
 
     if (error) {

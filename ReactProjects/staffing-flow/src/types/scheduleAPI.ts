@@ -1,0 +1,42 @@
+/**
+ * Schedule API Types (Frontend)
+ * Re-export from API types for frontend use
+ */
+
+export type {
+  GenerateScheduleRequest,
+  GenerateScheduleResponse,
+  ConstraintViolationSummary,
+  Schedule,
+  ScheduleAssignment,
+  UpdateScheduleRequest,
+  PublishScheduleRequest,
+  PublishScheduleResponse,
+  ScheduleVersion,
+  CompareSchedulesRequest,
+  ScheduleComparisonResult,
+  BatchGenerateRequest,
+  BatchGenerateResponse,
+  BatchUpdateAssignmentsRequest,
+  BatchUpdateResponse,
+  ScheduleTemplate,
+  CreateScheduleTemplateRequest,
+  UpdateScheduleTemplateRequest,
+  ScheduleHealthCheck,
+  ScheduleStatistics,
+  ScheduleExportRequest,
+  ScheduleExportResponse,
+  ScheduleComment,
+  CreateCommentRequest,
+  ResolveCommentRequest,
+  ApprovalRequest,
+  ApprovalResponse,
+  ApprovalHistory,
+  ValidateScheduleRequest,
+  ValidateScheduleResponse,
+  ListSchedulesRequest,
+  ListSchedulesResponse,
+  ListAssignmentsRequest,
+  ListAssignmentsResponse,
+  ScheduleErrorResponse,
+} from '../../api/types/scheduleAPI';

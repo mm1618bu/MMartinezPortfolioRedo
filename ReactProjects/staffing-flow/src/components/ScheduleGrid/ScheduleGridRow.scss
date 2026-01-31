@@ -1,0 +1,285 @@
+// Schedule Grid Row Styling
+// Individual employee row with shift assignments
+
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.schedule-grid-row {
+  display: flex;
+  border-bottom: 1px solid $color-border;
+  min-height: 60px;
+  background: white;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: $color-background;
+  }
+
+  &.highlighted {
+    background: rgba($color-primary, 0.05);
+  }
+
+  &.has-violations {
+    border-left: 4px solid $color-warning;
+  }
+
+  &.has-hard-violations {
+    border-left: 4px solid $color-error;
+  }
+
+  // Employee Name Cell (Left Frozen)
+  .employee-cell {
+    width: 250px;
+    min-width: 250px;
+    padding: $spacing-md;
+    border-right: 2px solid $color-border;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: $color-surface;
+    gap: $spacing-xs;
+
+    .employee-name {
+      font-weight: 600;
+      color: $color-text-primary;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+
+      .role-badge {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        background: $color-primary-light;
+        color: $color-primary;
+        border-radius: $border-radius-sm;
+        font-weight: 500;
+      }
+    }
+
+    .employee-meta {
+      font-size: 0.75rem;
+      color: $color-text-secondary;
+      display: flex;
+      gap: $spacing-sm;
+
+      span {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+    }
+
+    .violation-indicator {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: rgba($color-warning, 0.1);
+      color: $color-warning;
+      font-weight: 500;
+
+      &.hard {
+        background: rgba($color-error, 0.1);
+        color: $color-error;
+      }
+    }
+  }
+
+  // Assignment Cells Container
+  .shifts-container {
+    flex: 1;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 0;
+    position: relative;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $color-border;
+      border-radius: 2px;
+
+      &:hover {
+        background: $color-text-secondary;
+      }
+    }
+
+    // Empty Shift Cell
+    .shift-slot {
+      min-width: 120px;
+      border-right: 1px solid $color-border;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: $spacing-sm;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba($color-primary, 0.05);
+        border-right-color: $color-primary;
+      }
+
+      &.empty {
+        color: $color-text-secondary;
+        font-size: 0.75rem;
+        text-align: center;
+      }
+
+      &.available {
+        &::before {
+          content: '+';
+          color: $color-success;
+          font-size: 1.5rem;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+
+        &:hover::before {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  // Total Hours Column
+  .hours-summary {
+    width: 80px;
+    min-width: 80px;
+    padding: $spacing-md;
+    border-left: 1px solid $color-border;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: $color-surface;
+    border-right: 2px solid $color-border;
+
+    .hours-value {
+      font-weight: 600;
+      color: $color-text-primary;
+      font-size: 1rem;
+    }
+
+    .hours-label {
+      font-size: 0.7rem;
+      color: $color-text-secondary;
+    }
+
+    &.excessive {
+      background: rgba($color-warning, 0.1);
+
+      .hours-value {
+        color: $color-warning;
+      }
+    }
+
+    &.insufficient {
+      background: rgba($color-info, 0.1);
+
+      .hours-value {
+        color: $color-info;
+      }
+    }
+  }
+
+  // Actions Menu
+  .row-actions {
+    width: 50px;
+    min-width: 50px;
+    padding: $spacing-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $color-surface;
+    border-left: 1px solid $color-border;
+
+    .action-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: $color-text-secondary;
+      font-size: 1rem;
+      padding: $spacing-sm;
+      border-radius: $border-radius-sm;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: rgba($color-primary, 0.1);
+        color: $color-primary;
+      }
+
+      &.delete:hover {
+        background: rgba($color-error, 0.1);
+        color: $color-error;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .schedule-grid-row {
+    .employee-cell {
+      width: 200px;
+      min-width: 200px;
+
+      .employee-name {
+        font-size: 0.85rem;
+      }
+    }
+
+    .shifts-container .shift-slot {
+      min-width: 100px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .schedule-grid-row {
+    min-height: 50px;
+
+    .employee-cell {
+      width: 150px;
+      min-width: 150px;
+      padding: $spacing-sm;
+
+      .employee-name {
+        font-size: 0.8rem;
+      }
+
+      .employee-meta {
+        display: none;
+      }
+    }
+
+    .shifts-container .shift-slot {
+      min-width: 80px;
+      padding: 4px;
+    }
+
+    .hours-summary {
+      width: 60px;
+      padding: $spacing-sm;
+
+      .hours-value {
+        font-size: 0.9rem;
+      }
+
+      .hours-label {
+        font-size: 0.65rem;
+      }
+    }
+  }
+}

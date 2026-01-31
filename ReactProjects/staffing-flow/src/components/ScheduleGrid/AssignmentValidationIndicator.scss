@@ -1,0 +1,303 @@
+// =============================================
+// ASSIGNMENT VALIDATION INDICATOR STYLES
+// =============================================
+
+.assignment-validation-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.size-small {
+    font-size: 14px;
+
+    .indicator-icon {
+      font-size: 12px;
+    }
+
+    .warning-count {
+      font-size: 8px;
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &.size-medium {
+    font-size: 16px;
+
+    .indicator-icon {
+      font-size: 14px;
+    }
+
+    .warning-count {
+      font-size: 9px;
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &.size-large {
+    font-size: 20px;
+
+    .indicator-icon {
+      font-size: 18px;
+    }
+
+    .warning-count {
+      font-size: 10px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .indicator-icon {
+    display: inline-block;
+    animation: pulse-indicator 2s infinite;
+  }
+
+  .warning-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #dc2626;
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  &.severity-critical {
+    .warning-count {
+      background: #dc2626;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+      filter: brightness(0.9);
+    }
+  }
+
+  &.severity-warning {
+    .warning-count {
+      background: #f59e0b;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+      filter: brightness(0.95);
+    }
+  }
+
+  &.severity-info {
+    .warning-count {
+      background: #3b82f6;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+      filter: brightness(0.95);
+    }
+  }
+}
+
+@keyframes pulse-indicator {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// =============================================
+// VALIDATION HIGHLIGHT
+// =============================================
+
+.assignment-validation-highlight {
+  position: relative;
+  border-radius: 4px;
+  padding: 2px;
+  margin: -2px;
+  transition: all 0.2s ease;
+
+  &.severity-critical {
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+
+    &:hover {
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+      border-color: rgba(220, 38, 38, 0.5);
+    }
+  }
+
+  &.severity-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.1);
+
+    &:hover {
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+  }
+
+  &.severity-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+
+    &:hover {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.5);
+    }
+  }
+}
+
+// =============================================
+// VALIDATION BADGE
+// =============================================
+
+.validation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  .icon {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+  }
+
+  .label {
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 4px;
+  }
+
+  &.severity-critical {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+
+    .count {
+      background: #fca5a5;
+      color: white;
+    }
+
+    &:hover {
+      background: #fecaca;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+    }
+  }
+
+  &.severity-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+
+    .count {
+      background: #fcd34d;
+      color: #92400e;
+    }
+
+    &:hover {
+      background: #fef08a;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+    }
+  }
+
+  &.severity-info {
+    background: #e0f2fe;
+    color: #0c4a6e;
+    border: 1px solid #93c5fd;
+
+    .count {
+      background: #93c5fd;
+      color: white;
+    }
+
+    &:hover {
+      background: #cffafe;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    }
+  }
+
+  &.compact {
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 4px;
+
+    .icon {
+      font-size: 12px;
+    }
+
+    .label {
+      font-size: 10px;
+    }
+
+    .count {
+      min-width: 16px;
+      height: 16px;
+      font-size: 10px;
+    }
+  }
+}
+
+// =============================================
+// RESPONSIVE DESIGN
+// =============================================
+
+@media (max-width: 768px) {
+  .assignment-validation-indicator {
+    &.size-medium {
+      font-size: 14px;
+
+      .indicator-icon {
+        font-size: 12px;
+      }
+
+      .warning-count {
+        font-size: 8px;
+        width: 12px;
+        height: 12px;
+      }
+    }
+  }
+
+  .validation-badge {
+    padding: 4px 10px;
+    font-size: 11px;
+
+    .icon {
+      font-size: 12px;
+    }
+
+    .count {
+      min-width: 18px;
+      height: 18px;
+      font-size: 10px;
+    }
+  }
+}

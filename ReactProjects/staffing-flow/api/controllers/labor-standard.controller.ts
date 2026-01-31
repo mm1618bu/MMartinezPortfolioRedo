@@ -13,12 +13,8 @@ export const laborStandardController = {
    */
   getAll: async (req: Request, res: Response) => {
     try {
-      const queryValidation = laborStandardQuerySchema.safeParse(req.query);
-      if (!queryValidation.success) {
-        throw new ValidationError('Invalid query parameters', queryValidation.error.issues);
-      }
-
-      const result = await laborStandardService.getAll(queryValidation.data);
+      const query = (req as any).validatedQuery || req.query || {};
+      const result = await laborStandardService.getAll(query);
       res.json(result);
     } catch (error: any) {
       res.status(error.statusCode || 500).json({

@@ -141,7 +141,6 @@ export const DepartmentManagement: React.FC = () => {
       {showForm ? (
         <DepartmentForm
           department={editingDepartment}
-          organizationId={DEMO_ORG_ID}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isLoading={isSubmitting}

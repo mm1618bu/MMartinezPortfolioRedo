@@ -266,6 +266,7 @@ export const LaborStandardManagement: React.FC = () => {
         <div className="form-container">
           <LaborStandardForm
             laborStandard={selectedLaborStandard}
+            organizationId="3b82d4f1-c270-4458-a109-249b91224064"
             onSubmit={view === 'create' ? handleCreate : handleUpdate}
             onCancel={handleCancel}
             isLoading={isLoading}

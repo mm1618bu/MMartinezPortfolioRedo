@@ -5,7 +5,8 @@ import { handleError } from '../utils/error-handler';
 export const departmentController = {
   getAll: async (req: Request, res: Response) => {
     try {
-      const { organizationId } = req.query;
+      const validatedQuery = (req as any).validatedQuery || req.query;
+      const { organizationId } = validatedQuery;
       const departments = await departmentService.getAll(organizationId as string | undefined);
       res.json(departments);
     } catch (error) {
@@ -15,7 +16,8 @@ export const departmentController = {
 
   getById: async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const validatedParams = (req as any).validatedParams || req.params;
+      const { id } = validatedParams;
       const department = await departmentService.getById(id as string);
       if (!department) {
         res.status(404).json({ error: 'Department not found' });

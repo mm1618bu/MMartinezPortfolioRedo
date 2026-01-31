@@ -22,9 +22,6 @@ export const EmployeeManagement: React.FC = () => {
   const [viewingStats, setViewingStats] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Demo organization ID - replace with actual auth context
-  const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001';
-
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -43,7 +40,6 @@ export const EmployeeManagement: React.FC = () => {
       setLoading(true);
       setError(null);
       const data = await employeeService.getAll({
-        organizationId: DEMO_ORG_ID,
         status: statusFilter !== 'all' ? statusFilter : undefined,
         page: currentPage,
         limit: itemsPerPage,
@@ -161,7 +157,6 @@ export const EmployeeManagement: React.FC = () => {
       {showForm ? (
         <EmployeeForm
           employee={editingEmployee}
-          organizationId={DEMO_ORG_ID}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isLoading={isSubmitting}

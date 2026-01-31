@@ -3,6 +3,7 @@ import { LaborStandard, CreateLaborStandardInput } from '../../services/laborSta
 
 interface LaborStandardFormProps {
   laborStandard?: LaborStandard;
+  organizationId?: string;
   onSubmit: (data: CreateLaborStandardInput) => void;
   onCancel: () => void;
   isLoading: boolean;
@@ -12,6 +13,7 @@ type ProductivityType = 'units_per_hour' | 'hours_per_unit' | 'none';
 
 export const LaborStandardForm: React.FC<LaborStandardFormProps> = ({
   laborStandard,
+  organizationId,
   onSubmit,
   onCancel,
   isLoading,
@@ -27,7 +29,7 @@ export const LaborStandardForm: React.FC<LaborStandardFormProps> = ({
     effective_date: new Date().toISOString().split('T')[0],
     end_date: '',
     is_active: true,
-    organization_id: 'default-org-id', // This should come from auth context
+    organization_id: organizationId || '3b82d4f1-c270-4458-a109-249b91224064', // Default to actual org ID
   });
 
   const [productivityType, setProductivityType] = useState<ProductivityType>('none');

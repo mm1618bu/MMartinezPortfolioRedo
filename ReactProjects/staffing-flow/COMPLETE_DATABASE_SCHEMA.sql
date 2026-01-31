@@ -164,26 +164,31 @@ CREATE INDEX idx_shift_templates_active ON shift_templates(is_active);
 
 /**
  * LABOR STANDARDS TABLE
- * Staffing ratios and requirements by position/department
+ * Productivity standards and performance metrics by task type
+ * Defines productivity ratios, quality thresholds, and effectiveness dates
  */
 CREATE TABLE labor_standards (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-  department_id UUID REFERENCES departments(id) ON DELETE CASCADE,
+  department_id UUID REFERENCES departments(id) ON DELETE SET NULL,
   
-  -- Name and Description
+  -- Basic Information
   name TEXT NOT NULL,
   description TEXT,
   
-  -- Ratio Definition
-  metric TEXT NOT NULL, -- e.g., 'per_transaction', 'per_customer', 'per_unit'
-  numerator INTEGER NOT NULL CHECK (numerator > 0),
-  denominator INTEGER NOT NULL CHECK (denominator > 0),
+  -- Task Classification
+  task_type TEXT NOT NULL, -- e.g., 'customer_service', 'data_entry', 'processing'
   
-  -- Configuration
-  minimum_staff INTEGER,
-  recommended_staff INTEGER,
-  maximum_staff INTEGER,
+  -- Productivity Standards (choose one metric)
+  standard_units_per_hour NUMERIC(10, 2), -- e.g., 50 units/hour
+  standard_hours_per_unit NUMERIC(10, 2), -- e.g., 0.5 hours/unit (inverse metric)
+  
+  -- Quality Metrics
+  quality_threshold_percentage NUMERIC(5, 2) CHECK (quality_threshold_percentage >= 0 AND quality_threshold_percentage <= 100),
+  
+  -- Effective Period
+  effective_date DATE NOT NULL,
+  end_date DATE,
   
   -- Status
   is_active BOOLEAN DEFAULT true,
@@ -193,12 +198,21 @@ CREATE TABLE labor_standards (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   
   -- Constraints
-  UNIQUE(organization_id, department_id, name)
+  UNIQUE(organization_id, department_id, task_type, effective_date),
+  CONSTRAINT valid_date_range CHECK (end_date IS NULL OR end_date >= effective_date),
+  CONSTRAINT valid_productivity_metric CHECK (
+    (standard_units_per_hour IS NOT NULL AND standard_hours_per_unit IS NULL) OR
+    (standard_units_per_hour IS NULL AND standard_hours_per_unit IS NOT NULL) OR
+    (standard_units_per_hour IS NULL AND standard_hours_per_unit IS NULL)
+  )
 );
 
 CREATE INDEX idx_labor_standards_org ON labor_standards(organization_id);
 CREATE INDEX idx_labor_standards_department ON labor_standards(department_id);
+CREATE INDEX idx_labor_standards_task_type ON labor_standards(task_type);
 CREATE INDEX idx_labor_standards_active ON labor_standards(is_active);
+CREATE INDEX idx_labor_standards_effective_date ON labor_standards(effective_date);
+CREATE INDEX idx_labor_standards_org_task_active ON labor_standards(organization_id, task_type, is_active);
 
 -- =============================================
 
@@ -309,6 +323,106 @@ CREATE INDEX idx_demands_shift_type ON demands(shift_type) WHERE shift_type IS N
 CREATE INDEX idx_demands_skills ON demands USING GIN(required_skills);
 
 -- =============================================
+
+/**
+ * STAFFING BUFFERS TABLE
+ * Configuration for extra staff buffer percentages to handle surges and absences
+ * Allows flexible buffer settings by department and time period
+ */
+CREATE TABLE staffing_buffers (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  department_id UUID REFERENCES departments(id) ON DELETE CASCADE,
+  
+  -- Buffer Configuration
+  name TEXT NOT NULL,
+  description TEXT,
+  buffer_percentage NUMERIC(5, 2) NOT NULL CHECK (buffer_percentage >= 0 AND buffer_percentage <= 100),
+  buffer_minimum_count INTEGER CHECK (buffer_minimum_count IS NULL OR buffer_minimum_count >= 0),
+  
+  -- Time Period (optional - if NULL, applies globally)
+  day_of_week TEXT CHECK (day_of_week IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') OR day_of_week IS NULL),
+  start_time TIME,
+  end_time TIME,
+  
+  -- Effective Period
+  effective_date DATE NOT NULL,
+  end_date DATE,
+  
+  -- Status
+  is_active BOOLEAN DEFAULT true,
+  
+  -- Timestamps
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  
+  -- Constraints
+  CONSTRAINT valid_date_range CHECK (end_date IS NULL OR end_date >= effective_date),
+  CONSTRAINT valid_time_range CHECK (
+    (start_time IS NULL AND end_time IS NULL) OR
+    (start_time IS NOT NULL AND end_time IS NOT NULL AND end_time > start_time)
+  ),
+  UNIQUE(organization_id, department_id, effective_date, day_of_week, start_time)
+);
+
+CREATE INDEX idx_staffing_buffers_org ON staffing_buffers(organization_id);
+CREATE INDEX idx_staffing_buffers_dept ON staffing_buffers(department_id);
+CREATE INDEX idx_staffing_buffers_active ON staffing_buffers(is_active);
+CREATE INDEX idx_staffing_buffers_effective ON staffing_buffers(effective_date);
+
+-- =============================================
+
+/**
+ * SLA WINDOWS TABLE
+ * Service Level Agreement definitions for specific time periods
+ * Defines required service levels and coverage requirements
+ */
+CREATE TABLE sla_windows (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  department_id UUID REFERENCES departments(id) ON DELETE CASCADE,
+  
+  -- SLA Configuration
+  name TEXT NOT NULL,
+  description TEXT,
+  
+  -- Time Window (repeating pattern)
+  day_of_week TEXT NOT NULL CHECK (day_of_week IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')),
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  
+  -- Service Level Requirements
+  required_coverage_percentage NUMERIC(5, 2) NOT NULL CHECK (required_coverage_percentage >= 0 AND required_coverage_percentage <= 100),
+  minimum_staff_count INTEGER,
+  
+  -- Priority
+  priority TEXT NOT NULL DEFAULT 'medium'
+    CHECK (priority IN ('low', 'medium', 'high', 'critical')),
+  
+  -- Effective Period
+  effective_date DATE NOT NULL,
+  end_date DATE,
+  
+  -- Status
+  is_active BOOLEAN DEFAULT true,
+  
+  -- Timestamps
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  
+  -- Constraints
+  CONSTRAINT valid_date_range CHECK (end_date IS NULL OR end_date >= effective_date),
+  CONSTRAINT valid_times CHECK (end_time > start_time),
+  UNIQUE(organization_id, department_id, day_of_week, start_time, effective_date)
+);
+
+CREATE INDEX idx_sla_windows_org ON sla_windows(organization_id);
+CREATE INDEX idx_sla_windows_dept ON sla_windows(department_id);
+CREATE INDEX idx_sla_windows_active ON sla_windows(is_active);
+CREATE INDEX idx_sla_windows_dow ON sla_windows(day_of_week);
+CREATE INDEX idx_sla_windows_priority ON sla_windows(priority) WHERE priority IN ('high', 'critical');
+
+-- =============================================
 -- TRIGGERS FOR AUTO-UPDATE
 -- =============================================
 
@@ -353,6 +467,16 @@ CREATE TRIGGER trigger_employees_updated_at
 
 CREATE TRIGGER trigger_demands_updated_at 
   BEFORE UPDATE ON demands 
+  FOR EACH ROW 
+  EXECUTE FUNCTION update_updated_at();
+
+CREATE TRIGGER trigger_staffing_buffers_updated_at 
+  BEFORE UPDATE ON staffing_buffers 
+  FOR EACH ROW 
+  EXECUTE FUNCTION update_updated_at();
+
+CREATE TRIGGER trigger_sla_windows_updated_at 
+  BEFORE UPDATE ON sla_windows 
   FOR EACH ROW 
   EXECUTE FUNCTION update_updated_at();
 

@@ -1,0 +1,415 @@
+// Drop Zone and Drag Visual Feedback Styling
+// Drag-and-drop interaction feedback and visual indicators
+
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+// Droppable Shift Slot
+.droppable-shift-slot {
+  position: relative;
+  min-width: 120px;
+  border-right: 1px solid $color-border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm;
+  background: white;
+  cursor: default;
+  transition: all 0.2s ease;
+
+  // Empty state
+  &.empty {
+    color: $color-text-secondary;
+    font-size: 0.75rem;
+    text-align: center;
+
+    .empty-slot {
+      opacity: 0.5;
+    }
+  }
+
+  // Drag over - valid drop target
+  &.drag-over {
+    background: linear-gradient(135deg, rgba($color-success, 0.08), rgba($color-success, 0.12));
+    border-right-color: $color-success;
+    border-right-width: 2px;
+    box-shadow: inset 0 0 8px rgba($color-success, 0.15);
+
+    .drop-indicator {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: none;
+    }
+  }
+
+  // Drag over - invalid drop target
+  &.drag-over-invalid {
+    background: linear-gradient(135deg, rgba($color-error, 0.08), rgba($color-error, 0.12));
+    border-right-color: $color-error;
+    border-right-width: 2px;
+    box-shadow: inset 0 0 8px rgba($color-error, 0.15);
+
+    .drop-error {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: none;
+    }
+  }
+
+  // Drop Indicator
+  .drop-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xs;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 50;
+    pointer-events: none;
+
+    .indicator-icon {
+      font-size: 1.5rem;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    .indicator-text {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: $color-success;
+      text-align: center;
+      white-space: nowrap;
+    }
+  }
+
+  // Drop Error
+  .drop-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xs;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 50;
+    pointer-events: none;
+
+    .error-icon {
+      font-size: 1.5rem;
+      color: $color-error;
+    }
+
+    .error-text {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: $color-error;
+      text-align: center;
+      white-space: nowrap;
+    }
+  }
+
+  // Slot content (assignments)
+  .slot-content {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// Drag Feedback Overlay
+.drag-feedback {
+  position: fixed;
+  pointer-events: none;
+  z-index: 10000;
+  opacity: 0.8;
+  border-radius: $border-radius-sm;
+  box-shadow: $shadow-lg;
+  background: white;
+  border: 2px solid $color-primary;
+
+  &.invalid {
+    opacity: 0.6;
+    border-color: $color-error;
+    background: rgba($color-error, 0.05);
+  }
+}
+
+// Drag Preview
+.drag-preview {
+  padding: $spacing-sm $spacing-md;
+  background: rgba($color-primary, 0.95);
+  color: white;
+  border-radius: $border-radius-sm;
+  font-size: 0.8rem;
+  font-weight: 500;
+  box-shadow: $shadow-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .preview-icon {
+    font-size: 1rem;
+  }
+
+  .preview-text {
+    white-space: nowrap;
+  }
+}
+
+// Drag Helper Text
+.drag-helper {
+  position: fixed;
+  bottom: $spacing-lg;
+  right: $spacing-lg;
+  background: white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-md;
+  z-index: 10001;
+  max-width: 300px;
+
+  &.info {
+    border-left: 4px solid $color-info;
+    background: rgba($color-info, 0.05);
+  }
+
+  &.success {
+    border-left: 4px solid $color-success;
+    background: rgba($color-success, 0.05);
+  }
+
+  &.error {
+    border-left: 4px solid $color-error;
+    background: rgba($color-error, 0.05);
+  }
+
+  &.warning {
+    border-left: 4px solid $color-warning;
+    background: rgba($color-warning, 0.05);
+  }
+
+  .helper-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: $spacing-sm;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    .title-icon {
+      font-size: 1.1rem;
+    }
+  }
+
+  .helper-content {
+    font-size: 0.8rem;
+    color: $color-text-secondary;
+    line-height: 1.5;
+
+    ul {
+      margin: $spacing-sm 0 0 $spacing-md;
+      padding-left: $spacing-md;
+
+      li {
+        margin-bottom: $spacing-xs;
+      }
+    }
+  }
+
+  .helper-close {
+    position: absolute;
+    top: $spacing-sm;
+    right: $spacing-sm;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-text-secondary;
+    font-size: 1.2rem;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $border-radius-sm;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba($color-text-secondary, 0.1);
+      color: $color-text-primary;
+    }
+  }
+}
+
+// Drop Zone Validation Feedback
+.drop-validation-message {
+  position: absolute;
+  bottom: $spacing-md;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-sm;
+  padding: $spacing-sm $spacing-md;
+  font-size: 0.75rem;
+  color: $color-text-secondary;
+  white-space: nowrap;
+  box-shadow: $shadow-sm;
+  z-index: 100;
+  animation: slideUp 0.3s ease-out;
+
+  &.success {
+    border-color: $color-success;
+    color: $color-success;
+    background: rgba($color-success, 0.05);
+  }
+
+  &.error {
+    border-color: $color-error;
+    color: $color-error;
+    background: rgba($color-error, 0.05);
+  }
+
+  &.warning {
+    border-color: $color-warning;
+    color: $color-warning;
+    background: rgba($color-warning, 0.05);
+  }
+}
+
+// Animations
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+// Source highlight during drag
+.drag-source-highlight {
+  position: relative;
+  opacity: 0.5;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px dashed $color-primary;
+    border-radius: $border-radius-sm;
+    animation: pulse 1s ease-in-out infinite;
+  }
+}
+
+// Restricted drop zones
+.drop-zone-restricted {
+  opacity: 0.5;
+  cursor: not-allowed;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba($color-error, 0.05) 10px,
+      rgba($color-error, 0.05) 20px
+    );
+    border-radius: $border-radius-sm;
+    pointer-events: none;
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .droppable-shift-slot {
+    min-width: 100px;
+  }
+
+  .drag-helper {
+    max-width: 250px;
+    bottom: $spacing-md;
+    right: $spacing-md;
+  }
+}
+
+@media (max-width: 768px) {
+  .droppable-shift-slot {
+    min-width: 80px;
+    padding: 4px;
+
+    .drop-indicator,
+    .drop-error {
+      font-size: 0.7rem;
+
+      .indicator-icon,
+      .error-icon {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .drag-helper {
+    max-width: 200px;
+    padding: $spacing-md;
+
+    .helper-title {
+      font-size: 0.85rem;
+    }
+
+    .helper-content {
+      font-size: 0.75rem;
+    }
+  }
+
+  .drag-feedback {
+    min-width: 100px;
+  }
+}

@@ -3,7 +3,7 @@ import { Department, CreateDepartmentInput, UpdateDepartmentInput } from '../../
 
 interface DepartmentFormProps {
   department?: Department | null;
-  organizationId: string;
+  organizationId?: string;
   onSubmit: (data: CreateDepartmentInput | UpdateDepartmentInput) => void;
   onCancel: () => void;
   isLoading?: boolean;

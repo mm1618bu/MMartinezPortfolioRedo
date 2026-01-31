@@ -6,14 +6,8 @@ export interface ShiftTemplate {
   description?: string;
   start_time: string;
   end_time: string;
-  duration_hours: number;
-  break_duration_minutes: number;
-  shift_type?: 'morning' | 'afternoon' | 'evening' | 'night' | 'split';
-  required_skills?: string[];
-  required_certifications?: string[];
-  min_employees: number;
-  max_employees?: number;
-  department_id?: string;
+  days_of_week?: string[];
+  is_full_day: boolean;
   is_active: boolean;
   organization_id: string;
   created_at: string;
@@ -25,14 +19,8 @@ export interface CreateShiftTemplateInput {
   description?: string;
   start_time: string;
   end_time: string;
-  duration_hours: number;
-  break_duration_minutes?: number;
-  shift_type?: 'morning' | 'afternoon' | 'evening' | 'night' | 'split';
-  required_skills?: string[];
-  required_certifications?: string[];
-  min_employees?: number;
-  max_employees?: number;
-  department_id?: string;
+  days_of_week?: string[];
+  is_full_day?: boolean;
   is_active?: boolean;
   organization_id: string;
 }
@@ -42,20 +30,13 @@ export interface UpdateShiftTemplateInput {
   description?: string;
   start_time?: string;
   end_time?: string;
-  duration_hours?: number;
-  break_duration_minutes?: number;
-  shift_type?: 'morning' | 'afternoon' | 'evening' | 'night' | 'split';
-  required_skills?: string[];
-  required_certifications?: string[];
-  min_employees?: number;
-  max_employees?: number;
-  department_id?: string;
+  days_of_week?: string[];
+  is_full_day?: boolean;
   is_active?: boolean;
 }
 
 export interface ShiftTemplateQueryParams {
   organizationId?: string;
-  departmentId?: string;
   shiftType?: 'morning' | 'afternoon' | 'evening' | 'night' | 'split';
   isActive?: boolean;
   search?: string;
