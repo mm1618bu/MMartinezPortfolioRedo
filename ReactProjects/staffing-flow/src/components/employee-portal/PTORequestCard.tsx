@@ -113,7 +113,6 @@ export function PTORequestCard({ employee, compact = false }: PTORequestCardProp
   }
 
   const pendingRequests = requests.filter((r) => r.status === 'pending');
-  const approvedRequests = requests.filter((r) => r.status === 'approved');
   const displayedRequests = compact ? requests.slice(0, 3) : requests;
 
   return (

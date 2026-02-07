@@ -5,7 +5,7 @@ import { z } from 'zod';
  * Defines extra staff buffer percentages to handle surges and absences
  */
 
-export const createStaffingBufferSchema = z.object({
+const baseStaffingBufferSchema = z.object({
   name: z.string().min(1, 'Buffer name is required').max(200, 'Name too long'),
   description: z.string().max(1000, 'Description too long').optional(),
   buffer_percentage: z.number().min(0, 'Must be >= 0').max(100, 'Must be <= 100'),
@@ -20,7 +20,9 @@ export const createStaffingBufferSchema = z.object({
   department_id: z.string().uuid('Invalid department ID').optional(),
 });
 
-export const updateStaffingBufferSchema = createStaffingBufferSchema.partial().refine(
+export const createStaffingBufferSchema = baseStaffingBufferSchema;
+
+export const updateStaffingBufferSchema = baseStaffingBufferSchema.partial().refine(
   (data) => Object.keys(data).length > 0,
   { message: 'At least one field must be provided for update' }
 );

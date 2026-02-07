@@ -13,8 +13,8 @@ interface DemandFiltersProps {
   };
   availableOptions: {
     departments: Array<{ id: string; name: string }>;
-    shiftTypes: string[];
-    priorities: string[];
+    shiftTypes: Array<{ value: string; label: string }> | string[];
+    priorities: Array<{ value: string; label: string }> | string[];
   };
   onFiltersChange: (filters: any) => void;
   onExport: (format: 'csv' | 'json' | 'xlsx') => void;
@@ -153,16 +153,20 @@ const DemandFilters: React.FC<DemandFiltersProps> = ({
         <div className="filter-group">
           <label className="filter-label">Shift Type</label>
           <div className="checkbox-group">
-            {availableOptions.shiftTypes.map(shift => (
-              <label key={shift} className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={filters.shiftTypes.includes(shift)}
-                  onChange={() => handleShiftToggle(shift)}
-                />
-                <span>{shift}</span>
-              </label>
-            ))}
+            {availableOptions.shiftTypes.map(shift => {
+              const value = typeof shift === 'string' ? shift : shift.value;
+              const label = typeof shift === 'string' ? shift : shift.label;
+              return (
+                <label key={value} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={filters.shiftTypes.includes(value)}
+                    onChange={() => handleShiftToggle(value)}
+                  />
+                  <span>{label}</span>
+                </label>
+              );
+            })}
           </div>
         </div>
 
@@ -170,16 +174,20 @@ const DemandFilters: React.FC<DemandFiltersProps> = ({
         <div className="filter-group">
           <label className="filter-label">Priority</label>
           <div className="checkbox-group">
-            {availableOptions.priorities.map(priority => (
-              <label key={priority} className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={filters.priorities.includes(priority)}
-                  onChange={() => handlePriorityToggle(priority)}
-                />
-                <span>{priority}</span>
-              </label>
-            ))}
+            {availableOptions.priorities.map(priority => {
+              const value = typeof priority === 'string' ? priority : priority.value;
+              const label = typeof priority === 'string' ? priority : priority.label;
+              return (
+                <label key={value} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={filters.priorities.includes(value)}
+                    onChange={() => handlePriorityToggle(value)}
+                  />
+                  <span>{label}</span>
+                </label>
+              );
+            })}
           </div>
         </div>
       </div>

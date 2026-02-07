@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { LaborActionsCard } from './LaborActionsCard';
 import { PTORequestCard } from './PTORequestCard';
 import { UPTBalanceCard } from './UPTBalanceCard';

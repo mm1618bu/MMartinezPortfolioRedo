@@ -815,32 +815,6 @@ class AlertRulesEngineService {
     // rather than using JSONB array operations
   }
 
-  /**
-   * Format notification body
-   */
-  private _formatNotificationBody(alert: Alert, _rule: any): string {
-    return `
-Alert: ${alert.message}
-Severity: ${alert.severity}
-Queue: ${alert.queue_name || 'N/A'}
-Current Value: ${alert.current_value}
-Threshold: ${alert.threshold_value}
-Triggered: ${alert.triggered_at}
-    `.trim();
-  }
-
-  /**
-   * Map severity to notification priority
-   */
-  private _mapSeverityToPriority(severity: AlertSeverity): 'low' | 'medium' | 'high' | 'urgent' {
-    switch (severity) {
-      case 'critical': return 'urgent';
-      case 'error': return 'high';
-      case 'warning': return 'medium';
-      case 'info': return 'low';
-    }
-  }
-
   // ==============================================
   // ALERT MANAGEMENT
   // ==============================================
@@ -1174,10 +1148,6 @@ Triggered: ${alert.triggered_at}
 
   private generateGroupId(): string {
     return `group_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  private _generateNotificationId(): string {
-    return `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 }
 

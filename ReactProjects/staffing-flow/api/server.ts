@@ -101,14 +101,6 @@ const server = httpServer.listen(config.server.port, () => {
     host: config.server.host,
     port: config.server.port,
     environment: config.env,
-  
-  // Shutdown WebSocket server first
-  webSocketService.shutdown();
-  logger.info('WebSocket server shut down');
-  
-  // Then close HTTP server
-  server.close(() => {
-    logger.info('HTTP sabled',
     websocket_path: '/ws',
   });
 });

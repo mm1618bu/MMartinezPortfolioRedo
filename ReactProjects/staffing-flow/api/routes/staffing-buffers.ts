@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { staffingBufferService } from '../services/staffing-buffer.service';
 import { createStaffingBufferSchema, updateStaffingBufferSchema } from '../schemas/staffing-buffer.schema';
-import { validateQuery, validateBody } from '../middleware/validation.middleware';
+import { validateQuery, validate } from '../middleware/validation.middleware';
 
 const router = Router();
 
@@ -38,7 +38,7 @@ router.get('/:id', async (req, res) => {
  * POST /api/staffing-buffers
  * Create a new staffing buffer
  */
-router.post('/', validateBody(createStaffingBufferSchema), async (req, res) => {
+router.post('/', validate(createStaffingBufferSchema), async (req, res) => {
   try {
     const validatedData = (req as any).validatedBody;
     const buffer = await staffingBufferService.create(validatedData);
@@ -53,7 +53,7 @@ router.post('/', validateBody(createStaffingBufferSchema), async (req, res) => {
  * PUT /api/staffing-buffers/:id
  * Update a staffing buffer
  */
-router.put('/:id', validateBody(updateStaffingBufferSchema), async (req, res) => {
+router.put('/:id', validate(updateStaffingBufferSchema), async (req, res) => {
   try {
     const validatedData = (req as any).validatedBody;
     const buffer = await staffingBufferService.update(req.params.id, validatedData);

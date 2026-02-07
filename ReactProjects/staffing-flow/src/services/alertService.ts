@@ -346,7 +346,7 @@ export function subscribeToAlerts(
   callback: (payload: AlertEventPayload) => void
 ): () => void {
   // Import Supabase client
-  import('../utils/supabaseClient').then(({ supabase }: any) => {
+  import('../lib/supabase').then(({ supabase }: any) => {
     const channel = supabase
       .channel('alerts')
       .on(
@@ -359,7 +359,7 @@ export function subscribeToAlerts(
             ? `organization_id=eq.${options.organization_id}`
             : undefined,
         },
-        (payload) => {
+        (payload: any) => {
           const alert = payload.new as any as Alert;
           
           // Apply filters

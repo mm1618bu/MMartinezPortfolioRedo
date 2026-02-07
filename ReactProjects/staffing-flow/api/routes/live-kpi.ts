@@ -250,7 +250,7 @@ router.get('/quick', async (req: Request, res: Response): Promise<void> => {
  * GET /api/intraday/kpi/health
  * Health check endpoint
  */
-router.get('/health', async (req: Request, res: Response): Promise<void> => {
+router.get('/health', async (_req: Request, res: Response): Promise<void> => {
   res.status(200).json({
     status: 'healthy',
     service: 'live-kpi-computation',

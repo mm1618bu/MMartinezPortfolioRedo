@@ -6,6 +6,7 @@ import { EmployeeRequirementsChart } from './charts/EmployeeRequirementsChart.ts
 import { TimelineChart } from './charts/TimelineChart.tsx';
 import { DepartmentChart } from './charts/DepartmentChart.tsx';
 import { SkillsChart } from './charts/SkillsChart.tsx';
+import APP_CONFIG from '../../config/app.config';
 import './DemandCharts.css';
 
 interface ChartData {
@@ -30,6 +31,7 @@ export const DemandCharts: React.FC = () => {
 
       // Fetch grid data with filters
       const query: any = {
+        organizationId: APP_CONFIG.DEFAULT_ORGANIZATION_ID,
         pageSize: 1000,
         startDate: dateRange.start,
         endDate: dateRange.end,
@@ -45,7 +47,7 @@ export const DemandCharts: React.FC = () => {
 
       const [gridResponse, summaryResponse] = await Promise.all([
         demandService.getGridData(query),
-        demandService.getGridSummary(),
+        demandService.getGridSummary({ organizationId: APP_CONFIG.DEFAULT_ORGANIZATION_ID }),
       ]);
 
       setChartData({
@@ -134,7 +136,7 @@ export const DemandCharts: React.FC = () => {
             <div className="card-icon">👥</div>
             <div className="card-content">
               <span className="card-label">Employees Needed</span>
-              <span className="card-value">{chartData.summary.totalEmployees}</span>
+              <span className="card-value">{chartData.summary.totalEmployeesNeeded}</span>
             </div>
           </div>
           <div className="summary-card">
@@ -142,7 +144,7 @@ export const DemandCharts: React.FC = () => {
             <div className="card-content">
               <span className="card-label">Daily Average</span>
               <span className="card-value">
-                {chartData.summary.averageEmployeesPerDay.toFixed(1)}
+                {chartData.summary.averagePerDay.toFixed(1)}
               </span>
             </div>
           </div>

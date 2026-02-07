@@ -178,7 +178,7 @@ export function subscribeToAttendanceUpdates(
   callback: (payload: AttendanceUpdatePayload) => void
 ): () => void {
   // Import Supabase client
-  import('../utils/supabaseClient').then(({ supabase }: any) => {
+  import('../lib/supabase').then(({ supabase }: any) => {
     const channel = supabase
       .channel('attendance-snapshots')
       .on(
@@ -222,7 +222,7 @@ export function subscribeToAttendanceUpdates(
             ? `organization_id=eq.${options.organization_id}`
             : undefined,
         },
-        (payload) => {
+        (payload: any) => {
           const snapshot = payload.new as any;
           
           // Apply additional filters

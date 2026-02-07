@@ -275,7 +275,6 @@ export function VETVTOManagement({ manager, compact = false }: VETVTOManagementP
             <div className="action-cards">
               {displayedActions.map((action) => {
                 const pendingResponses = action.responses.filter((r) => r.status === 'pending');
-                const approvedResponses = action.responses.filter((r) => r.status === 'approved');
 
                 return (
                   <div key={action.action_id} className={`action-card ${action.action_type.toLowerCase()}`}>

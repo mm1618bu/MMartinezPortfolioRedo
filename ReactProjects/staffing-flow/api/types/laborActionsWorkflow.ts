@@ -4,9 +4,7 @@
  */
 
 import type {
-  LaborAction,
   LaborActionResponse,
-  PriorityOrder,
   ResponseStatus,
   ActionStatus,
 } from './laborActions';

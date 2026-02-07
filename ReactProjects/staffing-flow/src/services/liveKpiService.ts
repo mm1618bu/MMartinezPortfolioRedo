@@ -184,7 +184,7 @@ export function subscribeToKPIUpdates(
   callback: (payload: KPIUpdatePayload) => void
 ): () => void {
   // Import Supabase client
-  import('../utils/supabaseClient').then(({ supabase }: any) => {
+  import('../lib/supabase').then(({ supabase }: any) => {
     const channel = supabase
       .channel('live-kpi-snapshots')
       .on(
@@ -197,7 +197,7 @@ export function subscribeToKPIUpdates(
             ? `organization_id=eq.${options.organization_id}`
             : undefined,
         },
-        (payload) => {
+        (payload: any) => {
           const snapshot = payload.new as any as LiveKPISnapshot;
           
           // Apply additional filters

@@ -5,6 +5,7 @@ import DemandFilters from './DemandFilters.tsx';
 import DemandForm from './DemandForm.tsx';
 import { CSVExportModal } from './CSVExportModal';
 import { HeadcountSummary } from './HeadcountSummary';
+import APP_CONFIG from '../../config/app.config';
 import './DemandEditor.css';
 
 interface GridState {
@@ -32,7 +33,7 @@ export const DemandEditor: React.FC = () => {
     data: [],
     pagination: { page: 1, pageSize: 20, total: 0, totalPages: 0, hasNext: false, hasPrevious: false },
     filters: { applied: {}, available: { departments: [], shiftTypes: [], priorities: [] } },
-    sort: { field: 'date', order: 'DESC' },
+    sort: { field: 'date', order: 'desc' },
     loading: false,
     error: null,
   });
@@ -61,10 +62,11 @@ export const DemandEditor: React.FC = () => {
 
     try {
       const query: DemandGridQuery = {
+        organizationId: APP_CONFIG.DEFAULT_ORGANIZATION_ID,
         page: currentPage,
         pageSize,
         sortBy: (gridState.sort.field as any) || 'date',
-        sortOrder: (gridState.sort.order as any) || 'DESC',
+        sortOrder: (gridState.sort.order as any) || 'desc',
         departmentIds: filters.departmentIds.length > 0 ? filters.departmentIds : undefined,
         shiftTypes: filters.shiftTypes.length > 0 ? filters.shiftTypes : undefined,
         priorities: filters.priorities.length > 0 ? filters.priorities : undefined,
@@ -82,12 +84,14 @@ export const DemandEditor: React.FC = () => {
         pagination: response.pagination,
         filters: response.filters,
         sort: response.sort,
+        loading: false,
       }));
       setSelectedIds(new Set());
     } catch (error) {
       setGridState(prev => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Failed to fetch demands',
+        loading: false,
       }));
     }
   }, [currentPage, pageSize, filters, gridState.sort]);
@@ -95,7 +99,7 @@ export const DemandEditor: React.FC = () => {
   // Fetch summary
   const fetchSummary = useCallback(async () => {
     try {
-      const data = await demandService.getGridSummary();
+      const data = await demandService.getGridSummary({ organizationId: APP_CONFIG.DEFAULT_ORGANIZATION_ID });
       setSummary(data);
     } catch (error) {
       console.error('Failed to fetch summary:', error);
@@ -110,7 +114,7 @@ export const DemandEditor: React.FC = () => {
 
   const handleSort = (field: string) => {
     const newOrder =
-      gridState.sort.field === field && gridState.sort.order === 'DESC' ? 'ASC' : 'DESC';
+      gridState.sort.field === field && gridState.sort.order === 'desc' ? 'asc' : 'desc';
 
     setGridState(prev => ({
       ...prev,
@@ -259,16 +263,16 @@ export const DemandEditor: React.FC = () => {
           </div>
           <div className="summary-card">
             <div className="summary-label">Total Employees Needed</div>
-            <div className="summary-value">{summary.totalEmployees}</div>
+            <div className="summary-value">{summary.totalEmployeesNeeded}</div>
           </div>
           <div className="summary-card">
             <div className="summary-label">Avg Employees/Day</div>
-            <div className="summary-value">{summary.averageEmployeesPerDay.toFixed(1)}</div>
+            <div className="summary-value">{summary.averagePerDay.toFixed(1)}</div>
           </div>
           <div className="summary-card">
             <div className="summary-label">High Priority</div>
             <div className="summary-value" style={{ color: '#d32f2f' }}>
-              {summary.byPriority['high'] || 0}
+              {summary.byPriority.high || 0}
             </div>
           </div>
         </div>

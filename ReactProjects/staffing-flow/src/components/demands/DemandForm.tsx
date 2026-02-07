@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Demand, demandService, CreateDemandInput, UpdateDemandInput } from '../../services/demandService';
+import APP_CONFIG from '../../config/app.config';
 
 interface DemandFormProps {
   demand?: Demand;
@@ -52,9 +53,8 @@ const DemandForm: React.FC<DemandFormProps> = ({ demand, departments, onClose, o
       });
       setOrganizationId(demand.organization_id);
     } else {
-      // Get organization from current user/session
-      const orgId = localStorage.getItem('organization_id');
-      if (orgId) setOrganizationId(orgId);
+      // Use default organization ID from config
+      setOrganizationId(APP_CONFIG.DEFAULT_ORGANIZATION_ID);
     }
   }, [demand]);
 

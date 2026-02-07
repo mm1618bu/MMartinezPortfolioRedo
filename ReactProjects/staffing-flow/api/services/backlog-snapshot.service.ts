@@ -21,7 +21,6 @@ import type {
   BacklogAnalyticsResponse,
   CreateBacklogAlertRequest,
   BacklogAlertRule,
-  BacklogAlert,
 } from '../types/backlogSnapshot';
 
 class BacklogSnapshotService {

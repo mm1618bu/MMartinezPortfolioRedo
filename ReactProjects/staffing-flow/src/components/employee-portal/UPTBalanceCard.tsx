@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUPTBalance, getUPTExceptions, UPTBalance, UPTException } from '../../services/laborActionsService';
+import { getUPTBalance, UPTBalance, UPTException } from '../../services/laborActionsService';
 import type { EmployeeInfo } from './EmployeePortal';
 
 interface UPTBalanceCardProps {
@@ -12,7 +12,6 @@ export function UPTBalanceCard({ employee, compact = false }: UPTBalanceCardProp
   const [exceptions, setExceptions] = useState<UPTException[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAllExceptions, setShowAllExceptions] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -254,14 +253,6 @@ export function UPTBalanceCard({ employee, compact = false }: UPTBalanceCardProp
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-
-          {compact && exceptions.length > 3 && (
-            <div className="card-footer">
-              <button className="btn btn-link" onClick={() => setShowAllExceptions(true)}>
-                View all {exceptions.length} exceptions →
-              </button>
             </div>
           )}
         </div>

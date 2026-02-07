@@ -172,7 +172,7 @@ export function subscribeToBacklogUpdates(
   callback: (payload: BacklogUpdatePayload) => void
 ): () => void {
   // Import Supabase client
-  import('../utils/supabaseClient').then(({ supabase }: any) => {
+  import('../lib/supabase').then(({ supabase }: any) => {
     const channel = supabase
       .channel('backlog-snapshots')
       .on(

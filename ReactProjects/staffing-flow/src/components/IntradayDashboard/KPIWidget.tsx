@@ -58,7 +58,7 @@ const KPIWidget: React.FC<KPIWidgetProps> = ({ type, data, isLoading }) => {
           </div>
           <div className="detail-row">
             <span>Efficiency:</span>
-            <strong>{(util.efficiency_rate * 100).toFixed(0)}%</strong>
+            <strong>{(util.efficiency_score).toFixed(0)}%</strong>
           </div>
         </div>
         {change !== 0 && (
@@ -79,7 +79,7 @@ const KPIWidget: React.FC<KPIWidgetProps> = ({ type, data, isLoading }) => {
     const gap = data.headcount_gap;
     const gapValue = gap.headcount_gap;
     const status = gap.staffing_level === 'optimal' ? 'excellent' :
-                   gap.staffing_level === 'acceptable' ? 'good' :
+                   gap.staffing_level === 'overstaffed' ? 'good' :
                    gap.staffing_level === 'understaffed' ? 'warning' : 'critical';
 
     return (

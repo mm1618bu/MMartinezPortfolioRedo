@@ -5,7 +5,7 @@ import { z } from 'zod';
  * Service Level Agreement definitions for specific time periods
  */
 
-export const createSLAWindowSchema = z.object({
+const baseSLAWindowSchema = z.object({
   name: z.string().min(1, 'SLA name is required').max(200, 'Name too long'),
   description: z.string().max(1000, 'Description too long').optional(),
   day_of_week: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
@@ -19,12 +19,14 @@ export const createSLAWindowSchema = z.object({
   is_active: z.boolean().default(true),
   organization_id: z.string().uuid('Invalid organization ID'),
   department_id: z.string().uuid('Invalid department ID').optional(),
-}).refine(
+});
+
+export const createSLAWindowSchema = baseSLAWindowSchema.refine(
   (data) => data.end_time > data.start_time,
   { message: 'End time must be after start time', path: ['end_time'] }
 );
 
-export const updateSLAWindowSchema = createSLAWindowSchema.partial().refine(
+export const updateSLAWindowSchema = baseSLAWindowSchema.partial().refine(
   (data) => Object.keys(data).length > 0,
   { message: 'At least one field must be provided for update' }
 );

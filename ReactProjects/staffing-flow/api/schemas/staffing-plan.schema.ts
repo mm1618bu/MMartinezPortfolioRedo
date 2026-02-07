@@ -5,7 +5,8 @@ import { z } from 'zod';
  * Validates staffing plan creation, updates, and queries
  */
 
-export const createStaffingPlanSchema = z.object({
+// Base schema without refinements (for partial updates)
+const staffingPlanBaseSchema = z.object({
   name: z.string().min(1, 'Plan name is required').max(200, 'Name too long'),
   description: z.string().max(1000, 'Description too long').optional(),
   start_date: z.string().refine((date) => !isNaN(Date.parse(date)), 'Invalid start date'),
@@ -20,12 +21,14 @@ export const createStaffingPlanSchema = z.object({
   internal_comments: z.string().max(2000, 'Comments too long').optional(),
   organization_id: z.string().uuid('Invalid organization ID'),
   department_id: z.string().uuid('Invalid department ID').optional(),
-}).refine(
+});
+
+export const createStaffingPlanSchema = staffingPlanBaseSchema.refine(
   (data) => new Date(data.end_date) >= new Date(data.start_date),
   { message: 'End date must be after or equal to start date', path: ['end_date'] }
 );
 
-export const updateStaffingPlanSchema = createStaffingPlanSchema.partial().refine(
+export const updateStaffingPlanSchema = staffingPlanBaseSchema.partial().refine(
   (data) => Object.keys(data).length > 0,
   { message: 'At least one field must be provided for update' }
 );
@@ -46,7 +49,8 @@ export const staffingPlanQuerySchema = z.object({
  * Staffing Plan Assignment Schema
  */
 
-export const createStaffingPlanAssignmentSchema = z.object({
+// Base schema without refinements (for partial updates)
+const staffingPlanAssignmentBaseSchema = z.object({
   staffing_plan_id: z.string().uuid('Invalid plan ID'),
   employee_id: z.string().uuid('Invalid employee ID'),
   organization_id: z.string().uuid('Invalid organization ID'),
@@ -56,12 +60,14 @@ export const createStaffingPlanAssignmentSchema = z.object({
   shift_template_id: z.string().uuid('Invalid shift template ID').optional(),
   status: z.enum(['proposed', 'assigned', 'confirmed', 'active', 'completed', 'cancelled']).default('proposed'),
   notes: z.string().max(500, 'Notes too long').optional(),
-}).refine(
+});
+
+export const createStaffingPlanAssignmentSchema = staffingPlanAssignmentBaseSchema.refine(
   (data) => !data.assignment_end_date || new Date(data.assignment_end_date) >= new Date(data.assignment_date),
   { message: 'End date must be after or equal to start date', path: ['assignment_end_date'] }
 );
 
-export const updateStaffingPlanAssignmentSchema = createStaffingPlanAssignmentSchema.partial().refine(
+export const updateStaffingPlanAssignmentSchema = staffingPlanAssignmentBaseSchema.partial().refine(
   (data) => Object.keys(data).length > 0,
   { message: 'At least one field must be provided for update' }
 );

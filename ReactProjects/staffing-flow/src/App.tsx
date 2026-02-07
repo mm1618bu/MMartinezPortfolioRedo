@@ -10,6 +10,7 @@ import { DemandCharts } from './components/visualizations/DemandCharts.tsx';
 import { DatabaseHealthCheck } from './components/admin/DatabaseHealthCheck';
 import { EmployeePortal } from './components/employee-portal';
 import { LaborActionsManagement } from './components/labor-actions-management/LaborActionsManagement';
+import { DemandGenerationEngine } from './components/simulation/DemandGenerationEngine';
 import './components/departments/DepartmentManagement.css';
 import './components/employees/EmployeeManagement.css';
 import './components/labor-standards/LaborStandardManagement.css';
@@ -17,7 +18,7 @@ import './components/shift-templates/ShiftTemplateManagement.css';
 import './components/demands/DemandEditor.css';
 import './components/visualizations/DemandCharts.css';
 
-type Page = 'home' | 'sites' | 'departments' | 'employees' | 'labor-standards' | 'shift-templates' | 'demands' | 'demand-charts' | 'health-check' | 'employee-portal' | 'labor-management';
+type Page = 'home' | 'sites' | 'departments' | 'employees' | 'labor-standards' | 'shift-templates' | 'demands' | 'demand-charts' | 'health-check' | 'employee-portal' | 'labor-management' | 'simulation';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -62,6 +63,9 @@ function App() {
           <button className={currentPage === 'labor-management' ? 'active' : ''} onClick={() => setCurrentPage('labor-management')}>
             👔 Labor Management
           </button>
+          <button className={currentPage === 'simulation' ? 'active' : ''} onClick={() => setCurrentPage('simulation')}>
+            🎲 Simulation
+          </button>
         </div>
       </nav>
 
@@ -91,6 +95,9 @@ function App() {
               </button>
               <button className="btn btn-primary btn-lg" onClick={() => setCurrentPage('demand-charts')}>
                 View Analytics →
+              </button>
+              <button className="btn btn-primary btn-lg" onClick={() => setCurrentPage('simulation')}>
+                Run Simulation →
               </button>
             </div>
             <div className="feature-grid">
@@ -126,6 +133,10 @@ function App() {
                 <h3>📉 Analytics & Charts</h3>
                 <p>Visualize demand trends and requirements</p>
               </div>
+              <div className="feature-card">
+                <h3>🎲 Demand Simulation</h3>
+                <p>Generate and test workforce demand scenarios</p>
+              </div>
             </div>
           </div>
         )}
@@ -140,6 +151,7 @@ function App() {
         {currentPage === 'health-check' && <DatabaseHealthCheck />}
         {currentPage === 'employee-portal' && <EmployeePortal />}
         {currentPage === 'labor-management' && <LaborActionsManagement />}
+        {currentPage === 'simulation' && <DemandGenerationEngine />}
       </main>
     </div>
   );

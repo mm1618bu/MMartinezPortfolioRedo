@@ -45,7 +45,6 @@ const IntradayDashboard: React.FC<IntradayDashboardProps> = ({
   // WebSocket connection
   const {
     isConnected,
-    isAuthenticated,
     connectionStatus,
     error: connectionError,
     socketId,

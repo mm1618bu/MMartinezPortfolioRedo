@@ -16,7 +16,6 @@ import staffingPlanRoutes from './staffing-plans';
 import shiftConstraintRoutes from './shift-constraints';
 import scheduleGenerationRoutes from './schedule-generation';
 import coverageScoringRoutes from './coverage-scoring';
-import scheduleAPIRoutes from './schedule-api';
 import backlogSnapshotRoutes from './backlog-snapshot';
 import liveKPIRoutes from './live-kpi';
 import alertRoutes from './alerts';
@@ -36,8 +35,8 @@ router.use('/sites', siteRoutes);
 router.use('/skills', skillRoutes);
 router.use('/labor-standards', laborStandardRoutes);
 router.use('/shift-templates', shiftTemplateRoutes);
+router.use('/demands', demandGridRoutes); // Grid-specific endpoints (must be before demandRoutes to avoid /:id conflict)
 router.use('/demands', demandRoutes);
-router.use('/demands', demandGridRoutes); // Grid-specific endpoints
 router.use('/staffing-buffers', staffingBufferRoutes);
 router.use('/sla-windows', slaWindowRoutes);
 router.use('/staffing-plans', staffingPlanRoutes);

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { slaWindowService } from '../services/sla-window.service';
 import { createSLAWindowSchema, updateSLAWindowSchema } from '../schemas/sla-window.schema';
-import { validateQuery, validateBody } from '../middleware/validation.middleware';
+import { validateQuery, validate } from '../middleware/validation.middleware';
 
 const router = Router();
 
@@ -38,7 +38,7 @@ router.get('/:id', async (req, res) => {
  * POST /api/sla-windows
  * Create a new SLA window
  */
-router.post('/', validateBody(createSLAWindowSchema), async (req, res) => {
+router.post('/', validate(createSLAWindowSchema), async (req, res) => {
   try {
     const validatedData = (req as any).validatedBody;
     const window = await slaWindowService.create(validatedData);
@@ -53,7 +53,7 @@ router.post('/', validateBody(createSLAWindowSchema), async (req, res) => {
  * PUT /api/sla-windows/:id
  * Update an SLA window
  */
-router.put('/:id', validateBody(updateSLAWindowSchema), async (req, res) => {
+router.put('/:id', validate(updateSLAWindowSchema), async (req, res) => {
   try {
     const validatedData = (req as any).validatedBody;
     const window = await slaWindowService.update(req.params.id, validatedData);

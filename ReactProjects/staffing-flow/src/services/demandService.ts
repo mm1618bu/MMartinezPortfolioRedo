@@ -74,10 +74,11 @@ export interface UpdateDemandInput {
 }
 
 export interface DemandGridQuery {
+  organizationId?: string;
   page?: number;
   pageSize?: number;
   sortBy?: 'date' | 'department' | 'shift_type' | 'required_employees' | 'priority' | 'created_at';
-  sortOrder?: 'ASC' | 'DESC';
+  sortOrder?: 'asc' | 'desc';
   departmentIds?: string[];
   shiftTypes?: string[];
   priorities?: string[];
@@ -114,9 +115,13 @@ export interface DemandGridResponse {
 
 export interface DemandSummary {
   totalRecords: number;
-  totalEmployees: number;
-  averageEmployeesPerDay: number;
-  byPriority: Record<string, number>;
+  totalEmployeesNeeded: number;
+  averagePerDay: number;
+  byPriority: {
+    low: number;
+    medium: number;
+    high: number;
+  };
 }
 
 export interface BulkUpdateRequest {
@@ -139,6 +144,7 @@ class DemandService {
   async getGridData(query: DemandGridQuery = {}): Promise<DemandGridResponse> {
     const params = new URLSearchParams();
 
+    if (query.organizationId) params.append('organizationId', query.organizationId);
     if (query.page) params.append('page', query.page.toString());
     if (query.pageSize) params.append('pageSize', query.pageSize.toString());
     if (query.sortBy) params.append('sortBy', query.sortBy);
@@ -265,8 +271,11 @@ class DemandService {
   }
 
   // Get grid summary/statistics
-  async getGridSummary(): Promise<DemandSummary> {
-    const response = await fetch(`${API_BASE_URL}/grid/summary`, {
+  async getGridSummary(query: { organizationId?: string } = {}): Promise<DemandSummary> {
+    const params = new URLSearchParams();
+    if (query.organizationId) params.append('organizationId', query.organizationId);
+    
+    const response = await fetch(`${API_BASE_URL}/grid/summary?${params}`, {
       headers: this.getAuthHeaders(),
     });
 
