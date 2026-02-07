@@ -13,7 +13,7 @@ import type {
   ScheduleOptimizationRequest,
   ScheduleOptimizationResponse,
   EmployeeAssignment,
-} from '../../api/schemas/simulation.schema';
+} from './simulation.schema.types';
 
 // Re-export schema types
 export type {

@@ -57,12 +57,14 @@ function App() {
           <button className={currentPage === 'health-check' ? 'active' : ''} onClick={() => setCurrentPage('health-check')}>
             Database Health
           </button>
+          {/* Temporarily disabled - API routes need to be implemented
           <button className={currentPage === 'employee-portal' ? 'active' : ''} onClick={() => setCurrentPage('employee-portal')}>
             🧑‍💼 Employee Portal
           </button>
           <button className={currentPage === 'labor-management' ? 'active' : ''} onClick={() => setCurrentPage('labor-management')}>
             👔 Labor Management
           </button>
+          */}
           <button className={currentPage === 'simulation' ? 'active' : ''} onClick={() => setCurrentPage('simulation')}>
             🎲 Simulation
           </button>
@@ -149,8 +151,10 @@ function App() {
         {currentPage === 'demands' && <DemandEditor />}
         {currentPage === 'demand-charts' && <DemandCharts />}
         {currentPage === 'health-check' && <DatabaseHealthCheck />}
+        {/* Temporarily disabled - API routes need to be implemented
         {currentPage === 'employee-portal' && <EmployeePortal />}
         {currentPage === 'labor-management' && <LaborActionsManagement />}
+        */}
         {currentPage === 'simulation' && <DemandGenerationEngine />}
       </main>
     </div>

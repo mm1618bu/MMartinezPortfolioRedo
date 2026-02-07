@@ -8,6 +8,7 @@ import {
   UpdateDepartmentInput,
   DepartmentStatistics,
 } from '../../services/departmentService';
+import APP_CONFIG from '../../config/app.config';
 
 export const DepartmentManagement: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -38,7 +39,9 @@ export const DepartmentManagement: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await departmentService.getAll();
+      const data = await departmentService.getAll({
+        organizationId: APP_CONFIG.DEFAULT_ORGANIZATION_ID,
+      });
       setDepartments(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch departments');
@@ -141,6 +144,7 @@ export const DepartmentManagement: React.FC = () => {
       {showForm ? (
         <DepartmentForm
           department={editingDepartment}
+          organizationId={APP_CONFIG.DEFAULT_ORGANIZATION_ID}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isLoading={isSubmitting}

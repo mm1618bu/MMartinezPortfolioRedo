@@ -10,7 +10,7 @@ import {
   SimulationScenario,
   validateDemandSimulationResponse,
   validateScheduleOptimizationResponse,
-} from '../../api/schemas/simulation.schema';
+} from '../types/simulation.schema.types';
 
 /**
  * Simulation Service

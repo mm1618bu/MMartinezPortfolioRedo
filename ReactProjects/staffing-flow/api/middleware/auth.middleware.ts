@@ -33,17 +33,16 @@ export const authenticate = async (
   try {
     // Development bypass: skip auth check entirely in development
     const isDev = process.env.NODE_ENV === 'development';
-    console.log(`[AUTH] isDev=${isDev}, NODE_ENV=${process.env.NODE_ENV}`);
     
     if (isDev) {
       // Create a mock user for local development
-      console.log('[AUTH] Using development bypass');
+      // Using the same organization ID as default in frontend
       req.user = {
         id: '00000000-0000-0000-0000-000000000001',
         email: 'dev@localhost',
         name: 'Dev User',
         role: 'admin',
-        organization_id: '00000000-0000-0000-0000-000000000001',
+        organization_id: 'a0000000-0000-4000-8000-000000000001',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

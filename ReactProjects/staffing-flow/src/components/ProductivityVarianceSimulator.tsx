@@ -3,7 +3,7 @@
  * Example React component demonstrating productivity variance engine usage
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { productivityVarianceService } from '../services/productivityVarianceService';
 import {
   VarianceScenario,

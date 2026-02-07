@@ -123,6 +123,11 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
       }
     } else {
       // Create mode
+      if (!organizationId) {
+        setErrors((prev) => ({ ...prev, name: 'Organization ID is required' }));
+        return;
+      }
+
       const createData: CreateDepartmentInput = {
         name: formData.name,
         organization_id: organizationId,
