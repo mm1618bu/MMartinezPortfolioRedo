@@ -98,6 +98,41 @@
     }
   }
 
+  // Dashboard Tabs
+  .dashboard-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #e0e0e0;
+
+    .tab-button {
+      padding: 12px 24px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-size: 16px;
+      font-weight: 500;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: -2px;
+
+      &:hover {
+        color: #0066cc;
+        background: rgba(0, 102, 204, 0.05);
+      }
+
+      &.active {
+        color: #0066cc;
+        border-bottom-color: #0066cc;
+      }
+    }
+  }
+
+  .tab-content {
+    animation: fadeIn 0.3s ease;
+  }
+
   .connection-info {
     display: flex;
     gap: 24px;
@@ -289,5 +324,16 @@
   50% {
     opacity: 0.8;
     transform: scale(1.05);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

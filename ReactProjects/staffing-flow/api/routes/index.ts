@@ -22,6 +22,7 @@ import alertRoutes from './alerts';
 import attendanceSnapshotRoutes from './attendance-snapshot';
 import websocketRoutes from './websocket';
 import { router as laborActionsRoutes } from './labor-actions.routes';
+import simulationRoutes from './simulation.routes';
 
 const router = Router();
 
@@ -49,5 +50,6 @@ router.use('/alerts', alertRoutes); // Alert rules engine
 router.use('/intraday/attendance', attendanceSnapshotRoutes); // Attendance snapshot ingestion
 router.use('/ws', websocketRoutes); // WebSocket management and stats
 router.use('/labor-actions', laborActionsRoutes); // VET/VTO labor actions
+router.use('/simulations', simulationRoutes); // Workforce simulation operations
 
 export default router;

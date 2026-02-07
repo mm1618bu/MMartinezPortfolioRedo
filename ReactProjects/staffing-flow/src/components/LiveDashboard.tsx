@@ -1,6 +1,7 @@
 /**
  * Live Dashboard Component
  * Example component demonstrating WebSocket integration for real-time updates
+ * and simulation controls
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -16,6 +17,7 @@ import type {
   AlertUpdatePayload,
   BacklogUpdatePayload,
 } from '../../api/types/websocket';
+import SimulationControlPanel from './SimulationControlPanel';
 import './LiveDashboard.scss';
 
 interface LiveDashboardProps {
@@ -53,6 +55,9 @@ const LiveDashboard: React.FC<LiveDashboardProps> = ({
   // State for real-time data
   const [currentKPIs, setCurrentKPIs] = useState<KPIUpdatePayload | null>(null);
   const [currentBacklog, setCurrentBacklog] = useState<BacklogUpdatePayload | null>(null);
+  
+  // Tab state for dashboard sections
+  const [activeTab, setActiveTab] = useState<'live' | 'simulation'>('live');
 
   // KPI updates handler
   const handleKPIUpdate = useCallback((payload: KPIUpdatePayload) => {
@@ -118,12 +123,30 @@ const LiveDashboard: React.FC<LiveDashboardProps> = ({
         </div>
       </div>
 
-      {/* Connection Info */}
-      {connectionError && (
-        <div className="error-banner">
-          <strong>Connection Error:</strong> {connectionError.message}
-        </div>
-      )}
+      {/* Tab Navigation */}
+      <div className="dashboard-tabs">
+        <button
+          className={`tab-button ${activeTab === 'live' ? 'active' : ''}`}
+          onClick={() => setActiveTab('live')}
+        >
+          📊 Live Monitoring
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'simulation' ? 'active' : ''}`}
+          onClick={() => setActiveTab('simulation')}
+        >
+          🎯 Simulation Controls
+        </button>
+      </div>
+
+      {/* Live Monitoring Tab */}
+      {activeTab === 'live' && (
+        <div className="tab-content">
+          {connectionError && (
+            <div className="error-banner">
+              <strong>Connection Error:</strong> {connectionError.message}
+            </div>
+          )}
 
       {isConnected && isAuthenticated && (
         <div className="connection-info">
@@ -232,6 +255,22 @@ const LiveDashboard: React.FC<LiveDashboardProps> = ({
       {isConnected && !isAuthenticated && (
         <div className="status-message">
           <p>Authenticating...</p>
+        </div>
+      )}
+        </div>
+      )}
+
+      {/* Simulation Controls Tab */}
+      {activeTab === 'simulation' && (
+        <div className="tab-content">
+          <SimulationControlPanel
+            organizationId={organizationId}
+            departmentId={departmentId}
+            onSimulationComplete={(results) => {
+              console.log('Simulation completed:', results);
+              // Could trigger alerts or other actions here
+            }}
+          />
         </div>
       )}
     </div>
