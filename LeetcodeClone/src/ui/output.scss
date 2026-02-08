@@ -1,0 +1,219 @@
+// Output Panel Styles
+.output-panel {
+  background: var(--bg-main);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-12);
+  min-height: 120px;
+  max-height: 300px;
+  overflow-y: auto;
+  transition: border-color var(--duration-fast) var(--ease);
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--bg-elevated);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-default);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--text-secondary);
+    }
+  }
+}
+
+.output-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-8);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.output-status__icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.output-status__text {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  
+  .badge {
+    margin: 0;
+  }
+}
+
+.output-status__time {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.output-content {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+// State-specific styles
+.output-panel--idle {
+  .output-status__icon {
+    background: var(--text-secondary);
+    animation: none;
+  }
+  
+  .output-status__text {
+    color: var(--text-secondary);
+  }
+}
+
+.output-panel--running {
+  border-color: var(--primary-500);
+  
+  .output-status__icon {
+    background: var(--primary-500);
+    animation: pulse 1s ease-in-out infinite;
+  }
+  
+  .output-status__text {
+    color: var(--primary-500);
+  }
+  
+  .output-content {
+    color: var(--primary-500);
+  }
+}
+
+.output-panel--success {
+  border-color: var(--status-accepted);
+  
+  .output-status__icon {
+    background: var(--status-accepted);
+    animation: none;
+  }
+  
+  .output-status__text {
+    color: var(--status-accepted);
+  }
+  
+  .output-content {
+    color: var(--text-primary);
+  }
+}
+
+.output-panel--error,
+.output-panel--compile-error,
+.output-panel--runtime-error {
+  border-color: var(--status-wrong);
+  
+  .output-status__icon {
+    background: var(--status-wrong);
+    animation: none;
+  }
+  
+  .output-status__text {
+    color: var(--status-wrong);
+  }
+  
+  .output-content {
+    color: var(--status-wrong);
+  }
+}
+
+.output-panel--compile-error {
+  border-color: var(--status-compile);
+  
+  .output-status__icon {
+    background: var(--status-compile);
+  }
+  
+  .output-status__text {
+    color: var(--status-compile);
+  }
+  
+  .output-content {
+    color: var(--status-compile);
+  }
+}
+
+.output-panel--runtime-error {
+  border-color: var(--status-runtime);
+  
+  .output-status__icon {
+    background: var(--status-runtime);
+  }
+  
+  .output-status__text {
+    color: var(--status-runtime);
+  }
+  
+  .output-content {
+    color: var(--status-runtime);
+  }
+}
+
+// Console actions
+.console-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.console-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition: background var(--duration-fast) var(--ease),
+    color var(--duration-fast) var(--ease);
+
+  &:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 2px;
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+// Animations
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}

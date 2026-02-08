@@ -20,9 +20,18 @@ html(lang="en")
       .split-pane
         aside.split-pane__left.card
           .card__header
-            h2.card__title Problem
-            span.badge.badge--easy Easy
-          .card__body
+            .flex.items-center.gap-2
+              h2.card__title Problem
+              span.badge.badge--easy Easy
+              button#solvedToggle.solved-toggle(type="button" aria-label="Mark as solved" data-solved="false")
+                svg.solved-toggle__icon(width="20" height="20" viewBox="0 0 20 20" fill="none")
+                  circle.solved-toggle__circle(cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none")
+                  path.solved-toggle__check(d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+                span.solved-toggle__text Solved
+            button#problemToggle.toggle-btn(type="button" aria-label="Toggle problem statement" aria-expanded="true")
+              svg.chevron(width="20" height="20" viewBox="0 0 20 20" fill="none")
+                path(d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+          .card__body#problemContent
             p Given an array of integers, return indices of the two numbers such that they add up to target.
             h3 Constraints
             ul
@@ -38,18 +47,332 @@ html(lang="en")
         .split-pane__resizer(aria-hidden="true")
         section.split-pane__right.card
           .card__header
-            h2.card__title Editor
-            .tabs
-              button.tab.is-active(type="button") JavaScript
-              button.tab(type="button") Python
+            .flex.items-center.gap-2
+              h2.card__title Editor
+              .language-selector
+                button.language-tab.is-active(type="button" data-language="javascript" title="JavaScript")
+                  svg.language-tab__icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+                    rect(width="16" height="16" rx="2" fill="#F7DF1E")
+                    text(x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#000") JS
+                  span.language-tab__label JavaScript
+                button.language-tab(type="button" data-language="python" title="Python")
+                  svg.language-tab__icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+                    path(d="M7.5 1C5.5 1 5 2 5 3v2h3v.5H4C2.5 5.5 1 6.5 1 9s1.5 3.5 3 3.5h1.5V11c0-1.5 1-2.5 2.5-2.5h3c1 0 2-.8 2-2V3c0-1-1-2-3-2h-2.5zm-.5 1h1c.5 0 1 .5 1 1s-.5 1-1 1-1-.5-1-1 .5-1 1-1z" fill="#3776AB")
+                    path(d="M8.5 15c2 0 2.5-1 2.5-2v-2H8v-.5h4c1.5 0 3-1 3-3.5s-1.5-3.5-3-3.5h-1.5V5c0 1.5-1 2.5-2.5 2.5h-3c-1 0-2 .8-2 2V13c0 1 1 2 3 2h2.5zM9 14h-1c-.5 0-1-.5-1-1s.5-1 1-1 1 .5 1 1-.5 1-1 1z" fill="#FFD43B")
+                  span.language-tab__label Python
+                button.language-tab(type="button" data-language="typescript" title="TypeScript")
+                  svg.language-tab__icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+                    rect(width="16" height="16" rx="2" fill="#3178C6")
+                    text(x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#fff") TS
+                  span.language-tab__label TypeScript
+                button.language-tab(type="button" data-language="java" title="Java")
+                  svg.language-tab__icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+                    path(d="M5.5 11c0 .5 1 1 2.5 1s2.5-.5 2.5-1-1-1-2.5-1-2.5.5-2.5 1zm0-2.5c0 .5 1 1 2.5 1s2.5-.5 2.5-1-1-1-2.5-1-2.5.5-2.5 1z" fill="#5382A1")
+                    path(d="M6.5 6.5s-.5 1 1 1.5c0 0 2 .5 3.5-.5 0 0 1-.5 1-1.5s-1-2-2.5-2.5c0 0-.5-.5-1.5 0s-1.5 1-1.5 2.5z" fill="#5382A1")
+                    path(d="M9 13.5c0 .5 2 1 4 .5s2-1.5 1.5-2-1.5-.5-2.5-.5-3 .5-3 2z" fill="#E76F00")
+                  span.language-tab__label Java
+                button.language-tab(type="button" data-language="cpp" title="C++")
+                  svg.language-tab__icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+                    rect(width="16" height="16" rx="2" fill="#00599C")
+                    text(x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="9" font-weight="bold" fill="#fff") C++
+                  span.language-tab__label C++
+              #autosaveIndicator.autosave-indicator(data-state="saved")
+                svg.autosave-indicator__icon(width="14" height="14" viewBox="0 0 14 14" fill="none")
+                  circle.autosave-indicator__spinner(cx="7" cy="7" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="31.4" stroke-dashoffset="0")
+                  path.autosave-indicator__check(d="M4 7l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+                span.autosave-indicator__text All changes saved
+            .action-buttons
+              button#resetCodeBtn.btn.btn--icon(type="button" title="Reset to starter code" aria-label="Reset code")
+                svg(width="20" height="20" viewBox="0 0 20 20" fill="none")
+                  path(d="M4 10a6 6 0 1 1 12 0M4 10V4m0 6h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round")
+                  path(d="M16 10a6 6 0 0 1-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2")
+              button#runCodeBtn.btn.btn--secondary(type="button" title="Test your code against sample test cases")
+                svg.btn__icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+                  path(d="M3 2L13 8L3 14V2Z" fill="currentColor")
+                span Run Code
+                span.kbd-hint
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd ↵
+              button#submitCodeBtn.btn.btn--primary(type="button" title="Submit your solution for final evaluation")
+                svg.btn__icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+                  path(d="M13.5 3L6 10.5L2.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+                span Submit
+                span.kbd-hint
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd Shift
+                  |  + 
+                  kbd.kbd ↵
+              button#keyboardShortcutsBtn.btn.btn--icon(type="button" title="View keyboard shortcuts (?)" aria-label="View keyboard shortcuts")
+                svg(width="20" height="20" viewBox="0 0 20 20" fill="none")
+                  rect(x="2" y="5" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.5" fill="none")
+                  rect(x="5" y="7.5" width="2" height="2" rx="0.5" fill="currentColor")
+                  rect(x="9" y="7.5" width="2" height="2" rx="0.5" fill="currentColor")
+                  rect(x="13" y="7.5" width="2" height="2" rx="0.5" fill="currentColor")
+                  rect(x="5" y="11" width="2" height="2" rx="0.5" fill="currentColor")
+                  rect(x="9" y="11" width="5" height="2" rx="0.5" fill="currentColor")
           .editor-shell
             #editor
+          .info-banner
+            .info-banner__item
+              svg.info-banner__icon(width="14" height="14" viewBox="0 0 16 16" fill="none")
+                path(d="M3 2L13 8L3 14V2Z" fill="currentColor")
+              .info-banner__text
+                strong Run Code:
+                |  Tests against 
+                strong sample cases
+                |  (visible)
+            .info-banner__divider
+            .info-banner__item
+              svg.info-banner__icon(width="14" height="14" viewBox="0 0 16 16" fill="none")
+                path(d="M13.5 3L6 10.5L2.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+              .info-banner__text
+                strong Submit:
+                |  Tests against 
+                strong all cases
+                |  (including hidden)
           .card__header
             h3.card__title Console
-            .tabs
-              button.tab.is-active(type="button") Run
-              button.tab(type="button") Submit
-          pre.monospace
-            | Ready.
+            .console-actions
+              button#clearOutputBtn.console-btn(type="button" title="Clear console")
+                svg(width="16" height="16" viewBox="0 0 16 16" fill="none")
+                  path(d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round")
+          #outputPanel.output-panel
+            .output-status
+              .output-status__icon
+              span#outputState.output-status__text Ready
+              span#executionTime.output-status__time
+            #testResultsContainer.test-results-container
+            pre#outputContent.output-content Ready.
+          
+          #runtimeStats.runtime-stats.hidden
+            .runtime-stats__header
+              h4.runtime-stats__title Performance Metrics
+              button#closeRuntimeStats.console-btn(type="button" title="Hide metrics")
+                svg(width="14" height="14" viewBox="0 0 16 16" fill="none")
+                  path(d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round")
+            .runtime-stats__grid
+              .runtime-metric
+                .runtime-metric__header
+                  svg.runtime-metric__icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+                    path(d="M8 3.5V8L11 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round")
+                    circle(cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none")
+                  span.runtime-metric__label Runtime
+                .runtime-metric__value#runtimeValue --
+                .runtime-metric__bar
+                  .runtime-metric__bar-fill#runtimeBar(style="width: 0%")
+                .runtime-metric__comparison#runtimeComparison
+              
+              .runtime-metric
+                .runtime-metric__header
+                  svg.runtime-metric__icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+                    path(d="M3 2H13V14H3V2Z" stroke="currentColor" stroke-width="1.5" fill="none")
+                    path(d="M5 6H11M5 9H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round")
+                  span.runtime-metric__label Memory
+                .runtime-metric__value#memoryValue --
+                .runtime-metric__bar
+                  .runtime-metric__bar-fill#memoryBar(style="width: 0%")
+                .runtime-metric__comparison#memoryComparison
+          
+          .card__header.mt-4
+            h3.card__title Test Cases
+            button#testCasesToggle.toggle-btn(type="button" aria-label="Toggle test cases" aria-expanded="true")
+              svg.chevron(width="20" height="20" viewBox="0 0 20 20" fill="none")
+                path(d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+          #testCasesContent.test-cases
+            .test-case
+              .test-case__header
+                span.test-case__label Case 1
+                span.badge.badge--accepted Passed
+              .test-case__body
+                .test-case__row
+                  span.test-case__key Input:
+                  code.test-case__value nums = [2,7,11,15], target = 9
+                .test-case__row
+                  span.test-case__key Output:
+                  code.test-case__value [0,1]
+                .test-case__row
+                  span.test-case__key Expected:
+                  code.test-case__value [0,1]
+            
+            .test-case
+              .test-case__header
+                span.test-case__label Case 2
+                span.badge.badge--accepted Passed
+              .test-case__body
+                .test-case__row
+                  span.test-case__key Input:
+                  code.test-case__value nums = [3,2,4], target = 6
+                .test-case__row
+                  span.test-case__key Output:
+                  code.test-case__value [1,2]
+                .test-case__row
+                  span.test-case__key Expected:
+                  code.test-case__value [1,2]
+            
+            .test-case
+              .test-case__header
+                span.test-case__label Case 3
+                span.badge.badge--wrong Failed
+              .test-case__body
+                .test-case__row
+                  span.test-case__key Input:
+                  code.test-case__value nums = [3,3], target = 6
+                .test-case__row
+                  span.test-case__key Output:
+                  code.test-case__value [0,1]
+                .test-case__row
+                  span.test-case__key Expected:
+                  code.test-case__value [0,1]
+          
+          .card__header.mt-4
+            h3.card__title Verdict Reference
+          .verdict-grid
+            .verdict-item
+              span.badge.badge--ac AC
+              span.verdict-item__label Accepted
+            .verdict-item
+              span.badge.badge--wa WA
+              span.verdict-item__label Wrong Answer
+            .verdict-item
+              span.badge.badge--tle TLE
+              span.verdict-item__label Time Limit
+            .verdict-item
+              span.badge.badge--re RE
+              span.verdict-item__label Runtime Error
+            .verdict-item
+              span.badge.badge--ce CE
+              span.verdict-item__label Compile Error
+            .verdict-item
+              span.badge.badge--mle MLE
+              span.verdict-item__label Memory Limit
+
+    // Reset Code Confirmation Modal
+    #resetCodeModal.confirm-modal(aria-hidden="true")
+      .confirm-modal__overlay
+      .confirm-modal__content
+        .confirm-modal__icon.confirm-modal__icon--warning
+          svg(width="48" height="48" viewBox="0 0 24 24" fill="none")
+            circle(cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none")
+            path(d="M12 8v4m0 4h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round")
+        .confirm-modal__body
+          h2.confirm-modal__title Reset to Starter Code?
+          p.confirm-modal__message Your current code will be replaced with the starter template for 
+            strong#resetLanguageName JavaScript
+            | . This action cannot be undone.
+          .confirm-modal__info
+            svg.confirm-modal__info-icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+              circle(cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none")
+              path(d="M8 7v3m0-5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round")
+            span Make sure to save any code you want to keep before resetting.
+        .confirm-modal__actions
+          button#cancelResetBtn.btn.btn--secondary(type="button")
+            span Cancel
+          button#confirmResetBtn.btn.btn--danger(type="button")
+            svg.btn__icon(width="16" height="16" viewBox="0 0 16 16" fill="none")
+              path(d="M3 8a5 5 0 1 1 10 0M3 8V3m0 5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round")
+            span Reset Code
+
+    // Keyboard Shortcuts Modal
+    #keyboardShortcutsModal.shortcuts-modal(aria-hidden="true")
+      .shortcuts-modal__overlay
+      .shortcuts-modal__content
+        .shortcuts-modal__header
+          h2.shortcuts-modal__title Keyboard Shortcuts
+          button#closeShortcutsModal.shortcuts-modal__close(type="button" aria-label="Close")
+            svg(width="24" height="24" viewBox="0 0 24 24" fill="none")
+              path(d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round")
+        .shortcuts-modal__body
+          .shortcuts-section
+            h3.shortcuts-section__title Code Execution
+            .shortcuts-list
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd Enter
+                .shortcut-item__description Run code with sample test cases
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd Shift
+                  |  + 
+                  kbd.kbd Enter
+                .shortcut-item__description Submit solution for evaluation
+          
+          .shortcuts-section
+            h3.shortcuts-section__title Navigation & View
+            .shortcuts-list
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd Q
+                .shortcut-item__description Toggle problem statement
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd T
+                .shortcut-item__description Toggle test cases panel
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd ?
+                .shortcut-item__description Show keyboard shortcuts (this panel)
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Esc
+                .shortcut-item__description Close modal/panel
+          
+          .shortcuts-section
+            h3.shortcuts-section__title Editor
+            .shortcuts-list
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd /
+                .shortcut-item__description Toggle line comment
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd S
+                .shortcut-item__description Save code (auto-saves)
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd Z
+                .shortcut-item__description Undo
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd Shift
+                  |  + 
+                  kbd.kbd Z
+                .shortcut-item__description Redo
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd F
+                .shortcut-item__description Find
+              .shortcut-item
+                .shortcut-item__keys
+                  kbd.kbd Ctrl
+                  |  + 
+                  kbd.kbd H
+                .shortcut-item__description Find and replace
+        .shortcuts-modal__footer
+          p.shortcuts-modal__note
+            strong Note:
+            |  On macOS, use 
+            kbd.kbd Cmd
+            |  instead of 
+            kbd.kbd Ctrl
 
     script(type="module" src="/src/main.js")

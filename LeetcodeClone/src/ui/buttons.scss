@@ -94,3 +94,67 @@
   width: 40px;
   padding: 0;
 }
+
+// Enhanced Primary Button - Submit action
+.btn--primary,
+.btn-primary {
+  background: var(--primary-600);
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  font-weight: 600;
+}
+
+.btn--primary:hover:not(:disabled),
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-500);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn--primary:active:not(:disabled),
+.btn-primary:active:not(:disabled) {
+  background: var(--primary-700);
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+// Enhanced Secondary Button - Run Code action
+.btn--secondary,
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+  font-weight: 600;
+}
+
+.btn--secondary:hover:not(:disabled),
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-surface);
+  border-color: var(--primary-500);
+  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn--secondary:active:not(:disabled),
+.btn-secondary:active:not(:disabled) {
+  background: var(--bg-elevated);
+  transform: translateY(0);
+}
+
+// Button icon
+.btn__icon {
+  display: block;
+  flex-shrink: 0;
+  transition: transform var(--duration-fast) var(--ease);
+}
+
+.btn:hover:not(:disabled) .btn__icon {
+  transform: scale(1.1);
+}
+
+// Action buttons container
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}

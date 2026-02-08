@@ -1,50 +1,173 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 12px;
+  gap: 4px;
+  padding: 4px 12px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  transition: all var(--duration-fast) var(--ease);
+  border: 1px solid transparent;
 }
 
+// Difficulty badges
 .badge--easy {
   color: var(--status-accepted);
   background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.3);
 }
 
 .badge--medium {
   color: var(--status-tle);
   background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
 }
 
 .badge--hard {
   color: var(--status-wrong);
   background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
-.badge--accepted {
-  color: var(--status-accepted);
-  background: rgba(34, 197, 94, 0.15);
+// Verdict badges - Enhanced styling
+.badge--accepted,
+.badge--ac {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.4);
+  
+  &::before {
+    content: '✓';
+    font-weight: 900;
+  }
+  
+  &:hover {
+    background: rgba(16, 185, 129, 0.2);
+    transform: scale(1.05);
+  }
 }
 
-.badge--wrong {
-  color: var(--status-wrong);
-  background: rgba(239, 68, 68, 0.15);
+.badge--wrong,
+.badge--wa {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+  
+  &::before {
+    content: '✗';
+    font-weight: 900;
+  }
+  
+  &:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: scale(1.05);
+  }
 }
 
 .badge--tle {
-  color: var(--status-tle);
-  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.4);
+  
+  &::before {
+    content: '⏱';
+    font-size: 13px;
+  }
+  
+  &:hover {
+    background: rgba(245, 158, 11, 0.2);
+    transform: scale(1.05);
+  }
 }
 
-.badge--runtime {
-  color: var(--status-runtime);
-  background: rgba(249, 115, 22, 0.15);
+.badge--runtime,
+.badge--re {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.12);
+  border-color: rgba(249, 115, 22, 0.4);
+  
+  &::before {
+    content: '⚠';
+    font-weight: 900;
+  }
+  
+  &:hover {
+    background: rgba(249, 115, 22, 0.2);
+    transform: scale(1.05);
+  }
 }
 
-.badge--compile {
-  color: var(--status-compile);
-  background: rgba(225, 29, 72, 0.15);
+.badge--compile,
+.badge--ce {
+  color: #e11d48;
+  background: rgba(225, 29, 72, 0.12);
+  border-color: rgba(225, 29, 72, 0.4);
+  
+  &::before {
+    content: '⚡';
+    font-size: 13px;
+  }
+  
+  &:hover {
+    background: rgba(225, 29, 72, 0.2);
+    transform: scale(1.05);
+  }
+}
+
+.badge--mle {
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.4);
+  
+  &::before {
+    content: '📊';
+    font-size: 12px;
+  }
+  
+  &:hover {
+    background: rgba(139, 92, 246, 0.2);
+    transform: scale(1.05);
+  }
+}
+
+// Badge sizes
+.badge--sm {
+  padding: 2px 8px;
+  font-size: 10px;
+}
+
+.badge--lg {
+  padding: 6px 16px;
+  font-size: 13px;
+}
+
+// Animated badge for loading states
+.badge--loading {
+  animation: badge-pulse 1.5s ease-in-out infinite;
+  
+  &::before {
+    content: '⟳';
+    display: inline-block;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
