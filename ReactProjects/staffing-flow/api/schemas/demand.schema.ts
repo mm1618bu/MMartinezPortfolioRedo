@@ -17,6 +17,7 @@ export const demandRecordSchema = z.object({
   required_skills: z.array(z.string()).optional(),
   priority: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
   notes: z.string().max(500, 'Notes too long').optional(),
+  organization_id: z.string().uuid('Invalid organization ID'),
 }).refine(
   (data) => data.department_id || data.department_name,
   {

@@ -41,10 +41,20 @@ export function LaborActionsCard({ employee, compact = false }: LaborActionsCard
     }
   }
 
-  async function handleRespond(actionId: string, responseType: 'accept' | 'decline') {
+  async function handleRespond(
+    actionId: string,
+    responseType: 'accept' | 'decline',
+    actionType: 'VET' | 'VTO'
+  ) {
     try {
       setRespondingTo(actionId);
-      await respondToLaborAction(actionId, employee.employee_id, responseType, employee.organization_id);
+      await respondToLaborAction(
+        actionId,
+        employee.employee_id,
+        responseType,
+        employee.organization_id,
+        actionType
+      );
       await loadData(); // Refresh data
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to respond');
@@ -158,10 +168,12 @@ export function LaborActionsCard({ employee, compact = false }: LaborActionsCard
 
                   <div className="action-actions">
                     {myResponse ? (
-                      <div className={`response-status ${myResponse.response_type}`}>
-                        <span className="response-icon">{myResponse.response_type === 'accept' ? '✅' : '❌'}</span>
+                      <div className={`response-status ${myResponse.response_status}`}>
+                        <span className="response-icon">
+                          {myResponse.response_status === 'accepted' ? '✅' : '❌'}
+                        </span>
                         <span>
-                          You {myResponse.response_type === 'accept' ? 'accepted' : 'declined'} this offer
+                          You {myResponse.response_status === 'accepted' ? 'accepted' : 'declined'} this offer
                         </span>
                         {myResponse.status === 'pending' && <span className="badge badge-warning">Pending Approval</span>}
                         {myResponse.status === 'approved' && <span className="badge badge-success">Approved</span>}
@@ -171,14 +183,14 @@ export function LaborActionsCard({ employee, compact = false }: LaborActionsCard
                       <div className="response-buttons">
                         <button
                           className="btn btn-success"
-                          onClick={() => handleRespond(action.action_id, 'accept')}
+                          onClick={() => handleRespond(action.action_id, 'accept', action.action_type)}
                           disabled={isResponding || action.positions_remaining === 0}
                         >
                           {isResponding ? 'Accepting...' : action.action_type === 'VET' ? 'Accept VET' : 'Accept VTO'}
                         </button>
                         <button
                           className="btn btn-secondary"
-                          onClick={() => handleRespond(action.action_id, 'decline')}
+                          onClick={() => handleRespond(action.action_id, 'decline', action.action_type)}
                           disabled={isResponding}
                         >
                           {isResponding ? 'Declining...' : 'Decline'}

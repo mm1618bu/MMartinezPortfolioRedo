@@ -9,7 +9,6 @@ import { DemandEditor } from './components/demands/DemandEditor.tsx';
 import { DemandCharts } from './components/visualizations/DemandCharts.tsx';
 import { DatabaseHealthCheck } from './components/admin/DatabaseHealthCheck';
 import { EmployeePortal } from './components/employee-portal';
-import { LaborActionsManagement } from './components/labor-actions-management/LaborActionsManagement';
 import { DemandGenerationEngine } from './components/simulation/DemandGenerationEngine';
 import './components/departments/DepartmentManagement.css';
 import './components/employees/EmployeeManagement.css';
@@ -57,14 +56,10 @@ function App() {
           <button className={currentPage === 'health-check' ? 'active' : ''} onClick={() => setCurrentPage('health-check')}>
             Database Health
           </button>
-          {/* Temporarily disabled - API routes need to be implemented
           <button className={currentPage === 'employee-portal' ? 'active' : ''} onClick={() => setCurrentPage('employee-portal')}>
             🧑‍💼 Employee Portal
           </button>
-          <button className={currentPage === 'labor-management' ? 'active' : ''} onClick={() => setCurrentPage('labor-management')}>
-            👔 Labor Management
-          </button>
-          */}
+          {/* Labor Management still disabled until management endpoints are aligned */}
           <button className={currentPage === 'simulation' ? 'active' : ''} onClick={() => setCurrentPage('simulation')}>
             🎲 Simulation
           </button>
@@ -151,10 +146,8 @@ function App() {
         {currentPage === 'demands' && <DemandEditor />}
         {currentPage === 'demand-charts' && <DemandCharts />}
         {currentPage === 'health-check' && <DatabaseHealthCheck />}
-        {/* Temporarily disabled - API routes need to be implemented
         {currentPage === 'employee-portal' && <EmployeePortal />}
-        {currentPage === 'labor-management' && <LaborActionsManagement />}
-        */}
+        {/* {currentPage === 'labor-management' && <LaborActionsManagement />} */}
         {currentPage === 'simulation' && <DemandGenerationEngine />}
       </main>
     </div>

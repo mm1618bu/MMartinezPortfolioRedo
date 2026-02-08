@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { demandService, Demand, DemandGridQuery, DemandGridResponse, DemandSummary } from '../../services/demandService';
+import { departmentService } from '../../services/departmentService';
 import DemandGrid from './DemandGrid.tsx';
 import DemandFilters from './DemandFilters.tsx';
 import DemandForm from './DemandForm.tsx';
@@ -55,6 +56,7 @@ export const DemandEditor: React.FC = () => {
   const [editingDemand, setEditingDemand] = useState<Demand | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [showCSVExportModal, setShowCSVExportModal] = useState(false);
+  const [departmentOptions, setDepartmentOptions] = useState<Array<{ id: string; name: string }>>([]);
 
   // Fetch grid data
   const fetchGridData = useCallback(async () => {
@@ -111,6 +113,33 @@ export const DemandEditor: React.FC = () => {
     fetchGridData();
     fetchSummary();
   }, [fetchGridData, fetchSummary]);
+
+  // Load departments for the create/edit form dropdown
+  useEffect(() => {
+    const loadDepartments = async () => {
+      try {
+        const data = await departmentService.getAll({
+          organizationId: APP_CONFIG.DEFAULT_ORGANIZATION_ID,
+        });
+        setDepartmentOptions(data.map((dept) => ({ id: dept.id, name: dept.name })));
+      } catch (error) {
+        console.error('Failed to load departments:', error);
+      }
+    };
+
+    loadDepartments();
+  }, []);
+
+  const mergedDepartments = useMemo(() => {
+    const merged = new Map<string, { id: string; name: string }>();
+    gridState.filters.available.departments.forEach((dept) => {
+      merged.set(dept.id, dept);
+    });
+    departmentOptions.forEach((dept) => {
+      merged.set(dept.id, dept);
+    });
+    return Array.from(merged.values());
+  }, [gridState.filters.available.departments, departmentOptions]);
 
   const handleSort = (field: string) => {
     const newOrder =
@@ -337,7 +366,7 @@ export const DemandEditor: React.FC = () => {
             setEditingDemand(null);
           }}
           onSubmit={handleFormSubmit}
-          departments={gridState.filters.available.departments}
+          departments={mergedDepartments}
         />
       )}
 

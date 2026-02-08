@@ -192,7 +192,20 @@ class DemandService {
       body: JSON.stringify(input),
     });
 
-    if (!response.ok) throw new Error(`Failed to create demand: ${response.statusText}`);
+    if (!response.ok) {
+      let errorDetails: unknown = null;
+      try {
+        errorDetails = await response.json();
+      } catch {
+        errorDetails = await response.text();
+      }
+      console.error('Create demand failed', {
+        status: response.status,
+        statusText: response.statusText,
+        errorDetails,
+      });
+      throw new Error(`Failed to create demand: ${response.statusText}`);
+    }
     return response.json();
   }
 

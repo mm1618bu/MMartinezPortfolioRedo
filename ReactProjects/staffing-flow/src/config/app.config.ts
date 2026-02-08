@@ -6,7 +6,7 @@
 export const APP_CONFIG = {
   // Default Organization ID (from sample data)
   // Change this if you're using a different organization
-  DEFAULT_ORGANIZATION_ID: 'a0000000-0000-4000-8000-000000000001',
+  DEFAULT_ORGANIZATION_ID: '688590f3-2276-4b8c-aafd-6483bfb7f8d5',
   
   // Default Organization Name
   DEFAULT_ORGANIZATION_NAME: 'Demo Corporation',

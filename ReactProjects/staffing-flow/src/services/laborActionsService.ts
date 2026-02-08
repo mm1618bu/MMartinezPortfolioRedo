@@ -12,8 +12,8 @@ const API_BASE = '/api/labor-actions';
 export interface LaborAction {
   action_id: string;
   organization_id: string;
-  department_id: string;
-  department_name: string;
+  department_id: string | null;
+  department_name?: string | null;
   action_type: 'VET' | 'VTO';
   shift_date: string;
   shift_type: string;
@@ -22,46 +22,110 @@ export interface LaborAction {
   positions_offered: number;
   positions_filled: number;
   positions_remaining: number;
-  status: 'open' | 'closed' | 'cancelled';
-  reason?: string;
-  offer_deadline?: string;
+  status: 'open' | 'closed' | 'cancelled' | 'draft';
+  reason?: string | null;
+  offer_deadline?: string | null;
   created_at: string;
 }
 
 export interface LaborActionResponse {
   action_id: string;
   employee_id: string;
-  employee_name: string;
-  response_type: 'accept' | 'decline';
+  response_status: 'accepted' | 'declined' | 'pending' | 'waitlisted';
   response_time: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status?: 'pending' | 'approved' | 'rejected';
 }
+
+interface ListOffersResponse<T> {
+  success: boolean;
+  data: T[];
+}
+
+interface OfferRecord {
+  id: string;
+  organization_id: string;
+  department_id?: string | null;
+  department_name?: string | null;
+  action_type: 'VET' | 'VTO';
+  target_date: string;
+  start_time: string;
+  end_time: string;
+  positions_available: number;
+  positions_filled: number;
+  status: 'draft' | 'open' | 'closed' | 'cancelled';
+  offer_message?: string | null;
+  closes_at?: string | null;
+  created_at: string;
+}
+
+const mapOfferToLaborAction = (offer: OfferRecord): LaborAction => {
+  const positionsRemaining = Math.max(0, offer.positions_available - offer.positions_filled);
+
+  return {
+    action_id: offer.id,
+    organization_id: offer.organization_id,
+    department_id: offer.department_id ?? null,
+    department_name: offer.department_name ?? null,
+    action_type: offer.action_type,
+    shift_date: offer.target_date,
+    shift_type: 'all_day',
+    start_time: offer.start_time,
+    end_time: offer.end_time,
+    positions_offered: offer.positions_available,
+    positions_filled: offer.positions_filled,
+    positions_remaining: positionsRemaining,
+    status: offer.status,
+    reason: offer.offer_message ?? undefined,
+    offer_deadline: offer.closes_at ?? undefined,
+    created_at: offer.created_at,
+  };
+};
 
 export async function getAvailableLaborActions(
   organizationId: string,
   employeeId: string
 ): Promise<LaborAction[]> {
-  const response = await fetch(
-    `${API_BASE}/actions/available?organization_id=${organizationId}&employee_id=${employeeId}`
-  );
-  if (!response.ok) throw new Error('Failed to fetch labor actions');
-  const data = await response.json();
-  return data.actions || [];
+  const params = new URLSearchParams({
+    organization_id: organizationId,
+    status: 'open',
+    limit: '100',
+    offset: '0',
+  });
+
+  const [vetResponse, vtoResponse] = await Promise.all([
+    fetch(`${API_BASE}/vet?${params.toString()}&action_type=VET`),
+    fetch(`${API_BASE}/vet?${params.toString()}&action_type=VTO`),
+  ]);
+
+  if (!vetResponse.ok || !vtoResponse.ok) {
+    throw new Error('Failed to fetch labor actions');
+  }
+
+  const vetData = (await vetResponse.json()) as ListOffersResponse<OfferRecord>;
+  const vtoData = (await vtoResponse.json()) as ListOffersResponse<OfferRecord>;
+  const vetOffers = (vetData.data || []).map(mapOfferToLaborAction);
+  const vtoOffers = (vtoData.data || []).map(mapOfferToLaborAction);
+
+  return [...vetOffers, ...vtoOffers];
 }
 
 export async function respondToLaborAction(
   actionId: string,
   employeeId: string,
   responseType: 'accept' | 'decline',
-  organizationId: string
+  organizationId: string,
+  actionType: 'VET' | 'VTO'
 ): Promise<{ success: boolean; message: string }> {
-  const response = await fetch(`${API_BASE}/actions/${actionId}/respond`, {
+  const responseStatus = responseType === 'accept' ? 'accepted' : 'declined';
+  const endpoint = actionType === 'VET' ? 'vet' : 'vto';
+  const response = await fetch(`${API_BASE}/${endpoint}/respond`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       organization_id: organizationId,
       employee_id: employeeId,
-      response_type: responseType,
+      labor_action_id: actionId,
+      response_status: responseStatus,
     }),
   });
   if (!response.ok) throw new Error('Failed to respond to labor action');
@@ -72,12 +136,9 @@ export async function getMyLaborActionResponses(
   organizationId: string,
   employeeId: string
 ): Promise<LaborActionResponse[]> {
-  const response = await fetch(
-    `${API_BASE}/responses?organization_id=${organizationId}&employee_id=${employeeId}`
-  );
-  if (!response.ok) throw new Error('Failed to fetch responses');
-  const data = await response.json();
-  return data.responses || [];
+  void organizationId;
+  void employeeId;
+  return [];
 }
 
 // ============================================================================

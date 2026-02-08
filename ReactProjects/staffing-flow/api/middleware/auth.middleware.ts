@@ -42,7 +42,7 @@ export const authenticate = async (
         email: 'dev@localhost',
         name: 'Dev User',
         role: 'admin',
-        organization_id: 'a0000000-0000-4000-8000-000000000001',
+        organization_id: '688590f3-2276-4b8c-aafd-6483bfb7f8d5',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

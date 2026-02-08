@@ -98,6 +98,10 @@ const DemandForm: React.FC<DemandFormProps> = ({ demand, departments, onClose, o
         throw new Error('Date and organization are required');
       }
 
+      if (!formData.department_id) {
+        throw new Error('Department is required');
+      }
+
       if (formData.shift_type !== 'all_day') {
         if (!formData.start_time || !formData.end_time) {
           throw new Error('Start and end times are required for specific shifts');
@@ -235,12 +239,13 @@ const DemandForm: React.FC<DemandFormProps> = ({ demand, departments, onClose, o
 
           {/* Department */}
           <div className="form-group">
-            <label htmlFor="department_id">Department</label>
+            <label htmlFor="department_id">Department *</label>
             <select
               id="department_id"
               name="department_id"
               value={formData.department_id}
               onChange={handleInputChange}
+              required
             >
               <option value="">Select Department</option>
               {departments.map(dept => (
