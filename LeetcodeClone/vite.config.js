@@ -6,10 +6,12 @@ const locals = {
   title: 'LeetcodeClone'
 };
 
+const monacoPlugin = monacoEditorPlugin.default ?? monacoEditorPlugin;
+
 export default defineConfig({
   plugins: [
     pugPlugin(locals),
-    monacoEditorPlugin({
+    monacoPlugin({
       languages: ['javascript']
     })
   ]

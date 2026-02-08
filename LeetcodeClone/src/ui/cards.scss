@@ -1,0 +1,33 @@
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-16);
+}
+
+.card--elevated {
+  background: var(--bg-elevated);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.35);
+}
+
+.card--compact {
+  padding: var(--space-12);
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-bottom: var(--space-12);
+}
+
+.card__title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.card__body {
+  color: var(--text-secondary);
+}

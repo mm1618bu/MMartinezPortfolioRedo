@@ -1,0 +1,13 @@
+:where(
+  button,
+  [role="button"],
+  a,
+  input,
+  textarea,
+  select,
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary-500);
+  border-radius: var(--radius-md);
+}
