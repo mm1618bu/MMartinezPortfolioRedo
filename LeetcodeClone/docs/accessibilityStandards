@@ -1,0 +1,196 @@
+
+________________________________________
+♿ CodeForge Accessibility Standards
+Target: WCAG 2.1 Level AA
+________________________________________
+1️⃣ Color & Contrast
+🎯 Requirement
+
+All text and UI elements must meet WCAG AA contrast ratios.
+
+Minimum Ratios
+•	Normal text: 4.5:1
+•	Large text (18px+ or bold 14px+): 3:1
+•	UI components and focus indicators: 3:1
+________________________________________
+
+Implementation Rules
+
+•	Never rely on color alone to convey meaning.
+•	Verdict badges must include text (e.g., “AC”, not just green).
+•	Use high-contrast foreground/background pairings.
+•	Dark mode must also meet contrast standards.
+
+________________________________________
+
+Testing Standard
+
+•	Use contrast checker on all primary color combinations.
+•	Validate primary button, badge, and error states.
+•	Test in both light and dark themes.
+________________________________________
+2️⃣ Keyboard Accessibility
+🎯 Requirement
+All functionality must be accessible using keyboard only.
+Must Support:
+•	Tab navigation across all interactive elements
+•	Shift+Tab reverse navigation
+•	Enter/Space activation of buttons
+•	Escape closes modals
+•	Focus trapping inside modals
+________________________________________
+Editor-Specific Requirements
+•	Editor must not trap focus unintentionally.
+•	Keyboard shortcuts must not block accessibility.
+•	Focus returns to logical location after modal closes.
+________________________________________
+Testing Standard
+•	Complete full solve flow using only keyboard.
+•	Verify visible focus state on every interactive element.
+________________________________________
+3️⃣ Focus Visibility
+🎯 Requirement
+Every interactive element must have a visible focus indicator.
+Rules
+•	Do not remove browser focus outlines without replacement.
+•	Focus ring must have at least 3:1 contrast.
+•	Focus ring should not rely solely on subtle color changes.
+________________________________________
+Common Mistake to Avoid
+❌ outline: none without replacement
+❌ Invisible focus on dark backgrounds
+________________________________________
+4️⃣ Screen Reader Support
+🎯 Requirement
+All important content must be perceivable by screen readers.
+Required Elements
+•	All buttons have descriptive labels
+•	All icons include aria-label if standalone
+•	Form inputs have associated <label>
+•	Error messages are announced
+•	Verdict changes are announced
+________________________________________
+Specific to Code Execution
+When verdict changes:
+•	Use aria-live="polite" to announce result
+•	Do not rely on visual-only feedback
+Example:
+•	“Submission Accepted”
+•	“Wrong Answer on test case 3”
+________________________________________
+5️⃣ Semantic HTML
+🎯 Requirement
+Use proper semantic structure.
+Rules
+•	Use <main>, <nav>, <header>, <footer>
+•	Use <button> instead of clickable <div>
+•	Use <ul> for lists
+•	Use proper heading hierarchy (H1 → H2 → H3)
+________________________________________
+Problem Statement Structure
+•	Problem title: H1
+•	Sections: H2 (Examples, Constraints)
+•	Example inputs in <pre> blocks
+________________________________________
+6️⃣ Forms & Validation
+🎯 Requirement
+Errors must be clear and programmatically associated.
+Rules
+•	Show inline error messages
+•	Associate errors with aria-describedby
+•	Do not rely only on red color for errors
+•	Provide descriptive error text
+Bad:
+“Invalid input”
+Good:
+“Password must be at least 8 characters.”
+________________________________________
+7️⃣ Motion & Animation
+🎯 Requirement
+Respect users who prefer reduced motion.
+Implementation
+•	Detect prefers-reduced-motion
+•	Disable non-essential animations
+•	Avoid flashing effects
+•	Keep animations under 250ms
+________________________________________
+8️⃣ Touch Target Size
+🎯 Requirement
+Interactive elements must be easy to click.
+Minimum Size
+•	40px × 40px for touch targets
+•	Adequate spacing between controls
+Especially important for:
+•	Run
+•	Submit
+•	Filters
+•	Dropdowns
+________________________________________
+9️⃣ Error & System States
+🎯 Requirement
+System states must be clearly communicated.
+Must Include:
+•	Loading indicators
+•	Clear “Submission in progress” state
+•	Clear timeout messages
+•	Clear rate limit warnings
+Avoid:
+❌ Silent failures
+❌ Generic “Something went wrong”
+________________________________________
+🔟 Editor Accessibility Considerations
+Code editors are complex.
+Requirements
+•	Ensure editor supports screen readers (Monaco accessibility mode)
+•	Provide plain text fallback if needed
+•	Maintain visible cursor contrast
+•	Allow font size adjustment
+•	Avoid low-contrast syntax themes
+________________________________________
+1️⃣1️⃣ Dark Mode Compliance
+Dark mode must:
+•	Meet contrast requirements
+•	Not reduce readability
+•	Not rely on subtle shade differences
+Test:
+•	Error red against dark background
+•	Green success text
+•	Secondary text legibility
+________________________________________
+1️⃣2️⃣ Accessibility Testing Checklist
+Before release, verify:
+☐ Full keyboard navigation works
+☐ Focus indicators visible everywhere
+☐ All buttons labeled
+☐ Screen reader announces verdict
+☐ Contrast meets 4.5:1
+☐ Forms accessible
+☐ Editor usable with keyboard
+☐ No auto-playing motion
+☐ Mobile touch targets ≥ 40px
+________________________________________
+📊 Accessibility KPI Targets
+•	0 critical WCAG violations
+•	0 contrast failures
+•	100% interactive elements keyboard accessible
+•	100% forms labeled
+________________________________________
+🧠 Why This Matters
+Accessibility:
+•	Improves usability for everyone
+•	Makes your platform professional-grade
+•	Increases retention
+•	Reduces friction for all personas
+•	Demonstrates engineering maturity
+________________________________________
+🎯 Final Accessibility Principle
+Accessibility is not a feature.
+It is a baseline quality standard.
+If something is not accessible, it is not complete.
+________________________________________
+If you want next, I can:
+•	Create a developer accessibility checklist for PR reviews
+•	Generate a Tailwind accessibility config guide
+•	Or define accessibility test cases for QA
+You’re building this like a real SaaS product now.
+
