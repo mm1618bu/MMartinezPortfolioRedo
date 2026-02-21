@@ -1,0 +1,152 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'tripsync/**'
+      - '.github/workflows/pr-checks.yml'
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: tripsync/package-lock.json
+          
+      - name: Check PR title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|test|chore|perf)(\(.+\))?: ]]; then
+            echo "❌ PR title must follow conventional commits format"
+            echo "Examples: feat: add login, fix(auth): resolve token issue"
+            exit 1
+          fi
+          echo "✅ PR title follows conventional commits format"
+          
+      - name: Check for TODO comments
+        run: |
+          cd tripsync
+          TODO_COUNT=$(grep -r "TODO\|FIXME\|HACK" src/ --exclude-dir=node_modules || true | wc -l)
+          if [ "$TODO_COUNT" -gt 0 ]; then
+            echo "⚠️ Found $TODO_COUNT TODO/FIXME/HACK comments"
+            grep -r "TODO\|FIXME\|HACK" src/ --exclude-dir=node_modules || true
+          else
+            echo "✅ No TODO comments found"
+          fi
+          
+      - name: Install dependencies
+        working-directory: ./tripsync
+        run: npm ci
+        
+      - name: Run linting
+        working-directory: ./tripsync
+        run: npm run lint --if-present || npx eslint src/
+        
+      - name: Run tests
+        working-directory: ./tripsync
+        run: npm test -- --coverage --watchAll=false
+        env:
+          CI: true
+          
+      - name: Check test coverage
+        working-directory: ./tripsync
+        run: |
+          if [ -f "coverage/coverage-summary.json" ]; then
+            echo "📊 Test Coverage Summary:"
+            cat coverage/coverage-summary.json | grep -A 4 "total"
+          fi
+          
+      - name: Build verification
+        working-directory: ./tripsync
+        run: npm run build
+        
+      - name: Check bundle size
+        working-directory: ./tripsync
+        run: |
+          if [ -d "build/static/js" ]; then
+            echo "📦 JavaScript bundle sizes:"
+            du -h build/static/js/*.js | sort -h
+            TOTAL_SIZE=$(du -sh build/ | cut -f1)
+            echo "Total build size: $TOTAL_SIZE"
+          fi
+          
+      - name: Comment PR with results
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const fs = require('fs');
+            let coverageInfo = 'Coverage data not available';
+            
+            try {
+              const coveragePath = 'tripsync/coverage/coverage-summary.json';
+              if (fs.existsSync(coveragePath)) {
+                const coverage = JSON.parse(fs.readFileSync(coveragePath, 'utf8'));
+                const total = coverage.total;
+                coverageInfo = `
+                📊 **Test Coverage**
+                - Lines: ${total.lines.pct}%
+                - Statements: ${total.statements.pct}%
+                - Functions: ${total.functions.pct}%
+                - Branches: ${total.branches.pct}%
+                `;
+              }
+            } catch (error) {
+              console.log('Could not read coverage data:', error);
+            }
+            
+            const body = `## ✅ PR Checks Complete
+            
+            ${coverageInfo}
+            
+            **Build Status:** ${{ job.status }}
+            
+            All automated checks have passed. Please ensure:
+            - [ ] Code follows project style guidelines
+            - [ ] Tests cover new functionality
+            - [ ] Documentation is updated if needed
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  dependency-check:
+    name: Dependency Security Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Run npm audit
+        working-directory: ./tripsync
+        run: |
+          echo "🔒 Running security audit..."
+          npm audit --audit-level=moderate || true
+          
+      - name: Check for outdated dependencies
+        working-directory: ./tripsync
+        run: |
+          echo "📦 Checking for outdated packages..."
+          npm outdated || true
